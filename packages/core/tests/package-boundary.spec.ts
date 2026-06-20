@@ -18,9 +18,12 @@ describe('@nest-langchain/core package boundary', () => {
       ...packageJson.peerDependencies,
     };
 
+    expect(runtimeDependencies).not.toHaveProperty('@langchain/anthropic');
+    expect(runtimeDependencies).not.toHaveProperty('@langchain/aws');
+    expect(runtimeDependencies).not.toHaveProperty('@langchain/core');
+    expect(runtimeDependencies).not.toHaveProperty('@langchain/google-genai');
     expect(runtimeDependencies).not.toHaveProperty('@langchain/langgraph');
     expect(runtimeDependencies).not.toHaveProperty('@langchain/openai');
     expect(runtimeDependencies).not.toHaveProperty('langsmith');
   });
 });
-

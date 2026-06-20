@@ -13,6 +13,9 @@ NestJS에서 LangChain 생태계 기능을 선택 설치 방식으로 쓰기 위
 - `@nest-langchain/prompts`: `PromptsModule`, named prompt registry, LangChain prompt template format
 - `@nest-langchain/visualization`: `/ai/graphs` 같은 서버 path에 graph docs UI와 JSON/Mermaid/DOT/layout API 호스팅
 - `@nest-langchain/openai`: OpenAI provider token/factory
+- `@nest-langchain/anthropic`: Anthropic provider token/factory
+- `@nest-langchain/gemini`: Gemini provider token/factory
+- `@nest-langchain/bedrock`: AWS Bedrock provider token/factory
 
 ## Install Shapes
 
@@ -35,8 +38,11 @@ pnpm add @nest-langchain/prompts @langchain/core
 # hosted graph docs
 pnpm add @nest-langchain/core @nest-langchain/visualization
 
-# OpenAI provider
-pnpm add @nest-langchain/core @nest-langchain/openai @langchain/openai
+# provider packages
+pnpm add @nest-langchain/openai @langchain/openai
+pnpm add @nest-langchain/anthropic @langchain/anthropic
+pnpm add @nest-langchain/gemini @langchain/google-genai
+pnpm add @nest-langchain/bedrock @langchain/aws
 ```
 
 ## Demos

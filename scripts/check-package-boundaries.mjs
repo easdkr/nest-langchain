@@ -13,6 +13,11 @@ const packages = {
     await readFile(join('packages', 'visualization', 'package.json'), 'utf8'),
   ),
   openai: JSON.parse(await readFile(join('packages', 'openai', 'package.json'), 'utf8')),
+  anthropic: JSON.parse(
+    await readFile(join('packages', 'anthropic', 'package.json'), 'utf8'),
+  ),
+  gemini: JSON.parse(await readFile(join('packages', 'gemini', 'package.json'), 'utf8')),
+  bedrock: JSON.parse(await readFile(join('packages', 'bedrock', 'package.json'), 'utf8')),
   tools: JSON.parse(await readFile(join('packages', 'tools', 'package.json'), 'utf8')),
   prompts: JSON.parse(
     await readFile(join('packages', 'prompts', 'package.json'), 'utf8'),
@@ -26,6 +31,9 @@ const runtimeDeps = (packageJson) => ({
 
 const forbiddenCoreDeps = [
   '@langchain/core',
+  '@langchain/anthropic',
+  '@langchain/aws',
+  '@langchain/google-genai',
   '@langchain/langgraph',
   '@langchain/openai',
   'langsmith',
@@ -33,6 +41,9 @@ const forbiddenCoreDeps = [
   '@nest-langchain/langsmith',
   '@nest-langchain/visualization',
   '@nest-langchain/openai',
+  '@nest-langchain/anthropic',
+  '@nest-langchain/gemini',
+  '@nest-langchain/bedrock',
   '@nest-langchain/tools',
   '@nest-langchain/prompts',
 ];
@@ -63,6 +74,26 @@ assert(
 assert(
   Object.hasOwn(runtimeDeps(packages.openai), '@langchain/openai'),
   '@nest-langchain/openai must own @langchain/openai',
+);
+assertProviderBoundary(
+  packages.openai,
+  '@nest-langchain/openai',
+  '@langchain/openai',
+);
+assertProviderBoundary(
+  packages.anthropic,
+  '@nest-langchain/anthropic',
+  '@langchain/anthropic',
+);
+assertProviderBoundary(
+  packages.gemini,
+  '@nest-langchain/gemini',
+  '@langchain/google-genai',
+);
+assertProviderBoundary(
+  packages.bedrock,
+  '@nest-langchain/bedrock',
+  '@langchain/aws',
 );
 assert(
   Object.hasOwn(runtimeDeps(packages.tools), '@langchain/core'),
@@ -99,4 +130,25 @@ function assert(condition, message) {
   if (!condition) {
     throw new Error(message);
   }
+}
+
+function assertProviderBoundary(packageJson, packageName, providerDependency) {
+  const dependencies = runtimeDeps(packageJson);
+
+  assert(
+    Object.hasOwn(dependencies, providerDependency),
+    `${packageName} must own ${providerDependency}`,
+  );
+  assert(
+    !Object.hasOwn(dependencies, '@nest-langchain/core'),
+    `${packageName} must not require @nest-langchain/core`,
+  );
+  assert(
+    !Object.hasOwn(dependencies, '@langchain/langgraph'),
+    `${packageName} must not depend on @langchain/langgraph`,
+  );
+  assert(
+    !Object.hasOwn(dependencies, 'langsmith'),
+    `${packageName} must not depend on langsmith`,
+  );
 }

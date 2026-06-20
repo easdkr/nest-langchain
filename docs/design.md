@@ -17,6 +17,9 @@ The core package stays thin. Optional packages own optional runtime dependencies
 | `@nest-langchain/prompts` | `PromptsModule`, named prompt registry, prompt template formatting | graph compilation, tracing, provider SDKs |
 | `@nest-langchain/visualization` | hosted docs UI, JSON/Mermaid/DOT export, layout APIs/storage | graph execution, source rewrite |
 | `@nest-langchain/openai` | OpenAI provider DI token/factory | graph DSL, registry ownership |
+| `@nest-langchain/anthropic` | Anthropic provider DI token/factory | graph DSL, registry ownership |
+| `@nest-langchain/gemini` | Gemini provider DI token/factory | graph DSL, registry ownership |
+| `@nest-langchain/bedrock` | AWS Bedrock provider DI token/factory | graph DSL, registry ownership |
 
 ## Runtime Flow
 
@@ -95,8 +98,9 @@ pnpm build
 
 Boundary checks:
 
-- core has no `@langchain/langgraph`, `langsmith`, `@langchain/openai`, or visualization runtime dependency
+- core has no `@langchain/langgraph`, `langsmith`, provider SDK, or visualization runtime dependency
 - only `@nest-langchain/langgraph` owns `@langchain/langgraph`
 - only `@nest-langchain/langsmith` owns `langsmith`
-- only tool/prompt/provider packages own `@langchain/core` or provider SDKs
+- only tool/prompt packages own `@langchain/core`
+- only provider packages own their provider SDKs
 - visualization keeps image rendering optional

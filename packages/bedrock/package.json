@@ -1,7 +1,7 @@
 {
-  "name": "@nest-langchain/openai",
+  "name": "@nest-langchain/bedrock",
   "version": "0.1.0",
-  "description": "OpenAI provider tokens and model factory wiring for Nest LangChain.",
+  "description": "AWS Bedrock provider tokens and model factory wiring for Nest LangChain.",
   "license": "MIT",
   "author": "easdkr",
   "main": "dist/index.js",
@@ -22,15 +22,15 @@
   },
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
-    "test": "vitest run --passWithNoTests",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "peerDependencies": {
-    "@langchain/openai": "^1.5.1",
+    "@langchain/aws": "^1.4.1",
     "@nestjs/common": "^10 || ^11"
   },
   "devDependencies": {
-    "@langchain/openai": "^1.5.1",
+    "@langchain/aws": "^1.4.1",
     "@nestjs/common": "^11.1.27"
   }
 }

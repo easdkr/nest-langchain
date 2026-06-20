@@ -15,6 +15,9 @@ Forbidden in core:
 - `@langchain/langgraph`
 - `langsmith`
 - `@langchain/openai`
+- `@langchain/anthropic`
+- `@langchain/google-genai`
+- `@langchain/aws`
 - provider SDKs
 - `@langchain/core`
 - visualization/rendering dependencies
@@ -30,5 +33,10 @@ Current optional dependency ownership:
 | `@nest-langchain/tools` | `@langchain/core`, `zod` |
 | `@nest-langchain/prompts` | `@langchain/core` |
 | `@nest-langchain/openai` | `@langchain/openai` |
+| `@nest-langchain/anthropic` | `@langchain/anthropic` |
+| `@nest-langchain/gemini` | `@langchain/google-genai` |
+| `@nest-langchain/bedrock` | `@langchain/aws` |
 
 `@nest-langchain/prompts` does not need `@nest-langchain/core`; it exposes a prompt registry that can be injected through its own Nest module.
+
+Provider packages do not require `@nest-langchain/core`; they expose provider-specific Nest tokens and model factories only.
