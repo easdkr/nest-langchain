@@ -10,6 +10,8 @@
     "start": "node dist/main.js",
     "start:dev": "pnpm --filter @nest-langchain/core build && pnpm --filter @nest-langchain/langgraph build && pnpm --filter @nest-langchain/langsmith build && tsx watch src/main.ts",
     "test": "vitest run --passWithNoTests",
+    "pretest:e2e": "pnpm --filter @nest-langchain/core build && pnpm --filter @nest-langchain/langgraph build && pnpm --filter @nest-langchain/langsmith build",
+    "test:e2e": "vitest run tests",
     "pretypecheck": "pnpm --filter @nest-langchain/core build && pnpm --filter @nest-langchain/langgraph build && pnpm --filter @nest-langchain/langsmith build",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },

@@ -71,9 +71,9 @@ PUT /ai/graphs/layouts/:graphId
 ## LangGraph Example
 
 ```ts
-import { Injectable } from '@nestjs/common';
-import { Annotation } from '@langchain/langgraph';
-import { GraphNode, LangGraph } from '@nest-langchain/langgraph';
+import { Injectable } from "@nestjs/common";
+import { Annotation } from "@langchain/langgraph";
+import { GraphNode, LangGraph } from "@nest-langchain/langgraph";
 
 const JokeState = Annotation.Root({
   topic: Annotation<string>(),
@@ -81,10 +81,10 @@ const JokeState = Annotation.Root({
 });
 
 @LangGraph({
-  name: 'joke',
+  name: "joke",
   state: JokeState,
-  entry: 'generateAnswer',
-  finish: 'generateAnswer',
+  entry: "generateAnswer",
+  finish: "generateAnswer",
 })
 @Injectable()
 export class JokeGraph {
@@ -96,8 +96,8 @@ export class JokeGraph {
 ```
 
 ```ts
-import { Module } from '@nestjs/common';
-import { LangGraphModule } from '@nest-langchain/langgraph';
+import { Module } from "@nestjs/common";
+import { LangGraphModule } from "@nest-langchain/langgraph";
 
 @Module({
   imports: [LangGraphModule.forRoot({ global: true })],
@@ -110,15 +110,15 @@ export class AppModule {}
 
 ```ts
 VisualizationModule.setup(
-  '/ai/graphs',
+  "/ai/graphs",
   app,
   {
-    title: 'AI Graphs',
+    title: "AI Graphs",
   },
   {
     editable: true,
     layout: {
-      storage: new FileLayoutStorage('.nest-langchain/layouts'),
+      storage: new FileLayoutStorage(".nest-langchain/layouts"),
     },
   },
 );
@@ -128,6 +128,7 @@ Layout editing does not rewrite graph source files. Shared layouts are sidecar a
 
 ## More Docs
 
+- [Architecture](docs/architecture.md)
 - [Package boundaries](docs/package-boundaries.md)
 - [Visualization](docs/visualization.md)
 - [LangSmith privacy and redaction](docs/langsmith.md)
