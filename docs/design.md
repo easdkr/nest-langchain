@@ -11,7 +11,7 @@ The core package stays thin. Optional packages own optional runtime dependencies
 | Package | Owns | Must Not Own |
 |---|---|---|
 | `@nest-langchain/core` | Nest module, registry, runnable-like contracts, generic provider scanner | LangGraph, LangSmith, provider SDKs, visualization renderers |
-| `@nest-langchain/langgraph` | graph decorators, LangGraph `StateGraph` compile/discovery, graph metadata | LangSmith tracing, provider SDKs |
+| `@nest-langchain/langgraph` | graph decorators, LangGraph `StateGraph` compile/discovery, `LangGraphService`, checkpointer wiring, graph metadata | LangSmith tracing, provider SDKs |
 | `@nest-langchain/langsmith` | tracing module, `@TraceableRun`, env setup, request metadata, redaction, sampling hooks | graph compilation, provider SDKs |
 | `@nest-langchain/tools` | `@LangTool`, provider method discovery, LangChain tool wrappers | graph compilation, tracing, provider SDKs |
 | `@nest-langchain/prompts` | `PromptsModule`, named prompt registry, prompt template formatting | graph compilation, tracing, provider SDKs |
@@ -25,7 +25,7 @@ The core package stays thin. Optional packages own optional runtime dependencies
 
 1. `LangChainModule.forRoot()` registers `LangChainRegistry` and generic scanner utilities.
 2. Optional integration modules import core and register their own discovery/runtime behavior.
-3. `LangGraphModule` discovers `@LangGraph` providers, compiles LangGraph runnables, and registers them into core.
+3. `LangGraphModule` discovers `@LangGraph` providers, compiles LangGraph runnables, passes configured checkpointers to LangGraph, and registers compiled graphs into core.
 4. `LangSmithModule` applies tracing environment and method-level trace wrappers independently.
 5. `ToolsModule` discovers `@LangTool` methods and registers LangChain tools into core.
 6. `PromptsModule` exposes a named prompt registry without requiring core.
@@ -54,6 +54,8 @@ This keeps core compatible with LangChain runnables, LangGraph compiled graphs, 
 - `@ConditionalEdge`
 
 Compiled graphs are registered into core as `kind: 'graph'`.
+
+`LangGraphService` is the Nest execution surface for compiled graphs. It delegates to `LangChainRegistry.invokeGraph()` and preserves runnable config such as `configurable.thread_id` for checkpointer-backed execution.
 
 ## LangSmith Policy
 

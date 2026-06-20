@@ -2,12 +2,13 @@ import 'reflect-metadata';
 
 import { Injectable } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { Annotation } from '@langchain/langgraph';
+import { Annotation, StateGraph } from '@langchain/langgraph';
 import { LangChainRegistry } from '@nest-langchain/core';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ConditionalEdge, GraphNode, LangGraph } from '../src/decorators';
 import { LangGraphModule } from '../src/langgraph.module';
+import { LangGraphService } from '../src/langgraph.service';
 
 const DemoState = Annotation.Root({
   input: Annotation<string>(),
@@ -76,6 +77,10 @@ class ConditionalGraph {
 }
 
 describe('LangGraphExplorer', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('discovers decorated graph providers and registers compiled graphs', async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [LangGraphModule.forRoot()],
@@ -130,6 +135,54 @@ describe('LangGraphExplorer', () => {
       'decide',
       'left',
     ]);
+
+    await moduleRef.close();
+  });
+
+  it('invokes registered graphs through LangGraphService', async () => {
+    const moduleRef = await Test.createTestingModule({
+      imports: [LangGraphModule.forRoot()],
+      providers: [DemoGraph],
+    }).compile();
+
+    await moduleRef.init();
+
+    const service = moduleRef.get(LangGraphService);
+
+    await expect(
+      service.invoke<{ input: string }, { output: string }>('demo', {
+        input: 'service',
+      }),
+    ).resolves.toMatchObject({
+      output: 'hello service',
+    });
+
+    await moduleRef.close();
+  });
+
+  it('passes configured checkpointers to LangGraph compile', async () => {
+    const checkpointer = {
+      marker: 'checkpointer',
+    };
+    const compile = vi
+      .spyOn(StateGraph.prototype, 'compile')
+      .mockReturnValue({
+        invoke: async (input: unknown) => input,
+      } as never);
+    const moduleRef = await Test.createTestingModule({
+      imports: [
+        LangGraphModule.forRoot({
+          checkpointer,
+        }),
+      ],
+      providers: [DemoGraph],
+    }).compile();
+
+    await moduleRef.init();
+
+    expect(compile).toHaveBeenCalledWith({
+      checkpointer,
+    });
 
     await moduleRef.close();
   });

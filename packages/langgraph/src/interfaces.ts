@@ -29,6 +29,7 @@ export interface ConditionalEdgeOptions {
 export interface LangGraphModuleOptions {
   global?: boolean;
   autoDiscoverGraphs?: boolean;
+  checkpointer?: LangGraphCheckpointer;
 }
 
 export interface DiscoveredGraphMetadata {
@@ -38,3 +39,5 @@ export interface DiscoveredGraphMetadata {
   tags: readonly string[];
   metadata: Record<string, unknown>;
 }
+
+export type LangGraphCheckpointer = unknown;

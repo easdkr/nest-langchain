@@ -1,13 +1,12 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { LangChainRegistry } from '@nest-langchain/core';
+import { LangGraphService } from '@nest-langchain/langgraph';
 
 @Controller()
 export class AppController {
-  constructor(private readonly registry: LangChainRegistry) {}
+  constructor(private readonly graphs: LangGraphService) {}
 
   @Get('graphs/joke')
   invokeJokeGraph(@Query('topic') topic = 'Visualization') {
-    return this.registry.invokeGraph('joke', { topic });
+    return this.graphs.invoke('joke', { topic });
   }
 }
-

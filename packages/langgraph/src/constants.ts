@@ -7,3 +7,6 @@ export const CONDITIONAL_EDGE_METADATA = Symbol(
 export const LANG_GRAPH_MODULE_OPTIONS = Symbol(
   'nest-langchain:langgraph:options',
 );
+export const LANG_GRAPH_CHECKPOINTER = Symbol(
+  'nest-langchain:langgraph:checkpointer',
+);

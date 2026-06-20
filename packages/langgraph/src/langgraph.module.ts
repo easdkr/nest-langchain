@@ -2,9 +2,10 @@ import { DynamicModule, Module } from '@nestjs/common';
 import { DiscoveryModule } from '@nestjs/core';
 import { LangChainModule } from '@nest-langchain/core';
 
-import { LANG_GRAPH_MODULE_OPTIONS } from './constants';
+import { LANG_GRAPH_CHECKPOINTER, LANG_GRAPH_MODULE_OPTIONS } from './constants';
 import type { LangGraphModuleOptions } from './interfaces';
 import { LangGraphExplorer } from './langgraph.explorer';
+import { LangGraphService } from './langgraph.service';
 
 @Module({})
 export class LangGraphModule {
@@ -26,9 +27,19 @@ export class LangGraphModule {
             ...options,
           },
         },
+        {
+          provide: LANG_GRAPH_CHECKPOINTER,
+          useValue: options.checkpointer,
+        },
         LangGraphExplorer,
+        LangGraphService,
       ],
-      exports: [LangChainModule, LangGraphExplorer],
+      exports: [
+        LangChainModule,
+        LANG_GRAPH_CHECKPOINTER,
+        LangGraphExplorer,
+        LangGraphService,
+      ],
     };
   }
 }

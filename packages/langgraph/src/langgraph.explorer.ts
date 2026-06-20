@@ -7,6 +7,7 @@ import {
   GRAPH_NODE_METADATA,
   GRAPH_EDGE_METADATA,
   CONDITIONAL_EDGE_METADATA,
+  LANG_GRAPH_CHECKPOINTER,
   LANG_GRAPH_METADATA,
   LANG_GRAPH_MODULE_OPTIONS,
 } from './constants';
@@ -14,6 +15,7 @@ import type {
   ConditionalEdgeOptions,
   DiscoveredGraphMetadata,
   GraphEdgeOptions,
+  LangGraphCheckpointer,
   GraphNodeOptions,
   LangGraphEdge,
   LangGraphModuleOptions,
@@ -31,6 +33,9 @@ export class LangGraphExplorer implements OnModuleInit {
     @Optional()
     @Inject(LANG_GRAPH_MODULE_OPTIONS)
     private readonly options: LangGraphModuleOptions = {},
+    @Optional()
+    @Inject(LANG_GRAPH_CHECKPOINTER)
+    private readonly checkpointer?: LangGraphCheckpointer,
   ) {}
 
   onModuleInit(): void {
@@ -127,7 +132,13 @@ export class LangGraphExplorer implements OnModuleInit {
       workflow.addEdge(finish, END);
     }
 
-    const runnable = workflow.compile() as RunnableLike;
+    const runnable = workflow.compile(
+      typeof this.checkpointer === 'undefined'
+        ? undefined
+        : {
+            checkpointer: this.checkpointer as never,
+          },
+    ) as RunnableLike;
     const registeredEdges: LangGraphEdge[] = [
       [START, entry],
       ...edges,
