@@ -6,9 +6,8 @@ import type {
   LangChainModuleAsyncOptions,
   LangChainModuleOptions,
 } from './interfaces';
-import { LangChainExplorer } from './lang-chain.explorer';
 import { LangChainRegistry } from './lang-chain.registry';
-import { LangSmithEnvironment } from './lang-smith.environment';
+import { DecoratedProviderScanner } from './provider-scanner';
 
 @Module({})
 export class LangChainModule {
@@ -23,10 +22,9 @@ export class LangChainModule {
           useValue: normalizeOptions(options),
         },
         LangChainRegistry,
-        LangSmithEnvironment,
-        LangChainExplorer,
+        DecoratedProviderScanner,
       ],
-      exports: [LANG_CHAIN_OPTIONS, LangChainRegistry, LangSmithEnvironment],
+      exports: [LANG_CHAIN_OPTIONS, LangChainRegistry, DecoratedProviderScanner],
     };
   }
 
@@ -45,11 +43,10 @@ export class LangChainModule {
       providers: [
         optionsProvider,
         LangChainRegistry,
-        LangSmithEnvironment,
-        LangChainExplorer,
+        DecoratedProviderScanner,
         ...(options.extraProviders ?? []),
       ],
-      exports: [LANG_CHAIN_OPTIONS, LangChainRegistry, LangSmithEnvironment],
+      exports: [LANG_CHAIN_OPTIONS, LangChainRegistry, DecoratedProviderScanner],
     };
   }
 }
@@ -58,14 +55,6 @@ function normalizeOptions(
   options: LangChainModuleOptions,
 ): LangChainModuleOptions {
   return {
-    autoDiscoverGraphs: true,
     ...options,
-    langSmith: options.langSmith
-      ? {
-          ...options.langSmith,
-          enabled: options.langSmith.enabled ?? false,
-        }
-      : undefined,
   };
 }
-

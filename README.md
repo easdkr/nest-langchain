@@ -1,57 +1,121 @@
 # nest-langchain
 
-NestJS 애플리케이션에서 LangChain, LangGraph, LangSmith를 일관된 모듈/데코레이터 방식으로 쓰기 위한 npm 패키지 골격입니다.
+NestJS에서 LangChain 생태계 기능을 선택 설치 방식으로 쓰기 위한 패키지 모노레포입니다.
 
-## 구성
+핵심 원칙은 `@nest-langchain/core`를 얇게 유지하는 것입니다. core는 Nest module, registry, runnable 계약만 제공하고 LangGraph, LangSmith, tool, prompt, visualization, provider 연동은 별도 패키지에서 제공합니다.
 
-- `packages/core`: Nest dynamic module, graph/node decorators, LangGraph 자동 discovery, registry, LangSmith 환경 설정 유틸리티
-- `apps/demo`: 외부 LLM API 없이 바로 실행 가능한 NestJS 데모 앱
-- `docs/design.md`: 패키지 책임, 런타임 흐름, 공개 API, 확장 계획
+## Packages
 
-## 빠른 실행
+- `@nest-langchain/core`: Nest dynamic module, runnable registry, 공통 scanner/계약
+- `@nest-langchain/langgraph`: `@LangGraph`, `@GraphNode`, `@GraphEdge`, `@ConditionalEdge`, LangGraph compile/discovery
+- `@nest-langchain/langsmith`: `LangSmithModule`, `@TraceableRun`, LangSmith 환경 설정
+- `@nest-langchain/tools`: `@LangTool`, Nest provider method discovery, LangChain tool 등록
+- `@nest-langchain/prompts`: `PromptsModule`, named prompt registry, LangChain prompt template format
+- `@nest-langchain/visualization`: `/ai/graphs` 같은 서버 path에 graph docs UI와 JSON/Mermaid/DOT/layout API 호스팅
+- `@nest-langchain/openai`: OpenAI provider token/factory
+
+## Install Shapes
 
 ```bash
-cd nest-langchain
+# registry only
+pnpm add @nest-langchain/core
+
+# LangGraph decorator support
+pnpm add @nest-langchain/core @nest-langchain/langgraph @langchain/core @langchain/langgraph
+
+# LangSmith tracing
+pnpm add @nest-langchain/core @nest-langchain/langsmith langsmith
+
+# LangChain tools
+pnpm add @nest-langchain/core @nest-langchain/tools @langchain/core zod
+
+# prompt templates
+pnpm add @nest-langchain/prompts @langchain/core
+
+# hosted graph docs
+pnpm add @nest-langchain/core @nest-langchain/visualization
+
+# OpenAI provider
+pnpm add @nest-langchain/core @nest-langchain/openai @langchain/openai
+```
+
+## Demos
+
+```bash
 pnpm install
 pnpm check
-pnpm --filter @nest-langchain/demo start
+
+pnpm --filter @nest-langchain/demo-basic start
+pnpm --filter @nest-langchain/demo-langgraph start
+pnpm --filter @nest-langchain/demo-langsmith start
+pnpm --filter @nest-langchain/demo-visualization start
 ```
 
-데모 앱이 뜨면 아래 요청으로 decorator 기반 LangGraph 실행을 확인할 수 있습니다.
+The visualization demo hosts graph docs at:
 
-```bash
-curl "http://localhost:3000/graphs"
-curl "http://localhost:3000/graphs/joke?topic=NestJS&language=ko"
+```text
+GET /ai/graphs
+GET /ai/graphs/json
+GET /ai/graphs/mermaid
+GET /ai/graphs/dot
+GET /ai/graphs/layouts/:graphId
+PUT /ai/graphs/layouts/:graphId
 ```
 
-LangSmith 추적을 켜려면 `apps/demo/.env.example`을 참고해 환경변수를 설정한 뒤 실행하면 됩니다.
-
-## 패키지 API 예시
+## LangGraph Example
 
 ```ts
 import { Injectable } from '@nestjs/common';
 import { Annotation } from '@langchain/langgraph';
-import { GraphNode, LangGraph } from '@nest-langchain/core';
+import { GraphNode, LangGraph } from '@nest-langchain/langgraph';
 
 const JokeState = Annotation.Root({
   topic: Annotation<string>(),
-  answer: Annotation<string>(),
+  result: Annotation<string>(),
 });
 
 @LangGraph({
   name: 'joke',
   state: JokeState,
-  entry: 'answer',
-  finish: 'answer',
+  entry: 'generateAnswer',
+  finish: 'generateAnswer',
 })
 @Injectable()
 export class JokeGraph {
   @GraphNode()
-  answer(state: typeof JokeState.State) {
-    return { answer: `${state.topic} is ready for a graph.` };
+  generateAnswer(state: typeof JokeState.State) {
+    return { result: `${state.topic} is ready for a graph.` };
   }
 }
 ```
 
-Nest 모듈에는 `LangChainModule.forRoot()`만 추가하면 decorated graph provider가 bootstrap 시점에 registry에 등록됩니다.
+```ts
+import { Module } from '@nestjs/common';
+import { LangGraphModule } from '@nest-langchain/langgraph';
 
+@Module({
+  imports: [LangGraphModule.forRoot({ global: true })],
+  providers: [JokeGraph],
+})
+export class AppModule {}
+```
+
+## Hosted Visualization Example
+
+```ts
+VisualizationModule.setup(
+  '/ai/graphs',
+  app,
+  {
+    title: 'AI Graphs',
+  },
+  {
+    editable: true,
+    layout: {
+      storage: new FileLayoutStorage('.nest-langchain/layouts'),
+    },
+  },
+);
+```
+
+Layout editing does not rewrite graph source files. Shared layouts are sidecar artifacts; runtime/user-specific layouts can use custom storage.

@@ -6,4 +6,5 @@ coverage/
 !**/.env.example
 .DS_Store
 .codegraph/
+.nest-langchain/
 goal.md

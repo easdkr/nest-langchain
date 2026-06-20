@@ -1,0 +1,40 @@
+{
+  "name": "@nest-langchain/openai",
+  "version": "0.1.0",
+  "description": "OpenAI provider tokens and model factory wiring for Nest LangChain.",
+  "license": "MIT",
+  "author": "easdkr",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "prebuild": "pnpm --filter @nest-langchain/core build",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "test": "vitest run --passWithNoTests",
+    "pretypecheck": "pnpm --filter @nest-langchain/core build",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "@langchain/openai": "^1.5.1",
+    "@nest-langchain/core": "^0.1.0",
+    "@nestjs/common": "^10 || ^11"
+  },
+  "devDependencies": {
+    "@langchain/openai": "^1.5.1",
+    "@nest-langchain/core": "workspace:*",
+    "@nestjs/common": "^11.1.27"
+  }
+}

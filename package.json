@@ -2,7 +2,7 @@
   "name": "nest-langchain-monorepo",
   "version": "0.1.0",
   "private": true,
-  "description": "NestJS integration package skeleton for LangChain, LangGraph, and LangSmith.",
+  "description": "NestJS integration package skeleton for optional LangChain ecosystem packages.",
   "packageManager": "pnpm@10.18.0",
   "engines": {
     "node": ">=20"
@@ -12,7 +12,9 @@
     "clean": "pnpm -r exec rm -rf dist coverage",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
-    "check": "pnpm typecheck && pnpm test && pnpm build",
+    "lint": "pnpm typecheck",
+    "check:boundaries": "node scripts/check-package-boundaries.mjs",
+    "check": "pnpm check:boundaries && pnpm typecheck && pnpm test && pnpm build",
     "format": "prettier --write \"**/*.{ts,js,json,md,yaml,yml}\"",
     "format:check": "prettier --check \"**/*.{ts,js,json,md,yaml,yml}\""
   },
@@ -23,4 +25,3 @@
     "vitest": "^4.0.15"
   }
 }
-

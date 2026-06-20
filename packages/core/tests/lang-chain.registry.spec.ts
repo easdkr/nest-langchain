@@ -21,7 +21,7 @@ describe('LangChainRegistry', () => {
     });
 
     await expect(
-      registry.invokeGraph('echo', { value: 1 }, { tags: ['override'] }),
+      registry.invoke('echo', { value: 1 }, { tags: ['override'] }),
     ).resolves.toMatchObject({
       input: { value: 1 },
       config: {
@@ -43,5 +43,32 @@ describe('LangChainRegistry', () => {
       'already registered',
     );
   });
-});
 
+  it('keeps graph aliases for integration packages', async () => {
+    const registry = new LangChainRegistry();
+
+    registry.registerGraph({
+      name: 'graph',
+      kind: 'graph',
+      runnable: {
+        invoke: (input) => input,
+      },
+      nodes: ['one'],
+      edges: [],
+      tags: [],
+      metadata: {},
+    });
+
+    expect(registry.listGraphs()).toMatchObject([
+      {
+        name: 'graph',
+        kind: 'graph',
+        nodes: ['one'],
+      },
+    ]);
+
+    await expect(registry.invokeGraph('graph', { ok: true })).resolves.toEqual({
+      ok: true,
+    });
+  });
+});

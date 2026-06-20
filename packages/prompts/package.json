@@ -1,0 +1,43 @@
+{
+  "name": "@nest-langchain/prompts",
+  "version": "0.1.0",
+  "description": "NestJS prompt registry helpers for LangChain prompt templates.",
+  "license": "MIT",
+  "author": "easdkr",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "prebuild": "pnpm --filter @nest-langchain/core build",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "pretypecheck": "pnpm --filter @nest-langchain/core build",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "@langchain/core": "^1.2.0",
+    "@nestjs/common": "^10 || ^11",
+    "reflect-metadata": "^0.2.0"
+  },
+  "devDependencies": {
+    "@langchain/core": "^1.2.0",
+    "@nestjs/common": "^11.1.27",
+    "@nestjs/testing": "^11.1.27",
+    "reflect-metadata": "^0.2.2"
+  }
+}
+

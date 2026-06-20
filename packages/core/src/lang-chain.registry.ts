@@ -1,16 +1,17 @@
 import { Inject, Injectable, Optional } from '@nestjs/common';
-import type { RunnableConfig } from '@langchain/core/runnables';
 
 import { LANG_CHAIN_OPTIONS } from './constants';
 import type {
   LangChainModuleOptions,
+  RegisteredRunnable,
   RegisteredGraph,
+  RunnableConfigLike,
   RunnableLike,
 } from './interfaces';
 
 @Injectable()
 export class LangChainRegistry {
-  private readonly graphs = new Map<string, RegisteredGraph>();
+  private readonly runnables = new Map<string, RegisteredRunnable>();
 
   constructor(
     @Optional()
@@ -22,51 +23,102 @@ export class LangChainRegistry {
     return this.options;
   }
 
-  registerGraph(graph: RegisteredGraph): void {
-    if (this.graphs.has(graph.name)) {
-      throw new Error(`LangGraph "${graph.name}" is already registered.`);
-    }
-
-    this.graphs.set(graph.name, graph);
-  }
-
+  registerRunnable(runnable: RegisteredRunnable): void;
   registerRunnable(
     name: string,
     runnable: RunnableLike,
-    metadata: Partial<Omit<RegisteredGraph, 'name' | 'runnable'>> = {},
+    metadata?: Partial<Omit<RegisteredRunnable, 'name' | 'runnable'>>,
+  ): void;
+  registerRunnable(
+    nameOrRunnable: string | RegisteredRunnable,
+    runnable?: RunnableLike,
+    metadata: Partial<Omit<RegisteredRunnable, 'name' | 'runnable'>> = {},
   ): void {
-    this.registerGraph({
-      name,
-      runnable,
-      nodes: metadata.nodes ?? [],
-      edges: metadata.edges ?? [],
-      tags: metadata.tags ?? [],
-      metadata: metadata.metadata ?? {},
+    const registered =
+      typeof nameOrRunnable === 'string'
+        ? {
+            name: nameOrRunnable,
+            runnable: runnable as RunnableLike,
+            kind: metadata.kind ?? 'runnable',
+            nodes: metadata.nodes ?? [],
+            edges: metadata.edges ?? [],
+            tags: metadata.tags ?? [],
+            metadata: metadata.metadata ?? {},
+          }
+        : nameOrRunnable;
+
+    if (!registered.runnable) {
+      throw new Error(`Runnable "${registered.name}" must provide an invoke method.`);
+    }
+
+    if (this.runnables.has(registered.name)) {
+      throw new Error(`Runnable "${registered.name}" is already registered.`);
+    }
+
+    this.runnables.set(registered.name, registered);
+  }
+
+  registerGraph(graph: RegisteredGraph): void {
+    this.registerRunnable({
+      ...graph,
+      kind: 'graph',
     });
   }
 
-  getGraph(name: string): RegisteredGraph {
-    const graph = this.graphs.get(name);
+  getRunnable(name: string): RegisteredRunnable {
+    const registered = this.runnables.get(name);
 
-    if (!graph) {
-      throw new Error(`Unknown LangGraph "${name}".`);
+    if (!registered) {
+      throw new Error(`Unknown runnable "${name}".`);
     }
 
-    return graph;
+    return registered;
+  }
+
+  getGraph(name: string): RegisteredGraph {
+    const registered = this.getRunnable(name);
+
+    if (registered.kind !== 'graph') {
+      throw new Error(`Runnable "${name}" is not a graph.`);
+    }
+
+    return registered;
+  }
+
+  listRunnables(): Array<Omit<RegisteredRunnable, 'runnable'>> {
+    return Array.from(this.runnables.values()).map(
+      ({ runnable: _runnable, ...registered }) => registered,
+    );
   }
 
   listGraphs(): Array<Omit<RegisteredGraph, 'runnable'>> {
-    return Array.from(this.graphs.values()).map(({ runnable: _runnable, ...graph }) => graph);
+    return this.listRunnables().filter((registered) => registered.kind === 'graph');
+  }
+
+  async invoke<TInput = unknown, TOutput = unknown>(
+    name: string,
+    input: TInput,
+    config?: RunnableConfigLike,
+  ): Promise<TOutput> {
+    const registered = this.getRunnable(name);
+    const mergedConfig = this.mergeConfig(config);
+
+    return registered.runnable.invoke(input, mergedConfig) as Promise<TOutput>;
   }
 
   async invokeGraph<TInput = unknown, TOutput = unknown>(
     name: string,
     input: TInput,
-    config?: RunnableConfig,
+    config?: RunnableConfigLike,
   ): Promise<TOutput> {
-    const graph = this.getGraph(name);
+    this.getGraph(name);
+    return this.invoke(name, input, config);
+  }
+
+  private mergeConfig(config?: RunnableConfigLike): RunnableConfigLike {
     const defaultConfig = this.options.defaultConfig ?? {};
-    const mergedConfig = {
+
+    return {
       ...defaultConfig,
       ...config,
       configurable: {
@@ -79,8 +131,5 @@ export class LangChainRegistry {
       },
       tags: [...(defaultConfig.tags ?? []), ...(config?.tags ?? [])],
     };
-
-    return graph.runnable.invoke(input, mergedConfig) as Promise<TOutput>;
   }
 }
-

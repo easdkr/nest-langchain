@@ -1,0 +1,43 @@
+{
+  "name": "@nest-langchain/langsmith",
+  "version": "0.1.0",
+  "description": "LangSmith tracing module and decorators for NestJS.",
+  "license": "MIT",
+  "author": "easdkr",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "prebuild": "pnpm --filter @nest-langchain/core build",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "pretypecheck": "pnpm --filter @nest-langchain/core build",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "@nest-langchain/core": "^0.1.0",
+    "@nestjs/common": "^10 || ^11",
+    "langsmith": "^0.7.10",
+    "reflect-metadata": "^0.2.0"
+  },
+  "devDependencies": {
+    "@nest-langchain/core": "workspace:*",
+    "@nestjs/common": "^11.1.27",
+    "langsmith": "^0.7.10",
+    "reflect-metadata": "^0.2.2"
+  }
+}

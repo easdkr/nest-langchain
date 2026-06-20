@@ -1,11 +1,25 @@
 # @nest-langchain/core
 
-NestJS에서 LangGraph workflow와 LangSmith tracing 설정을 module/decorator 방식으로 묶는 core package입니다.
+NestJS용 얇은 registry/core package입니다.
+
+포함하는 것:
+
+- `LangChainModule`
+- `LangChainRegistry`
+- runnable-like 계약
+- generic provider scanner
+
+포함하지 않는 것:
+
+- LangGraph
+- LangSmith
+- OpenAI/Anthropic/Gemini 같은 provider SDK
+- visualization renderer
 
 ## 설치
 
 ```bash
-pnpm add @nest-langchain/core @langchain/core @langchain/langgraph langsmith
+pnpm add @nest-langchain/core
 ```
 
 Nest peer dependency는 소비 앱이 이미 가지고 있어야 합니다.
@@ -13,46 +27,22 @@ Nest peer dependency는 소비 앱이 이미 가지고 있어야 합니다.
 ## 사용
 
 ```ts
-import { Module } from '@nestjs/common';
-import { LangChainModule } from '@nest-langchain/core';
+import { Module, OnModuleInit } from '@nestjs/common';
+import { LangChainModule, LangChainRegistry } from '@nest-langchain/core';
 
 @Module({
-  imports: [
-    LangChainModule.forRoot({
-      global: true,
-      langSmith: {
-        enabled: process.env.LANGSMITH_TRACING === 'true',
-        apiKey: process.env.LANGSMITH_API_KEY,
-        project: process.env.LANGSMITH_PROJECT,
-      },
-    }),
-  ],
+  imports: [LangChainModule.forRoot({ global: true })],
 })
-export class AppModule {}
-```
+export class AppModule implements OnModuleInit {
+  constructor(private readonly registry: LangChainRegistry) {}
 
-```ts
-import { Injectable } from '@nestjs/common';
-import { Annotation } from '@langchain/langgraph';
-import { GraphNode, LangGraph } from '@nest-langchain/core';
-
-const State = Annotation.Root({
-  input: Annotation<string>(),
-  output: Annotation<string>(),
-});
-
-@LangGraph({
-  name: 'hello',
-  state: State,
-  entry: 'answer',
-  finish: 'answer',
-})
-@Injectable()
-export class HelloGraph {
-  @GraphNode()
-  answer(state: typeof State.State) {
-    return { output: `hello ${state.input}` };
+  onModuleInit() {
+    this.registry.registerRunnable('echo', {
+      invoke: (input) => ({ input }),
+    });
   }
 }
 ```
+
+LangGraph decorator가 필요하면 `@nest-langchain/langgraph`를, LangSmith tracing이 필요하면 `@nest-langchain/langsmith`를 별도로 설치합니다.
 

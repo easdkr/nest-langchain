@@ -21,17 +21,57 @@ importers:
         specifier: ^4.0.15
         version: 4.1.9(@types/node@24.13.2)(vite@8.0.16(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.22.4))
 
-  apps/demo:
+  apps/demo-basic:
     dependencies:
-      '@langchain/core':
-        specifier: ^1.2.0
-        version: 1.2.0
-      '@langchain/langgraph':
-        specifier: ^1.4.4
-        version: 1.4.4(@langchain/core@1.2.0)(zod@4.4.3)
       '@nest-langchain/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@nestjs/common':
+        specifier: ^11.1.27
+        version: 11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core':
+        specifier: ^11.1.27
+        version: 11.1.27(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.27)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/platform-express':
+        specifier: ^11.1.27
+        version: 11.1.27(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
+      rxjs:
+        specifier: ^7.8.2
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^24.10.1
+        version: 24.13.2
+      tsx:
+        specifier: ^4.21.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.15
+        version: 4.1.9(@types/node@24.13.2)(vite@8.0.16(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.22.4))
+
+  apps/demo-langgraph:
+    dependencies:
+      '@langchain/core':
+        specifier: ^1.2.0
+        version: 1.2.0(openai@6.44.0(zod@4.4.3))
+      '@langchain/langgraph':
+        specifier: ^1.4.4
+        version: 1.4.4(@langchain/core@1.2.0(openai@6.44.0(zod@4.4.3)))(zod@4.4.3)
+      '@nest-langchain/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@nest-langchain/langgraph':
+        specifier: workspace:*
+        version: link:../../packages/langgraph
+      '@nest-langchain/langsmith':
+        specifier: workspace:*
+        version: link:../../packages/langsmith
       '@nestjs/common':
         specifier: ^11.1.27
         version: 11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -46,7 +86,96 @@ importers:
         version: 11.1.27(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)
       langsmith:
         specifier: ^0.7.10
-        version: 0.7.10
+        version: 0.7.10(openai@6.44.0(zod@4.4.3))
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
+      rxjs:
+        specifier: ^7.8.2
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^24.10.1
+        version: 24.13.2
+      tsx:
+        specifier: ^4.21.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.15
+        version: 4.1.9(@types/node@24.13.2)(vite@8.0.16(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.22.4))
+
+  apps/demo-langsmith:
+    dependencies:
+      '@nest-langchain/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@nest-langchain/langsmith':
+        specifier: workspace:*
+        version: link:../../packages/langsmith
+      '@nestjs/common':
+        specifier: ^11.1.27
+        version: 11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/config':
+        specifier: ^4.0.2
+        version: 4.0.4(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(rxjs@7.8.2)
+      '@nestjs/core':
+        specifier: ^11.1.27
+        version: 11.1.27(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.27)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/platform-express':
+        specifier: ^11.1.27
+        version: 11.1.27(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)
+      langsmith:
+        specifier: ^0.7.10
+        version: 0.7.10(openai@6.44.0(zod@4.4.3))
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
+      rxjs:
+        specifier: ^7.8.2
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^24.10.1
+        version: 24.13.2
+      tsx:
+        specifier: ^4.21.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.15
+        version: 4.1.9(@types/node@24.13.2)(vite@8.0.16(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.22.4))
+
+  apps/demo-visualization:
+    dependencies:
+      '@langchain/core':
+        specifier: ^1.2.0
+        version: 1.2.0(openai@6.44.0(zod@4.4.3))
+      '@langchain/langgraph':
+        specifier: ^1.4.4
+        version: 1.4.4(@langchain/core@1.2.0(openai@6.44.0(zod@4.4.3)))(zod@4.4.3)
+      '@nest-langchain/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@nest-langchain/langgraph':
+        specifier: workspace:*
+        version: link:../../packages/langgraph
+      '@nest-langchain/visualization':
+        specifier: workspace:*
+        version: link:../../packages/visualization
+      '@nestjs/common':
+        specifier: ^11.1.27
+        version: 11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core':
+        specifier: ^11.1.27
+        version: 11.1.27(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.27)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/platform-express':
+        specifier: ^11.1.27
+        version: 11.1.27(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -69,12 +198,6 @@ importers:
 
   packages/core:
     devDependencies:
-      '@langchain/core':
-        specifier: ^1.2.0
-        version: 1.2.0
-      '@langchain/langgraph':
-        specifier: ^1.4.4
-        version: 1.4.4(@langchain/core@1.2.0)(zod@4.4.3)
       '@nestjs/common':
         specifier: ^11.1.27
         version: 11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -84,15 +207,117 @@ importers:
       '@nestjs/testing':
         specifier: ^11.1.27
         version: 11.1.27(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(@nestjs/platform-express@11.1.27)
-      langsmith:
-        specifier: ^0.7.10
-        version: 0.7.10
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
       rxjs:
         specifier: ^7.8.2
         version: 7.8.2
+
+  packages/langgraph:
+    devDependencies:
+      '@langchain/core':
+        specifier: ^1.2.0
+        version: 1.2.0(openai@6.44.0(zod@4.4.3))
+      '@langchain/langgraph':
+        specifier: ^1.4.4
+        version: 1.4.4(@langchain/core@1.2.0(openai@6.44.0(zod@4.4.3)))(zod@4.4.3)
+      '@nest-langchain/core':
+        specifier: workspace:*
+        version: link:../core
+      '@nestjs/common':
+        specifier: ^11.1.27
+        version: 11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core':
+        specifier: ^11.1.27
+        version: 11.1.27(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.27)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/testing':
+        specifier: ^11.1.27
+        version: 11.1.27(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(@nestjs/platform-express@11.1.27)
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
+      rxjs:
+        specifier: ^7.8.2
+        version: 7.8.2
+
+  packages/langsmith:
+    devDependencies:
+      '@nest-langchain/core':
+        specifier: workspace:*
+        version: link:../core
+      '@nestjs/common':
+        specifier: ^11.1.27
+        version: 11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      langsmith:
+        specifier: ^0.7.10
+        version: 0.7.10(openai@6.44.0(zod@4.4.3))
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
+
+  packages/openai:
+    devDependencies:
+      '@langchain/openai':
+        specifier: ^1.5.1
+        version: 1.5.1(@langchain/core@1.2.0(openai@6.44.0(zod@4.4.3)))
+      '@nest-langchain/core':
+        specifier: workspace:*
+        version: link:../core
+      '@nestjs/common':
+        specifier: ^11.1.27
+        version: 11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2)
+
+  packages/prompts:
+    devDependencies:
+      '@langchain/core':
+        specifier: ^1.2.0
+        version: 1.2.0(openai@6.44.0(zod@4.4.3))
+      '@nestjs/common':
+        specifier: ^11.1.27
+        version: 11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/testing':
+        specifier: ^11.1.27
+        version: 11.1.27(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(@nestjs/platform-express@11.1.27)
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
+
+  packages/tools:
+    devDependencies:
+      '@langchain/core':
+        specifier: ^1.2.0
+        version: 1.2.0(openai@6.44.0(zod@4.4.3))
+      '@nest-langchain/core':
+        specifier: workspace:*
+        version: link:../core
+      '@nestjs/common':
+        specifier: ^11.1.27
+        version: 11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core':
+        specifier: ^11.1.27
+        version: 11.1.27(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.27)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/testing':
+        specifier: ^11.1.27
+        version: 11.1.27(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(@nestjs/platform-express@11.1.27)
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
+      rxjs:
+        specifier: ^7.8.2
+        version: 7.8.2
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
+
+  packages/visualization:
+    devDependencies:
+      '@nest-langchain/core':
+        specifier: workspace:*
+        version: link:../core
+      '@nestjs/common':
+        specifier: ^11.1.27
+        version: 11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2)
 
 packages:
 
@@ -308,6 +533,12 @@ packages:
     peerDependenciesMeta:
       zod-to-json-schema:
         optional: true
+
+  '@langchain/openai@1.5.1':
+    resolution: {integrity: sha512-7Ndik936Wta8+BLHjRZmkxEFLFKyNINc6ecKu4t//YQqTxboHAUotzae7Otqe3IRaE5NqsDiIvVqN6nYEe6ruw==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@langchain/core': ^1.2.0
 
   '@langchain/protocol@0.0.16':
     resolution: {integrity: sha512-ws+J7MaHyhO5dG7f0vdyHQiUn9hoCnki0f3crJPa4MCTGzcRC39jYSCghyrGtBPYQnZbUQiGyRVpW3z3M8IpJg==}
@@ -945,6 +1176,17 @@ packages:
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
 
+  openai@6.44.0:
+    resolution: {integrity: sha512-09/gH+8jH0RgUwsgWHAaxsKGRT5zVZ95IaJUnqAWj6XejIBmnFRwq2WUIF37VtDEsmGrtPmvCs5+yBSeZGWvkA==}
+    peerDependencies:
+      ws: ^8.18.0
+      zod: ^3.25 || ^4.0
+    peerDependenciesMeta:
+      ws:
+        optional: true
+      zod:
+        optional: true
+
   p-finally@1.0.0:
     resolution: {integrity: sha512-LICb2p9CB7FS+0eR1oqWnHhp0FljGLZCWBE9aix0Uye9W8LTQPwMTYVGWQWIw9RdQiDg4+epXQODwIYJtSJaow==}
     engines: {node: '>=4'}
@@ -1357,12 +1599,12 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
-  '@langchain/core@1.2.0':
+  '@langchain/core@1.2.0(openai@6.44.0(zod@4.4.3))':
     dependencies:
       '@cfworker/json-schema': 4.1.1
       '@standard-schema/spec': 1.1.0
       js-tiktoken: 1.0.21
-      langsmith: 0.7.10
+      langsmith: 0.7.10(openai@6.44.0(zod@4.4.3))
       mustache: 4.2.0
       p-queue: 6.6.2
       zod: 4.4.3
@@ -1373,23 +1615,23 @@ snapshots:
       - openai
       - ws
 
-  '@langchain/langgraph-checkpoint@1.1.2(@langchain/core@1.2.0)':
+  '@langchain/langgraph-checkpoint@1.1.2(@langchain/core@1.2.0(openai@6.44.0(zod@4.4.3)))':
     dependencies:
-      '@langchain/core': 1.2.0
+      '@langchain/core': 1.2.0(openai@6.44.0(zod@4.4.3))
 
-  '@langchain/langgraph-sdk@1.9.23(@langchain/core@1.2.0)':
+  '@langchain/langgraph-sdk@1.9.23(@langchain/core@1.2.0(openai@6.44.0(zod@4.4.3)))':
     dependencies:
-      '@langchain/core': 1.2.0
+      '@langchain/core': 1.2.0(openai@6.44.0(zod@4.4.3))
       '@langchain/protocol': 0.0.16
       '@types/json-schema': 7.0.15
       p-queue: 9.3.0
       p-retry: 7.1.1
 
-  '@langchain/langgraph@1.4.4(@langchain/core@1.2.0)(zod@4.4.3)':
+  '@langchain/langgraph@1.4.4(@langchain/core@1.2.0(openai@6.44.0(zod@4.4.3)))(zod@4.4.3)':
     dependencies:
-      '@langchain/core': 1.2.0
-      '@langchain/langgraph-checkpoint': 1.1.2(@langchain/core@1.2.0)
-      '@langchain/langgraph-sdk': 1.9.23(@langchain/core@1.2.0)
+      '@langchain/core': 1.2.0(openai@6.44.0(zod@4.4.3))
+      '@langchain/langgraph-checkpoint': 1.1.2(@langchain/core@1.2.0(openai@6.44.0(zod@4.4.3)))
+      '@langchain/langgraph-sdk': 1.9.23(@langchain/core@1.2.0(openai@6.44.0(zod@4.4.3)))
       '@langchain/protocol': 0.0.16
       '@standard-schema/spec': 1.1.0
       zod: 4.4.3
@@ -1398,6 +1640,15 @@ snapshots:
       - react-dom
       - svelte
       - vue
+
+  '@langchain/openai@1.5.1(@langchain/core@1.2.0(openai@6.44.0(zod@4.4.3)))':
+    dependencies:
+      '@langchain/core': 1.2.0(openai@6.44.0(zod@4.4.3))
+      js-tiktoken: 1.0.21
+      openai: 6.44.0(zod@4.4.3)
+      zod: 4.4.3
+    transitivePeerDependencies:
+      - ws
 
   '@langchain/protocol@0.0.16': {}
 
@@ -1858,9 +2109,11 @@ snapshots:
     dependencies:
       base64-js: 1.5.1
 
-  langsmith@0.7.10:
+  langsmith@0.7.10(openai@6.44.0(zod@4.4.3)):
     dependencies:
       p-queue: 6.6.2
+    optionalDependencies:
+      openai: 6.44.0(zod@4.4.3)
 
   lightningcss-android-arm64@1.32.0:
     optional: true
@@ -1967,6 +2220,10 @@ snapshots:
   once@1.4.0:
     dependencies:
       wrappy: 1.0.2
+
+  openai@6.44.0(zod@4.4.3):
+    optionalDependencies:
+      zod: 4.4.3
 
   p-finally@1.0.0: {}
 
