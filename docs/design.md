@@ -57,10 +57,22 @@ This keeps core compatible with LangChain runnables, LangGraph compiled graphs, 
 - `@GraphNode`
 - `@GraphEdge`
 - `@ConditionalEdge`
+- `commandTo`, `parentHandoff`, `sendTo`, `fanOut`, `interruptFor`, `resumeWith`, `callSubgraph`
+- `CommandNode`, `RouteCommandNode`, `ParentHandoffNode`
 
 Compiled graphs are registered into core as `kind: 'graph'`.
 
 `LangGraphService` is the Nest execution surface for compiled graphs. It delegates to `LangChainRegistry.invokeGraph()` and preserves runnable config such as `configurable.thread_id` for checkpointer-backed execution.
+
+LangGraph execution-control patterns stay in this package because they depend directly on `@langchain/langgraph` primitives:
+
+- command routing uses `Command` and `@GraphNode({ ends })`
+- parent handoff uses `Command.PARENT`
+- dynamic fan-out uses `Send`
+- human-in-the-loop uses `interrupt()` and resume `Command`
+- subgraph communication uses explicit state input/output transforms
+
+See [langgraph-patterns.md](langgraph-patterns.md) for the supported mapping.
 
 ## Collaborative Patterns Contract
 

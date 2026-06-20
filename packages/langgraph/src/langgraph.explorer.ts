@@ -84,10 +84,14 @@ export class LangGraphExplorer implements OnModuleInit {
     const decoratedEdges = this.discoverGraphEdges(instance);
     const conditionalEdges = this.discoverConditionalEdges(instance);
     const entry = graphOptions.entry ?? nodeNames[0];
-    const finishes = this.normalizeFinishes(graphOptions.finish ?? nodeNames.at(-1));
+    const finishes = this.normalizeFinishes(
+      graphOptions.finish ?? nodeNames.at(-1),
+    );
     const edges =
       graphOptions.edges ??
-      (decoratedEdges.length > 0 ? decoratedEdges : this.defaultEdges(nodeNames));
+      (decoratedEdges.length > 0
+        ? decoratedEdges
+        : this.defaultEdges(nodeNames));
 
     this.assertKnownNode(entry, nodeNames, 'entry', graphName);
 
@@ -101,17 +105,33 @@ export class LangGraphExplorer implements OnModuleInit {
     }
 
     for (const conditionalEdge of conditionalEdges) {
-      this.assertKnownNode(conditionalEdge.from, nodeNames, 'conditional.from', graphName);
+      this.assertKnownNode(
+        conditionalEdge.from,
+        nodeNames,
+        'conditional.from',
+        graphName,
+      );
 
       for (const target of Object.values(conditionalEdge.mapping ?? {})) {
-        this.assertKnownNode(target, nodeNames, 'conditional.mapping', graphName);
+        this.assertKnownNode(
+          target,
+          nodeNames,
+          'conditional.mapping',
+          graphName,
+        );
       }
     }
 
     const workflow = new StateGraph(graphOptions.state as never) as any;
 
     for (const node of nodeDefinitions) {
-      workflow.addNode(node.name, node.handler);
+      const nodeOptions = toStateGraphNodeOptions(node.options);
+
+      if (Object.keys(nodeOptions).length === 0) {
+        workflow.addNode(node.name, node.handler);
+      } else {
+        workflow.addNode(node.name, node.handler, nodeOptions);
+      }
     }
 
     workflow.addEdge(START, entry);
@@ -142,6 +162,9 @@ export class LangGraphExplorer implements OnModuleInit {
     const registeredEdges: LangGraphEdge[] = [
       [START, entry],
       ...edges,
+      ...nodeDefinitions.flatMap((node) =>
+        (node.options.ends ?? []).map((target) => [node.name, target] as const),
+      ),
       ...conditionalEdges.flatMap((conditionalEdge) =>
         Object.values(conditionalEdge.mapping ?? {}).map(
           (target) => [conditionalEdge.from, target] as const,
@@ -174,7 +197,9 @@ export class LangGraphExplorer implements OnModuleInit {
     });
   }
 
-  private discoverGraphEdges(instance: Record<string, unknown>): LangGraphEdge[] {
+  private discoverGraphEdges(
+    instance: Record<string, unknown>,
+  ): LangGraphEdge[] {
     const options =
       this.reflector.get<GraphEdgeOptions[]>(
         GRAPH_EDGE_METADATA,
@@ -228,6 +253,7 @@ export class LangGraphExplorer implements OnModuleInit {
   private discoverNodes(instance: Record<string, unknown>): Array<{
     name: string;
     handler: (...args: unknown[]) => unknown;
+    options: GraphNodeOptions;
   }> {
     const prototype = Object.getPrototypeOf(instance);
     const methodNames = Object.getOwnPropertyNames(prototype).filter((key) => {
@@ -259,16 +285,16 @@ export class LangGraphExplorer implements OnModuleInit {
         {
           name: options.name ?? methodName,
           handler: handler.bind(instance),
+          options,
         },
       ];
     });
   }
 
   private defaultEdges(nodeNames: readonly string[]): LangGraphEdge[] {
-    return nodeNames.slice(0, -1).map((nodeName, index) => [
-      nodeName,
-      nodeNames[index + 1],
-    ]);
+    return nodeNames
+      .slice(0, -1)
+      .map((nodeName, index) => [nodeName, nodeNames[index + 1]]);
   }
 
   private normalizeFinishes(
@@ -293,4 +319,20 @@ export class LangGraphExplorer implements OnModuleInit {
       );
     }
   }
+}
+
+function toStateGraphNodeOptions(
+  options: GraphNodeOptions,
+): Record<string, unknown> {
+  return Object.fromEntries(
+    [
+      ['ends', options.ends],
+      ['metadata', options.metadata],
+      ['subgraphs', options.subgraphs],
+      ['defer', options.defer],
+      ['retryPolicy', options.retryPolicy],
+      ['cachePolicy', options.cachePolicy],
+      ['timeout', options.timeout],
+    ].filter(([, value]) => typeof value !== 'undefined'),
+  );
 }
