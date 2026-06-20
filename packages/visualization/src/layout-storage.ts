@@ -25,6 +25,20 @@ export class MemoryLayoutStorage implements VisualGraphLayoutStorage {
   }
 }
 
+export class BrowserLayoutStorage implements VisualGraphLayoutStorage {
+  readonly kind = 'browser';
+
+  constructor(readonly keyPrefix = 'nest-langchain:layout:') {}
+
+  async get(): Promise<undefined> {
+    return undefined;
+  }
+
+  async save(): Promise<void> {
+    throw new Error('Browser layout storage is client-side only.');
+  }
+}
+
 export class FileLayoutStorage implements VisualGraphLayoutStorage {
   constructor(private readonly directory: string) {}
 
@@ -55,6 +69,12 @@ export class FileLayoutStorage implements VisualGraphLayoutStorage {
   }
 }
 
+export function isBrowserLayoutStorage(
+  storage: VisualGraphLayoutStorage,
+): storage is BrowserLayoutStorage {
+  return storage instanceof BrowserLayoutStorage;
+}
+
 function sanitizeGraphId(graphId: string): string {
   return graphId.replace(/[^a-zA-Z0-9._-]/g, '_');
 }
@@ -67,4 +87,3 @@ function isNotFoundError(error: unknown): boolean {
     error.code === 'ENOENT'
   );
 }
-

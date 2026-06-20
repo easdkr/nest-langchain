@@ -12,7 +12,7 @@ The core package stays thin. Optional packages own optional runtime dependencies
 |---|---|---|
 | `@nest-langchain/core` | Nest module, registry, runnable-like contracts, generic provider scanner | LangGraph, LangSmith, provider SDKs, visualization renderers |
 | `@nest-langchain/langgraph` | graph decorators, LangGraph `StateGraph` compile/discovery, graph metadata | LangSmith tracing, provider SDKs |
-| `@nest-langchain/langsmith` | tracing module, `@TraceableRun`, env setup, redaction/sampling extension points | graph compilation, provider SDKs |
+| `@nest-langchain/langsmith` | tracing module, `@TraceableRun`, env setup, request metadata, redaction, sampling hooks | graph compilation, provider SDKs |
 | `@nest-langchain/tools` | `@LangTool`, provider method discovery, LangChain tool wrappers | graph compilation, tracing, provider SDKs |
 | `@nest-langchain/prompts` | `PromptsModule`, named prompt registry, prompt template formatting | graph compilation, tracing, provider SDKs |
 | `@nest-langchain/visualization` | hosted docs UI, JSON/Mermaid/DOT export, layout APIs/storage | graph execution, source rewrite |
@@ -59,7 +59,9 @@ Compiled graphs are registered into core as `kind: 'graph'`.
 - tracing defaults to off
 - API keys are redacted in public environment snapshots
 - background callback behavior is configurable
-- redaction/sampling/request metadata hooks are future extension points
+- request metadata can be propagated with `LangSmithContext`
+- redaction hooks can transform traced inputs/outputs before LangSmith logging
+- sampling hooks can skip trace wrapping for selected runs
 
 ## Visualization Policy
 

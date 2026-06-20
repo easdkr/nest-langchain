@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { MemoryLayoutStorage } from '../src/layout-storage';
-import { renderMermaid } from '../src/renderers';
+import { BrowserLayoutStorage, MemoryLayoutStorage } from '../src/layout-storage';
+import { renderHtml, renderMermaid } from '../src/renderers';
 import type { VisualizationDocument } from '../src/interfaces';
 
 describe('visualization renderers and storage', () => {
@@ -55,5 +55,16 @@ describe('visualization renderers and storage', () => {
       },
     });
   });
-});
 
+  it('renders browser-local editable layout controls without server persistence', () => {
+    const html = renderHtml(document, '/ai/graphs', {
+      editable: true,
+      layoutStorage: new BrowserLayoutStorage('nest-langchain:layout:'),
+    });
+
+    expect(html).toContain('localStorage');
+    expect(html).toContain('nest-langchain:layout:');
+    expect(html).toContain('draggable="true"');
+    expect(html).toContain('data-node-id="joke:draft"');
+  });
+});

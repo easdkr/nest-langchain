@@ -11,7 +11,7 @@ import type {
   VisualGraphLayoutStorage,
   VisualNodeKind,
 } from './interfaces';
-import { ReadOnlyLayoutStorage } from './layout-storage';
+import { isBrowserLayoutStorage, ReadOnlyLayoutStorage } from './layout-storage';
 import { renderDot, renderHtml, renderMermaid } from './renderers';
 
 @Module({})
@@ -81,7 +81,13 @@ export class VisualizationModule {
     if (options.ui !== false) {
       registerGet(adapter, basePath, (_req, res) => {
         const document = getDocument();
-        sendHtml(res, renderHtml(document, basePath));
+        sendHtml(
+          res,
+          renderHtml(document, basePath, {
+            editable: options.editable,
+            layoutStorage: storage,
+          }),
+        );
       });
     }
 
@@ -112,6 +118,16 @@ export class VisualizationModule {
       const graphId = getParam(req, 'graphId');
       const body = typeof req.body === 'undefined' ? await readJsonBody(req) : req.body;
       const layout = normalizeLayout(graphId, body);
+
+      if (isBrowserLayoutStorage(storage)) {
+        sendJson(
+          res,
+          { message: 'Browser layout storage is client-side only.' },
+          400,
+        );
+        return;
+      }
+
       await saveLayout(storage, graphId, layout);
       sendJson(res, layout);
     });

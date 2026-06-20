@@ -19,6 +19,17 @@ VisualizationModule.setup('/ai/graphs', app, document, {
 });
 ```
 
+사용자별 layout만 브라우저에 저장하려면 server-side storage 대신 `BrowserLayoutStorage`를 사용합니다.
+
+```ts
+VisualizationModule.setup('/ai/graphs', app, document, {
+  editable: true,
+  layout: {
+    storage: new BrowserLayoutStorage('nest-langchain:layout:'),
+  },
+});
+```
+
 기본 endpoint:
 
 - `GET /ai/graphs`
@@ -28,5 +39,4 @@ VisualizationModule.setup('/ai/graphs', app, document, {
 - `GET /ai/graphs/layouts/:graphId`
 - `PUT /ai/graphs/layouts/:graphId`
 
-Layout 변경은 실행 graph source file을 수정하지 않습니다. 공용 layout이 필요하면 sidecar JSON storage를 선택합니다.
-
+Layout 변경은 실행 graph source file을 수정하지 않습니다. 공용 layout이 필요하면 sidecar JSON storage를 선택하고, 운영 DB 저장은 `VisualGraphLayoutStorage` interface를 구현한 custom storage를 사용합니다.

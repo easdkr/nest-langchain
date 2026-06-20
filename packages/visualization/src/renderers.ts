@@ -1,4 +1,14 @@
-import type { VisualizationDocument, VisualGraph } from './interfaces';
+import type {
+  VisualizationDocument,
+  VisualGraph,
+  VisualGraphLayoutStorage,
+} from './interfaces';
+import { isBrowserLayoutStorage } from './layout-storage';
+
+export interface RenderHtmlOptions {
+  editable?: boolean;
+  layoutStorage?: VisualGraphLayoutStorage;
+}
 
 export function renderMermaid(document: VisualizationDocument): string {
   return document.graphs.map(renderGraphMermaid).join('\n\n');
@@ -30,9 +40,17 @@ export function renderDot(document: VisualizationDocument): string {
   return lines.join('\n');
 }
 
-export function renderHtml(document: VisualizationDocument, basePath: string): string {
+export function renderHtml(
+  document: VisualizationDocument,
+  basePath: string,
+  options: RenderHtmlOptions = {},
+): string {
   const title = escapeHtml(document.title);
   const normalizedBasePath = normalizeBasePath(basePath);
+  const browserLayout =
+    options.layoutStorage && isBrowserLayoutStorage(options.layoutStorage)
+      ? options.layoutStorage
+      : undefined;
 
   return `<!doctype html>
 <html lang="en">
@@ -48,7 +66,8 @@ export function renderHtml(document: VisualizationDocument, basePath: string): s
       h1 { margin: 0; font-size: 22px; }
       h2 { margin: 0 0 12px; font-size: 17px; }
       pre { overflow: auto; background: #0f172a; color: #e5e7eb; padding: 14px; border-radius: 6px; }
-      .node { display: inline-flex; margin: 4px; padding: 5px 8px; border: 1px solid #94a3b8; border-radius: 6px; background: #f8fafc; }
+      .node { display: inline-flex; margin: 4px; padding: 5px 8px; border: 1px solid #94a3b8; border-radius: 6px; background: #f8fafc; position: relative; }
+      .node[draggable="true"] { cursor: grab; }
       .links a { margin-right: 12px; color: #2563eb; }
     </style>
   </head>
@@ -63,8 +82,9 @@ export function renderHtml(document: VisualizationDocument, basePath: string): s
         <a href="${normalizedBasePath}/mermaid">Mermaid</a>
         <a href="${normalizedBasePath}/dot">DOT</a>
       </section>
-      ${document.graphs.map(renderGraphSection).join('\n')}
+      ${document.graphs.map((graph) => renderGraphSection(graph, options)).join('\n')}
     </main>
+    ${renderBrowserLayoutScript(options.editable === true, browserLayout?.keyPrefix)}
   </body>
 </html>`;
 }
@@ -88,14 +108,74 @@ function renderGraphMermaid(graph: VisualGraph): string {
   return lines.join('\n');
 }
 
-function renderGraphSection(graph: VisualGraph): string {
-  return `<section>
+function renderGraphSection(graph: VisualGraph, options: RenderHtmlOptions): string {
+  const draggable = options.editable === true ? ' draggable="true"' : '';
+
+  return `<section data-graph-id="${escapeHtml(graph.id)}">
   <h2>${escapeHtml(graph.label)}</h2>
   <div>${graph.nodes
-    .map((node) => `<span class="node">${escapeHtml(node.label)}</span>`)
+    .map(
+      (node) =>
+        `<span class="node" data-node-id="${escapeHtml(node.id)}"${draggable}>${escapeHtml(node.label)}</span>`,
+    )
     .join('')}</div>
   <pre>${escapeHtml(renderGraphMermaid(graph))}</pre>
 </section>`;
+}
+
+function renderBrowserLayoutScript(
+  editable: boolean,
+  keyPrefix: string | undefined,
+): string {
+  if (!editable || !keyPrefix) {
+    return '';
+  }
+
+  return `<script>
+(() => {
+  const keyPrefix = ${JSON.stringify(keyPrefix)};
+
+  for (const section of document.querySelectorAll('[data-graph-id]')) {
+    const graphId = section.getAttribute('data-graph-id');
+    const storageKey = keyPrefix + graphId;
+    const layout = readLayout(storageKey, graphId);
+
+    for (const node of section.querySelectorAll('[data-node-id]')) {
+      const nodeId = node.getAttribute('data-node-id');
+      const saved = layout.nodes[nodeId];
+
+      if (saved) {
+        node.style.transform = \`translate(\${saved.x}px, \${saved.y}px)\`;
+      }
+
+      node.addEventListener('dragend', (event) => {
+        layout.nodes[nodeId] = {
+          x: event.clientX,
+          y: event.clientY,
+          pinned: true,
+        };
+        localStorage.setItem(storageKey, JSON.stringify(layout));
+      });
+    }
+  }
+
+  function readLayout(storageKey, graphId) {
+    try {
+      return JSON.parse(localStorage.getItem(storageKey)) || {
+        graphId,
+        version: '1',
+        nodes: {},
+      };
+    } catch {
+      return {
+        graphId,
+        version: '1',
+        nodes: {},
+      };
+    }
+  }
+})();
+</script>`;
 }
 
 function normalizeBasePath(basePath: string): string {
@@ -126,4 +206,3 @@ function escapeHtml(value: string): string {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
-

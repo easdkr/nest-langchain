@@ -8,7 +8,7 @@ NestJS에서 LangChain 생태계 기능을 선택 설치 방식으로 쓰기 위
 
 - `@nest-langchain/core`: Nest dynamic module, runnable registry, 공통 scanner/계약
 - `@nest-langchain/langgraph`: `@LangGraph`, `@GraphNode`, `@GraphEdge`, `@ConditionalEdge`, LangGraph compile/discovery
-- `@nest-langchain/langsmith`: `LangSmithModule`, `@TraceableRun`, LangSmith 환경 설정
+- `@nest-langchain/langsmith`: `LangSmithModule`, `@TraceableRun`, request metadata/redaction/sampling hook
 - `@nest-langchain/tools`: `@LangTool`, Nest provider method discovery, LangChain tool 등록
 - `@nest-langchain/prompts`: `PromptsModule`, named prompt registry, LangChain prompt template format
 - `@nest-langchain/visualization`: `/ai/graphs` 같은 서버 path에 graph docs UI와 JSON/Mermaid/DOT/layout API 호스팅
@@ -119,3 +119,10 @@ VisualizationModule.setup(
 ```
 
 Layout editing does not rewrite graph source files. Shared layouts are sidecar artifacts; runtime/user-specific layouts can use custom storage.
+
+## More Docs
+
+- [Package boundaries](docs/package-boundaries.md)
+- [Visualization](docs/visualization.md)
+- [LangSmith privacy and redaction](docs/langsmith.md)
+- [Publishing](docs/publishing.md)
