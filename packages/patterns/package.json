@@ -1,0 +1,57 @@
+{
+  "name": "@nest-langchain/patterns",
+  "version": "0.1.0",
+  "description": "Decorators for provider collaboration and modern LangChain task patterns in NestJS.",
+  "license": "MIT",
+  "author": "easdkr",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "prebuild": "pnpm --filter @nest-langchain/core build",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "pretypecheck": "pnpm --filter @nest-langchain/core build",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "@langchain/core": "^1.2.0",
+    "@nest-langchain/core": "^0.1.0",
+    "@nestjs/common": "^10 || ^11",
+    "@nestjs/core": "^10 || ^11",
+    "deepagents": "^1.10.5",
+    "reflect-metadata": "^0.2.0",
+    "rxjs": "^7.8.0"
+  },
+  "peerDependenciesMeta": {
+    "deepagents": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@langchain/core": "^1.2.0",
+    "@nest-langchain/core": "workspace:*",
+    "@nestjs/common": "^11.1.27",
+    "@nestjs/core": "^11.1.27",
+    "@nestjs/testing": "^11.1.27",
+    "deepagents": "^1.10.5",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.15"
+  }
+}

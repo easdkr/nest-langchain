@@ -13,6 +13,7 @@ Nest app
        @nest-langchain/langsmith
        @nest-langchain/tools
        @nest-langchain/prompts
+       @nest-langchain/patterns
        @nest-langchain/visualization
        @nest-langchain/openai
        @nest-langchain/anthropic
@@ -31,6 +32,7 @@ Optional packages own their runtime dependency imports:
 | `@nest-langchain/langsmith`     | `langsmith`                                 |
 | `@nest-langchain/tools`         | `@langchain/core`, `zod`                    |
 | `@nest-langchain/prompts`       | `@langchain/core`                           |
+| `@nest-langchain/patterns`      | `@langchain/core`, optional `deepagents`    |
 | `@nest-langchain/visualization` | hosted docs UI and graph metadata rendering |
 | provider packages               | provider-specific LangChain SDK             |
 
@@ -40,7 +42,8 @@ Optional packages own their runtime dependency imports:
 2. Feature modules discover their own decorators/providers.
 3. Feature modules register runnable metadata into core only when installed.
 4. Application controllers or services use the feature package API.
-5. Visualization reads neutral metadata from core and serves docs routes when
+5. Collaborative patterns register provider collaboration tasks and optional Deep Agents into core.
+6. Visualization reads neutral metadata from core and serves docs routes when
    `VisualizationModule.setup(path, app, options)` is called.
 
 ## Visualization Layout

@@ -2,7 +2,7 @@
 
 NestJS에서 LangChain 생태계 기능을 선택 설치 방식으로 쓰기 위한 패키지 모노레포입니다.
 
-핵심 원칙은 `@nest-langchain/core`를 얇게 유지하는 것입니다. core는 Nest module, registry, runnable 계약만 제공하고 LangGraph, LangSmith, tool, prompt, visualization, provider 연동은 별도 패키지에서 제공합니다.
+핵심 원칙은 `@nest-langchain/core`를 얇게 유지하는 것입니다. core는 Nest module, registry, runnable 계약만 제공하고 LangGraph, LangSmith, tool, prompt, patterns, visualization, provider 연동은 별도 패키지에서 제공합니다.
 
 ## Packages
 
@@ -11,6 +11,7 @@ NestJS에서 LangChain 생태계 기능을 선택 설치 방식으로 쓰기 위
 - `@nest-langchain/langsmith`: `LangSmithModule`, `@TraceableRun`, request metadata/redaction/sampling hook
 - `@nest-langchain/tools`: `@LangTool`, Nest provider method discovery, LangChain tool 등록
 - `@nest-langchain/prompts`: `PromptsModule`, named prompt registry, LangChain prompt template format
+- `@nest-langchain/patterns`: `@CollaborativeTask`, `@TaskStep`, `@DeepAgent`, provider collaboration/delegation patterns
 - `@nest-langchain/visualization`: `/ai/graphs` 같은 서버 path에 graph docs UI와 JSON/Mermaid/DOT/layout API 호스팅
 - `@nest-langchain/openai`: OpenAI provider token/factory
 - `@nest-langchain/anthropic`: Anthropic provider token/factory
@@ -35,6 +36,12 @@ pnpm add @nest-langchain/core @nest-langchain/tools @langchain/core zod
 # prompt templates
 pnpm add @nest-langchain/prompts @langchain/core
 
+# provider collaboration and modern LangChain task patterns
+pnpm add @nest-langchain/core @nest-langchain/patterns @langchain/core
+
+# Deep Agents decorators, only when @DeepAgent is used
+pnpm add deepagents
+
 # hosted graph docs
 pnpm add @nest-langchain/core @nest-langchain/visualization
 
@@ -54,6 +61,7 @@ pnpm check
 pnpm --filter @nest-langchain/demo-basic start
 pnpm --filter @nest-langchain/demo-langgraph start
 pnpm --filter @nest-langchain/demo-langsmith start
+pnpm --filter @nest-langchain/demo-patterns start
 pnpm --filter @nest-langchain/demo-visualization start
 ```
 
@@ -125,6 +133,37 @@ VisualizationModule.setup(
 ```
 
 Layout editing does not rewrite graph source files. Shared layouts are sidecar artifacts; runtime/user-specific layouts can use custom storage.
+
+## Collaborative Task Example
+
+```ts
+@CollaborativeTask({
+  name: "launch-review",
+  models: [
+    { role: "planner", token: OPENAI_MODEL },
+    { role: "critic", token: ANTHROPIC_MODEL },
+    { role: "judge", token: GEMINI_MODEL },
+  ],
+})
+@Injectable()
+export class LaunchReviewTask {
+  @TaskStep({
+    name: "drafts",
+    pattern: "parallel",
+    models: ["planner", "critic"],
+  })
+  drafts(input: { product: string }) {
+    return `Draft a launch plan for ${input.product}.`;
+  }
+
+  @TaskStep({ name: "decision", pattern: "structured", model: "judge" })
+  decision(input: unknown, context: TaskExecutionContext) {
+    return `Decide from ${JSON.stringify(context.steps)}.`;
+  }
+}
+```
+
+`@DeepAgent`, `@DeepAgentTool`, and `@DeepAgentSubagent` are available from `@nest-langchain/patterns` when the application installs `deepagents`.
 
 ## More Docs
 
