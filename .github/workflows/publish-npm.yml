@@ -1,0 +1,203 @@
+name: Publish npm Packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: Package to publish
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - '@nest-langchain/core'
+          - '@nest-langchain/langgraph'
+          - '@nest-langchain/langsmith'
+          - '@nest-langchain/tools'
+          - '@nest-langchain/prompts'
+          - '@nest-langchain/patterns'
+          - '@nest-langchain/visualization'
+          - '@nest-langchain/openai'
+          - '@nest-langchain/openai-compatible'
+          - '@nest-langchain/anthropic'
+          - '@nest-langchain/gemini'
+          - '@nest-langchain/bedrock'
+      npm_tag:
+        description: npm dist-tag to publish with
+        required: true
+        default: latest
+        type: string
+      dry_run:
+        description: Run npm publish without publishing
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: npm-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.18.0
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check formatting
+        run: pnpm format:check
+
+      - name: Check package boundaries, types, tests, and builds
+        run: pnpm check
+
+  publish:
+    name: Publish ${{ matrix.package }}
+    needs: verify
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - package: '@nest-langchain/core'
+            directory: packages/core
+          - package: '@nest-langchain/langgraph'
+            directory: packages/langgraph
+          - package: '@nest-langchain/langsmith'
+            directory: packages/langsmith
+          - package: '@nest-langchain/tools'
+            directory: packages/tools
+          - package: '@nest-langchain/prompts'
+            directory: packages/prompts
+          - package: '@nest-langchain/patterns'
+            directory: packages/patterns
+          - package: '@nest-langchain/visualization'
+            directory: packages/visualization
+          - package: '@nest-langchain/openai'
+            directory: packages/openai
+          - package: '@nest-langchain/openai-compatible'
+            directory: packages/openai-compatible
+          - package: '@nest-langchain/anthropic'
+            directory: packages/anthropic
+          - package: '@nest-langchain/gemini'
+            directory: packages/gemini
+          - package: '@nest-langchain/bedrock'
+            directory: packages/bedrock
+    steps:
+      - name: Skip unselected package
+        if: ${{ inputs.package != 'all' && inputs.package != matrix.package }}
+        run: echo "Skipping ${{ matrix.package }}; selected ${{ inputs.package }}."
+
+      - name: Checkout
+        if: ${{ inputs.package == 'all' || inputs.package == matrix.package }}
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        if: ${{ inputs.package == 'all' || inputs.package == matrix.package }}
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.18.0
+          run_install: false
+
+      - name: Setup Node.js
+        if: ${{ inputs.package == 'all' || inputs.package == matrix.package }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+
+      - name: Install dependencies
+        if: ${{ inputs.package == 'all' || inputs.package == matrix.package }}
+        run: pnpm install --frozen-lockfile
+
+      - name: Build package
+        if: ${{ inputs.package == 'all' || inputs.package == matrix.package }}
+        run: pnpm --filter "${{ matrix.package }}" build
+
+      - name: Pack dry-run
+        if: ${{ inputs.package == 'all' || inputs.package == matrix.package }}
+        working-directory: ${{ matrix.directory }}
+        run: npm pack --dry-run
+
+      - name: Check published version
+        id: published
+        if: ${{ inputs.package == 'all' || inputs.package == matrix.package }}
+        working-directory: ${{ matrix.directory }}
+        run: |
+          package_name="$(node -p "require('./package.json').name")"
+          package_version="$(node -p "require('./package.json').version")"
+
+          echo "package-name=${package_name}" >> "$GITHUB_OUTPUT"
+          echo "package-version=${package_version}" >> "$GITHUB_OUTPUT"
+
+          if npm view "${package_name}@${package_version}" version >/dev/null 2>&1; then
+            echo "already-published=true" >> "$GITHUB_OUTPUT"
+            echo "${package_name}@${package_version} is already published; skipping publish."
+          else
+            echo "already-published=false" >> "$GITHUB_OUTPUT"
+            echo "${package_name}@${package_version} is not published yet."
+          fi
+
+      - name: Validate npm token
+        if: >-
+          ${{
+            (inputs.package == 'all' || inputs.package == matrix.package) &&
+            steps.published.outputs.already-published == 'false' &&
+            inputs.dry_run == false
+          }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "NPM_TOKEN secret is required for npm publish."
+            exit 1
+          fi
+
+      - name: Publish package
+        if: >-
+          ${{
+            (inputs.package == 'all' || inputs.package == matrix.package) &&
+            steps.published.outputs.already-published == 'false'
+          }}
+        working-directory: ${{ matrix.directory }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TAG: ${{ inputs.npm_tag }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            npm publish --access public --tag "$NPM_TAG" --dry-run
+          else
+            npm publish --access public --tag "$NPM_TAG" --provenance
+          fi
+
+      - name: Summary
+        if: ${{ inputs.package == 'all' || inputs.package == matrix.package }}
+        run: |
+          if [ "${{ steps.published.outputs.already-published }}" = "true" ]; then
+            echo "Skipped ${{ matrix.package }} because version ${{ steps.published.outputs.package-version }} is already published."
+          elif [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "Dry-run completed for ${{ matrix.package }}."
+          else
+            echo "Published ${{ matrix.package }}@${{ steps.published.outputs.package-version }} with tag ${{ inputs.npm_tag }}."
+          fi
