@@ -81,12 +81,19 @@ export class LangGraphExplorer implements OnModuleInit {
     }
 
     const nodeNames = nodeDefinitions.map((node) => node.name);
+    this.assertUniqueNodeNames(nodeNames, graphName);
+
     const decoratedEdges = this.discoverGraphEdges(instance);
     const conditionalEdges = this.discoverConditionalEdges(instance);
-    const entry = graphOptions.entry ?? nodeNames[0];
+    const entry = this.resolveEntry(graphOptions, nodeDefinitions, graphName);
     const finishes = this.normalizeFinishes(
-      graphOptions.finish ?? nodeNames.at(-1),
+      graphOptions.finish ??
+        nodeDefinitions
+          .filter((node) => node.options.finish === true)
+          .map((node) => node.name),
     );
+    const resolvedFinishes =
+      finishes.length > 0 ? finishes : [nodeNames.at(-1)!];
     const edges =
       graphOptions.edges ??
       (decoratedEdges.length > 0
@@ -95,7 +102,7 @@ export class LangGraphExplorer implements OnModuleInit {
 
     this.assertKnownNode(entry, nodeNames, 'entry', graphName);
 
-    for (const finish of finishes) {
+    for (const finish of resolvedFinishes) {
       this.assertKnownNode(finish, nodeNames, 'finish', graphName);
     }
 
@@ -148,7 +155,7 @@ export class LangGraphExplorer implements OnModuleInit {
       );
     }
 
-    for (const finish of finishes) {
+    for (const finish of resolvedFinishes) {
       workflow.addEdge(finish, END);
     }
 
@@ -170,7 +177,7 @@ export class LangGraphExplorer implements OnModuleInit {
           (target) => [conditionalEdge.from, target] as const,
         ),
       ),
-      ...finishes.map((finish) => [finish, END] as const),
+      ...resolvedFinishes.map((finish) => [finish, END] as const),
     ];
     const metadata = graphOptions.metadata ?? {};
     const tags = graphOptions.tags ?? [];
@@ -305,6 +312,54 @@ export class LangGraphExplorer implements OnModuleInit {
     }
 
     return typeof finish === 'string' ? [finish] : finish;
+  }
+
+  private resolveEntry(
+    graphOptions: LangGraphOptions,
+    nodeDefinitions: Array<{ name: string; options: GraphNodeOptions }>,
+    graphName: string,
+  ): string {
+    if (graphOptions.entry) {
+      return graphOptions.entry;
+    }
+
+    const entries = nodeDefinitions.filter(
+      (node) => node.options.entry === true,
+    );
+
+    if (entries.length > 1) {
+      throw new Error(
+        `LangGraph "${graphName}" declares multiple entry nodes: ${entries
+          .map((node) => node.name)
+          .join(', ')}`,
+      );
+    }
+
+    return entries[0]?.name ?? nodeDefinitions[0].name;
+  }
+
+  private assertUniqueNodeNames(
+    nodeNames: readonly string[],
+    graphName: string,
+  ): void {
+    const seen = new Set<string>();
+    const duplicates = new Set<string>();
+
+    for (const nodeName of nodeNames) {
+      if (seen.has(nodeName)) {
+        duplicates.add(nodeName);
+      }
+
+      seen.add(nodeName);
+    }
+
+    if (duplicates.size > 0) {
+      throw new Error(
+        `LangGraph "${graphName}" declares duplicate node names: ${[
+          ...duplicates,
+        ].join(', ')}`,
+      );
+    }
   }
 
   private assertKnownNode(

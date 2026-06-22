@@ -1,15 +1,10 @@
 import { ChatOpenAI } from '@langchain/openai';
 import { describe, expect, it, vi } from 'vitest';
 
-import {
-  NEST_LANGCHAIN_OPENAI_CHAT_MODEL,
-  OpenAIProviderModule,
-} from '../src';
+import { NEST_LANGCHAIN_OPENAI_CHAT_MODEL, OpenAIProviderModule } from '../src';
 
 vi.mock('@langchain/openai', () => ({
-  ChatOpenAI: vi.fn(function ChatOpenAIMock(
-    config: Record<string, unknown>,
-  ) {
+  ChatOpenAI: vi.fn(function ChatOpenAIMock(config: Record<string, unknown>) {
     return {
       config,
       provider: 'openai',

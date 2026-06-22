@@ -11,7 +11,7 @@ The core package stays thin. Optional packages own optional runtime dependencies
 | Package                         | Owns                                                                                                                   | Must Not Own                                                 |
 | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
 | `@nest-langchain/core`          | Nest module, registry, runnable-like contracts, generic provider scanner                                               | LangGraph, LangSmith, provider SDKs, visualization renderers |
-| `@nest-langchain/langgraph`     | graph decorators, LangGraph `StateGraph` compile/discovery, `LangGraphService`, checkpointer wiring, graph metadata    | LangSmith tracing, provider SDKs                             |
+| `@nest-langchain/langgraph`     | graph decorators, LangGraph `StateGraph` compile/discovery, `LangGraphRunner`, checkpointer wiring, graph metadata     | LangSmith tracing, provider SDKs                             |
 | `@nest-langchain/langsmith`     | tracing module, `@TraceableRun`, env setup, request metadata, redaction, sampling hooks                                | graph compilation, provider SDKs                             |
 | `@nest-langchain/tools`         | `@LangTool`, provider method discovery, LangChain tool wrappers                                                        | graph compilation, tracing, provider SDKs                    |
 | `@nest-langchain/prompts`       | `PromptsModule`, named prompt registry, prompt template formatting                                                     | graph compilation, tracing, provider SDKs                    |
@@ -62,7 +62,7 @@ This keeps core compatible with LangChain runnables, LangGraph compiled graphs, 
 
 Compiled graphs are registered into core as `kind: 'graph'`.
 
-`LangGraphService` is the Nest execution surface for compiled graphs. It delegates to `LangChainRegistry.invokeGraph()` and preserves runnable config such as `configurable.thread_id` for checkpointer-backed execution.
+`LangGraphRunner` is the Nest execution surface for compiled graphs. It delegates to `LangChainRegistry.invokeGraph()` and preserves runnable config such as `configurable.thread_id` for checkpointer-backed execution.
 
 LangGraph execution-control patterns stay in this package because they depend directly on `@langchain/langgraph` primitives:
 
@@ -80,7 +80,7 @@ See [langgraph-patterns.md](langgraph-patterns.md) for the supported mapping.
 
 - `@CollaborativeTask` binds logical model roles to Nest provider tokens.
 - `@TaskStep` supports `invoke`, `parallel`, `structured`, `tool-call`, and `fallback` patterns.
-- `PatternsService` lists and invokes discovered tasks through the core registry.
+- `PatternsRegistry` lists and invokes discovered tasks through the core registry.
 - Model providers are supplied by the app, for example from `@nest-langchain/openai`, `@nest-langchain/anthropic`, `@nest-langchain/gemini`, or `@nest-langchain/bedrock`.
 
 Deep Agents support is decorator-based but optional:

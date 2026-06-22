@@ -1,11 +1,11 @@
-import { DynamicModule, Module } from "@nestjs/common";
-import { DiscoveryModule } from "@nestjs/core";
-import { LangChainModule } from "@nest-langchain/core";
+import { DynamicModule, Module } from '@nestjs/common';
+import { DiscoveryModule } from '@nestjs/core';
+import { LangChainModule } from '@nest-langchain/core';
 
-import { PATTERNS_MODULE_OPTIONS } from "./constants";
-import type { CollaborativePatternsModuleOptions } from "./interfaces";
-import { PatternsExplorer } from "./patterns.explorer";
-import { PatternsService } from "./patterns.service";
+import { PATTERNS_MODULE_OPTIONS } from './constants';
+import type { CollaborativePatternsModuleOptions } from './interfaces';
+import { PatternsExplorer } from './patterns.explorer';
+import { PatternsRegistry } from './patterns.registry';
 
 @Module({})
 export class CollaborativePatternsModule {
@@ -31,9 +31,9 @@ export class CollaborativePatternsModule {
           },
         },
         PatternsExplorer,
-        PatternsService,
+        PatternsRegistry,
       ],
-      exports: [LangChainModule, PatternsExplorer, PatternsService],
+      exports: [LangChainModule, PatternsExplorer, PatternsRegistry],
     };
   }
 }

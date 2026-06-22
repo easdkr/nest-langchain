@@ -14,11 +14,15 @@ export class DecoratedProviderScanner {
     private readonly reflector: Reflector,
   ) {}
 
-  scan<TMetadata>(metadataKey: string | symbol): Array<DecoratedProvider<TMetadata>> {
+  scan<TMetadata>(
+    metadataKey: string | symbol,
+  ): Array<DecoratedProvider<TMetadata>> {
     return this.discoveryService
       .getProviders()
       .flatMap((wrapper): Array<DecoratedProvider<TMetadata>> => {
-        const instance = wrapper.instance as Record<string, unknown> | undefined;
+        const instance = wrapper.instance as
+          | Record<string, unknown>
+          | undefined;
         const metatype = wrapper.metatype;
 
         if (!instance || !metatype) {
@@ -41,4 +45,3 @@ export class DecoratedProviderScanner {
       });
   }
 }
-

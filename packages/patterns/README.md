@@ -20,35 +20,40 @@ pnpm add deepagents
 
 ```ts
 @CollaborativeTask({
-  name: "launch-review",
+  name: 'launch-review',
   models: [
-    { role: "planner", token: OPENAI_MODEL },
-    { role: "critic", token: ANTHROPIC_MODEL },
-    { role: "judge", token: GEMINI_MODEL },
+    { role: 'planner', token: OPENAI_MODEL },
+    { role: 'critic', token: ANTHROPIC_MODEL },
+    { role: 'judge', token: GEMINI_MODEL },
   ],
 })
-@Injectable()
 export class LaunchReviewTask {
   @TaskStep({
-    name: "drafts",
-    pattern: "parallel",
-    models: ["planner", "critic"],
+    name: 'drafts',
+    pattern: 'parallel',
+    models: ['planner', 'critic'],
   })
   drafts(input: { product: string }) {
     return `Draft a launch plan for ${input.product}.`;
   }
 
   @TaskStep({
-    name: "decision",
-    pattern: "structured",
-    model: "judge",
-    dependsOn: ["drafts"],
+    name: 'decision',
+    pattern: 'structured',
+    model: 'judge',
+    dependsOn: ['drafts'],
   })
   decision(input: unknown, context: TaskExecutionContext) {
     return `Decide from ${JSON.stringify(context.steps)}.`;
   }
 }
 ```
+
+`@CollaborativeTask()` and `@DeepAgent()` apply Nest injectable metadata, so
+decorated task classes do not need a separate `@Injectable()` decorator. They
+must still be registered as Nest providers. During module startup, task
+definitions fail fast on duplicate model roles, duplicate step names, unknown
+step dependencies, and unknown model role references.
 
 Supported `@TaskStep` patterns:
 
@@ -62,22 +67,21 @@ Supported `@TaskStep` patterns:
 
 ```ts
 @DeepAgent({
-  name: "market-research-agent",
-  model: "supervisor",
-  models: [{ role: "supervisor", token: OPENAI_MODEL }],
-  systemPrompt: "Plan, research, and write concise reports.",
-  skills: ["/skills/research"],
+  name: 'market-research-agent',
+  model: 'supervisor',
+  models: [{ role: 'supervisor', token: OPENAI_MODEL }],
+  systemPrompt: 'Plan, research, and write concise reports.',
+  skills: ['/skills/research'],
   interruptOn: { write_file: true },
 })
-@Injectable()
 export class MarketResearchAgent {
   @DeepAgentTool({
-    name: "search_market",
-    description: "Search market notes.",
+    name: 'search_market',
+    description: 'Search market notes.',
     schema: {
-      type: "object",
-      properties: { query: { type: "string" } },
-      required: ["query"],
+      type: 'object',
+      properties: { query: { type: 'string' } },
+      required: ['query'],
     },
   })
   searchMarket(input: { query: string }) {
@@ -85,14 +89,18 @@ export class MarketResearchAgent {
   }
 
   @DeepAgentSubagent({
-    name: "researcher",
-    description: "Runs isolated market research.",
-    model: "supervisor",
-    systemPrompt: "You are a focused market researcher.",
-    tools: ["search_market"],
+    name: 'researcher',
+    description: 'Runs isolated market research.',
+    model: 'supervisor',
+    systemPrompt: 'You are a focused market researcher.',
+    tools: ['search_market'],
   })
   researcher() {
     return undefined;
   }
 }
 ```
+
+Deep agent definitions also fail fast during module startup when selected tool
+or subagent names do not match decorated `@DeepAgentTool` or
+`@DeepAgentSubagent` methods.

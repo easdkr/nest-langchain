@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { LangSmithModule } from '@nest-langchain/langsmith';
 
 import { AppController } from './app.controller';
-import { TraceDemoService } from './trace-demo.service';
+import { TraceDemoHandler } from './trace-demo.handler';
 
 @Module({
   imports: [
@@ -21,7 +21,6 @@ import { TraceDemoService } from './trace-demo.service';
     }),
   ],
   controllers: [AppController],
-  providers: [TraceDemoService],
+  providers: [TraceDemoHandler],
 })
 export class AppModule {}
-

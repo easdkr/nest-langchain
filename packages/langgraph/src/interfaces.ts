@@ -14,6 +14,8 @@ export interface LangGraphOptions {
 
 export interface GraphNodeOptions {
   name?: string;
+  entry?: boolean;
+  finish?: boolean;
   ends?: readonly string[];
   metadata?: Record<string, unknown>;
   subgraphs?: unknown[];

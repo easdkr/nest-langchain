@@ -17,4 +17,3 @@ Release automation should preserve package boundaries:
 - keep peer dependency ranges explicit
 - do not leak `workspace:*` into published peer dependencies
 - verify package tarballs include `dist`, `src`, and package-local `README.md`
-

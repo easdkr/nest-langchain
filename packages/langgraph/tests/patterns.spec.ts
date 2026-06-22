@@ -1,6 +1,5 @@
 import 'reflect-metadata';
 
-import { Injectable } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { Annotation, Command, Send } from '@langchain/langgraph';
 import { LangChainRegistry } from '@nest-langchain/core';
@@ -31,13 +30,11 @@ const RouteState = Annotation.Root({
 @LangGraph({
   name: 'command-route',
   state: RouteState,
-  entry: 'decide',
-  finish: ['approvedPath', 'rejectedPath'],
   edges: [],
 })
-@Injectable()
 class CommandRouteGraph {
   @GraphNode({
+    entry: true,
     ends: ['approvedPath', 'rejectedPath'],
   })
   decide(state: typeof RouteState.State) {
@@ -48,14 +45,18 @@ class CommandRouteGraph {
     });
   }
 
-  @GraphNode()
+  @GraphNode({
+    finish: true,
+  })
   approvedPath(state: typeof RouteState.State) {
     return {
       output: `${state.output}:approved`,
     };
   }
 
-  @GraphNode()
+  @GraphNode({
+    finish: true,
+  })
   rejectedPath(state: typeof RouteState.State) {
     return {
       output: `${state.output}:rejected`,

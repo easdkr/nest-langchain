@@ -1,16 +1,16 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 import {
   LangChainRegistry,
   type RunnableConfigLike,
-} from "@nest-langchain/core";
+} from '@nest-langchain/core';
 
 import type {
   DiscoveredDeepAgentMetadata,
   DiscoveredTaskMetadata,
-} from "./interfaces";
+} from './interfaces';
 
 @Injectable()
-export class PatternsService {
+export class PatternsRegistry {
   private readonly tasks = new Map<string, DiscoveredTaskMetadata>();
   private readonly deepAgents = new Map<string, DiscoveredDeepAgentMetadata>();
 

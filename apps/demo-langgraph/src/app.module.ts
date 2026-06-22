@@ -5,7 +5,7 @@ import { LangGraphModule } from '@nest-langchain/langgraph';
 import { LangSmithModule } from '@nest-langchain/langsmith';
 
 import { AppController } from './app.controller';
-import { JokeGraph } from './graphs/joke.graph';
+import { SupportIntakeGraph } from './graphs/support-intake.graph';
 
 @Module({
   imports: [
@@ -26,6 +26,6 @@ import { JokeGraph } from './graphs/joke.graph';
     }),
   ],
   controllers: [AppController],
-  providers: [JokeGraph],
+  providers: [SupportIntakeGraph],
 })
 export class AppModule {}

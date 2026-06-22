@@ -13,10 +13,10 @@ export class DeterministicChatModel {
         content: `${this.role}:called score_plan`,
         tool_calls: [
           {
-            name: "score_plan",
+            name: 'score_plan',
             args: {
               score: 9,
-              reason: "critic approved",
+              reason: 'critic approved',
             },
           },
         ],
@@ -27,7 +27,7 @@ export class DeterministicChatModel {
   withStructuredOutput() {
     return {
       invoke: async () => ({
-        decision: "ship",
+        decision: 'ship',
         owner: this.role,
       }),
     };
@@ -35,7 +35,7 @@ export class DeterministicChatModel {
 }
 
 function stringifyInput(input: unknown): string {
-  if (typeof input === "string") {
+  if (typeof input === 'string') {
     return input;
   }
 

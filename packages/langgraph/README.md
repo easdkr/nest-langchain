@@ -31,11 +31,11 @@ export class AppModule {}
 
 ```ts
 import { Injectable } from '@nestjs/common';
-import { LangGraphService } from '@nest-langchain/langgraph';
+import { LangGraphRunner } from '@nest-langchain/langgraph';
 
 @Injectable()
 export class AgentRunner {
-  constructor(private readonly graphs: LangGraphService) {}
+  constructor(private readonly graphs: LangGraphRunner) {}
 
   run(input: unknown) {
     return this.graphs.invoke('support-agent', input, {
@@ -53,7 +53,6 @@ export class AgentRunner {
 execution primitives.
 
 ```ts
-import { Injectable } from '@nestjs/common';
 import { Annotation } from '@langchain/langgraph';
 import {
   commandTo,
@@ -73,13 +72,11 @@ const SupportState = Annotation.Root({
 @LangGraph({
   name: 'support',
   state: SupportState,
-  entry: 'decide',
-  finish: ['approvedPath', 'rejectedPath'],
   edges: [],
 })
-@Injectable()
 export class SupportGraph {
   @GraphNode({
+    entry: true,
     ends: ['approvedPath', 'rejectedPath'],
   })
   decide(state: typeof SupportState.State) {
@@ -88,17 +85,25 @@ export class SupportGraph {
     });
   }
 
-  @GraphNode()
+  @GraphNode({
+    finish: true,
+  })
   approvedPath(state: typeof SupportState.State) {
     return { output: `${state.output}:approved` };
   }
 
-  @GraphNode()
+  @GraphNode({
+    finish: true,
+  })
   rejectedPath(state: typeof SupportState.State) {
     return { output: `${state.output}:rejected` };
   }
 }
 ```
+
+`@LangGraph()` also applies Nest `@Injectable()` metadata, so graph providers
+do not need a separate `@Injectable()` decorator. The class still has to be
+registered as a Nest provider in the consuming module.
 
 Available helpers:
 
@@ -110,3 +115,8 @@ Available helpers:
 - `callSubgraph(subgraph, mapInput, mapOutput)`: wrapper for parent/subgraph state-schema transforms.
 
 When returning `Command` from a node, set `@GraphNode({ ends: [...] })` for destinations inside the same graph and avoid also defining static edges from that node. LangGraph will run both static edges and command destinations if both are configured. Parent handoff destinations are parent-graph nodes, so `ParentHandoffNode` does not infer `ends` automatically.
+
+`entry` and `finish` can still be configured on `@LangGraph({ entry, finish })`
+for compatibility, but node-local `@GraphNode({ entry: true, finish: true })`
+is the preferred style because it survives method reordering and reduces
+class-level string configuration.

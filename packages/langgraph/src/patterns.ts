@@ -163,6 +163,8 @@ function graphNodeOptionsFromCommand(
 ): GraphNodeOptions {
   return {
     name: options.name ?? String(propertyKey),
+    entry: options.entry,
+    finish: options.finish,
     ends: options.ends ?? (graph ? undefined : staticTargets(options.to)),
     metadata: options.metadata,
     subgraphs: options.subgraphs,

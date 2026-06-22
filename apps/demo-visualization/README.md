@@ -8,10 +8,16 @@ pnpm --filter @nest-langchain/demo-visualization start
 
 Endpoints:
 
+- `POST /graphs/support-workflow`
 - `GET /ai/graphs`
 - `GET /ai/graphs/json`
 - `GET /ai/graphs/mermaid`
 - `GET /ai/graphs/dot`
-- `GET /ai/graphs/layouts/joke`
-- `PUT /ai/graphs/layouts/joke`
+- `GET /ai/graphs/layouts/support-workflow`
+- `PUT /ai/graphs/layouts/support-workflow`
 
+```bash
+curl -X POST "http://localhost:3000/graphs/support-workflow" \
+  -H "content-type: application/json" \
+  -d '{"message":"Delivery tracking is late for an enterprise customer.","customerTier":"enterprise"}'
+```

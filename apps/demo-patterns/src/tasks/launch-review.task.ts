@@ -1,11 +1,10 @@
-import { Injectable } from "@nestjs/common";
 import {
   CollaborativeTask,
   TaskStep,
   type TaskExecutionContext,
-} from "@nest-langchain/patterns";
+} from '@nest-langchain/patterns';
 
-import { CRITIC_MODEL, JUDGE_MODEL, PLANNER_MODEL } from "../tokens";
+import { CRITIC_MODEL, JUDGE_MODEL, PLANNER_MODEL } from '../tokens';
 
 interface LaunchReviewInput {
   product: string;
@@ -13,47 +12,46 @@ interface LaunchReviewInput {
 }
 
 @CollaborativeTask({
-  name: "launch-review",
-  description: "Draft, critique, score, and decide a product launch.",
+  name: 'launch-review',
+  description: 'Draft, critique, score, and decide a product launch.',
   models: [
-    { role: "planner", token: PLANNER_MODEL },
-    { role: "critic", token: CRITIC_MODEL },
-    { role: "judge", token: JUDGE_MODEL },
+    { role: 'planner', token: PLANNER_MODEL },
+    { role: 'critic', token: CRITIC_MODEL },
+    { role: 'judge', token: JUDGE_MODEL },
   ],
-  tags: ["demo", "collaboration"],
+  tags: ['demo', 'collaboration'],
 })
-@Injectable()
 export class LaunchReviewTask {
   @TaskStep({
-    name: "drafts",
-    pattern: "parallel",
-    models: ["planner", "critic"],
+    name: 'drafts',
+    pattern: 'parallel',
+    models: ['planner', 'critic'],
   })
   drafts(input: LaunchReviewInput) {
     return `Draft a launch plan for ${input.product} in ${input.market}.`;
   }
 
   @TaskStep({
-    name: "score",
-    pattern: "tool-call",
-    model: "critic",
-    dependsOn: ["drafts"],
+    name: 'score',
+    pattern: 'tool-call',
+    model: 'critic',
+    dependsOn: ['drafts'],
     tools: [
       {
-        name: "score_plan",
-        description: "Score the launch plan from 1 to 10.",
+        name: 'score_plan',
+        description: 'Score the launch plan from 1 to 10.',
         schema: {
-          type: "object",
+          type: 'object',
           properties: {
-            score: { type: "number" },
-            reason: { type: "string" },
+            score: { type: 'number' },
+            reason: { type: 'string' },
           },
-          required: ["score", "reason"],
+          required: ['score', 'reason'],
           additionalProperties: false,
         },
       },
     ],
-    toolChoice: "any",
+    toolChoice: 'any',
   })
   score(input: LaunchReviewInput, context: TaskExecutionContext) {
     return `Score launch drafts for ${input.product}: ${JSON.stringify(
@@ -62,18 +60,18 @@ export class LaunchReviewTask {
   }
 
   @TaskStep({
-    name: "decision",
-    pattern: "structured",
-    model: "judge",
-    dependsOn: ["score"],
-    schemaName: "LaunchDecision",
+    name: 'decision',
+    pattern: 'structured',
+    model: 'judge',
+    dependsOn: ['score'],
+    schemaName: 'LaunchDecision',
     schema: {
-      type: "object",
+      type: 'object',
       properties: {
-        decision: { type: "string" },
-        owner: { type: "string" },
+        decision: { type: 'string' },
+        owner: { type: 'string' },
       },
-      required: ["decision", "owner"],
+      required: ['decision', 'owner'],
       additionalProperties: false,
     },
   })

@@ -1,12 +1,12 @@
-import "reflect-metadata";
+import 'reflect-metadata';
 
-import type { INestApplication } from "@nestjs/common";
-import { NestFactory } from "@nestjs/core";
-import { afterEach, describe, expect, it } from "vitest";
+import type { INestApplication } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { afterEach, describe, expect, it } from 'vitest';
 
-import { AppModule } from "../src/app.module";
+import { AppModule } from '../src/app.module';
 
-describe("demo-patterns e2e", () => {
+describe('demo-patterns e2e', () => {
   let app: INestApplication | undefined;
 
   afterEach(async () => {
@@ -14,7 +14,7 @@ describe("demo-patterns e2e", () => {
     app = undefined;
   });
 
-  it("lists and invokes a decorated multi-provider collaboration task through HTTP", async () => {
+  it('lists and invokes a decorated multi-provider collaboration task through HTTP', async () => {
     app = await NestFactory.create(AppModule, { logger: false });
     await app.listen(0);
     const baseUrl = await app.getUrl();
@@ -28,19 +28,19 @@ describe("demo-patterns e2e", () => {
     }>;
 
     expect(tasks[0]).toMatchObject({
-      name: "launch-review",
-      nodes: ["drafts", "score", "decision"],
-      models: ["planner", "critic", "judge"],
+      name: 'launch-review',
+      nodes: ['drafts', 'score', 'decision'],
+      models: ['planner', 'critic', 'judge'],
     });
 
     const invokeResponse = await fetch(`${baseUrl}/tasks/launch-review`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "content-type": "application/json",
+        'content-type': 'application/json',
       },
       body: JSON.stringify({
-        product: "Nest LangChain Patterns",
-        market: "Korea B2B SaaS",
+        product: 'Nest LangChain Patterns',
+        market: 'Korea B2B SaaS',
       }),
     });
     expect(invokeResponse.ok).toBe(true);
@@ -64,23 +64,23 @@ describe("demo-patterns e2e", () => {
       };
     };
 
-    expect(body.taskName).toBe("launch-review");
+    expect(body.taskName).toBe('launch-review');
     expect(body.steps.drafts.planner.content).toContain(
-      "planner:Draft a launch plan",
+      'planner:Draft a launch plan',
     );
     expect(body.steps.drafts.critic.content).toContain(
-      "critic:Draft a launch plan",
+      'critic:Draft a launch plan',
     );
     expect(body.steps.score.toolCalls[0]).toMatchObject({
-      name: "score_plan",
+      name: 'score_plan',
       args: {
         score: 9,
-        reason: "critic approved",
+        reason: 'critic approved',
       },
     });
     expect(body.output).toEqual({
-      decision: "ship",
-      owner: "judge",
+      decision: 'ship',
+      owner: 'judge',
     });
   });
 });

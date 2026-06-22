@@ -1,7 +1,7 @@
-import { DynamicModule, Module } from "@nestjs/common";
-import { ChatAnthropic } from "@langchain/anthropic";
+import { DynamicModule, Module } from '@nestjs/common';
+import { ChatAnthropic } from '@langchain/anthropic';
 
-import { NEST_LANGCHAIN_ANTHROPIC_CHAT_MODEL } from "./tokens";
+import { NEST_LANGCHAIN_ANTHROPIC_CHAT_MODEL } from './tokens';
 
 export interface AnthropicProviderOptions {
   apiKey?: string;
@@ -27,7 +27,7 @@ export class AnthropicProviderModule {
             );
 
             if (!apiKey) {
-              throw new Error("Anthropic API key is required.");
+              throw new Error('Anthropic API key is required.');
             }
 
             const anthropicApiUrl = firstNonEmpty(
@@ -37,7 +37,7 @@ export class AnthropicProviderModule {
             );
             const config: Record<string, unknown> = {
               apiKey,
-              model: options.model ?? "claude-haiku-4-5-20251001",
+              model: options.model ?? 'claude-haiku-4-5-20251001',
               temperature: options.temperature ?? 0,
             };
 
@@ -61,5 +61,5 @@ type ChatAnthropicConstructor = new (
 function firstNonEmpty(
   ...values: Array<string | undefined>
 ): string | undefined {
-  return values.find((value) => typeof value === "string" && value.length > 0);
+  return values.find((value) => typeof value === 'string' && value.length > 0);
 }

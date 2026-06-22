@@ -9,3 +9,7 @@ export interface ToolsModuleOptions {
   autoDiscoverTools?: boolean;
 }
 
+export interface ToolsetOptions {
+  tags?: readonly string[];
+  metadata?: Record<string, unknown>;
+}

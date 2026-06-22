@@ -1,4 +1,6 @@
-import "reflect-metadata";
+import 'reflect-metadata';
+
+import { Injectable } from '@nestjs/common';
 
 import {
   COLLABORATIVE_TASK_METADATA,
@@ -6,19 +8,20 @@ import {
   DEEP_AGENT_SUBAGENT_METADATA,
   DEEP_AGENT_TOOL_METADATA,
   TASK_STEP_METADATA,
-} from "./constants";
+} from './constants';
 import type {
   CollaborativeTaskOptions,
   DeepAgentOptions,
   DeepAgentSubagentOptions,
   DeepAgentToolOptions,
   TaskStepOptions,
-} from "./interfaces";
+} from './interfaces';
 
 export function CollaborativeTask(
   options: CollaborativeTaskOptions,
 ): ClassDecorator {
   return (target) => {
+    Injectable()(target);
     Reflect.defineMetadata(COLLABORATIVE_TASK_METADATA, options, target);
   };
 }
@@ -35,6 +38,7 @@ export function TaskStep(options: TaskStepOptions = {}): MethodDecorator {
 
 export function DeepAgent(options: DeepAgentOptions): ClassDecorator {
   return (target) => {
+    Injectable()(target);
     Reflect.defineMetadata(DEEP_AGENT_METADATA, options, target);
   };
 }

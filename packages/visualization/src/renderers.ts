@@ -90,12 +90,13 @@ export function renderHtml(
 }
 
 function renderGraphMermaid(graph: VisualGraph): string {
-  const lines = [`flowchart LR`, `  subgraph ${safeMermaidId(graph.id)}["${escapeMermaid(graph.label)}"]`];
+  const lines = [
+    `flowchart LR`,
+    `  subgraph ${safeMermaidId(graph.id)}["${escapeMermaid(graph.label)}"]`,
+  ];
 
   for (const node of graph.nodes) {
-    lines.push(
-      `    ${safeMermaidId(node.id)}["${escapeMermaid(node.label)}"]`,
-    );
+    lines.push(`    ${safeMermaidId(node.id)}["${escapeMermaid(node.label)}"]`);
   }
 
   for (const edge of graph.edges) {
@@ -108,7 +109,10 @@ function renderGraphMermaid(graph: VisualGraph): string {
   return lines.join('\n');
 }
 
-function renderGraphSection(graph: VisualGraph, options: RenderHtmlOptions): string {
+function renderGraphSection(
+  graph: VisualGraph,
+  options: RenderHtmlOptions,
+): string {
   const draggable = options.editable === true ? ' draggable="true"' : '';
 
   return `<section data-graph-id="${escapeHtml(graph.id)}">

@@ -10,8 +10,9 @@ async function bootstrap() {
 
   await app.listen(port);
 
-  console.log(`nest-langchain LangSmith demo listening on http://localhost:${port}`);
+  console.log(
+    `nest-langchain LangSmith demo listening on http://localhost:${port}`,
+  );
 }
 
 void bootstrap();
-

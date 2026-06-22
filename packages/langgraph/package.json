@@ -1,6 +1,6 @@
 {
   "name": "@nest-langchain/langgraph",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "LangGraph decorators and discovery integration for NestJS.",
   "license": "MIT",
   "author": "easdkr",

@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { BrowserLayoutStorage, MemoryLayoutStorage } from '../src/layout-storage';
+import {
+  BrowserLayoutStorage,
+  MemoryLayoutStorage,
+} from '../src/layout-storage';
 import { renderHtml, renderMermaid } from '../src/renderers';
 import type { VisualizationDocument } from '../src/interfaces';
 
@@ -16,9 +19,7 @@ describe('visualization renderers and storage', () => {
           { id: 'joke:draft', label: 'draft', kind: 'node' },
           { id: 'joke:localize', label: 'localize', kind: 'node' },
         ],
-        edges: [
-          { from: 'joke:draft', to: 'joke:localize', kind: 'normal' },
-        ],
+        edges: [{ from: 'joke:draft', to: 'joke:localize', kind: 'normal' }],
       },
     ],
   };

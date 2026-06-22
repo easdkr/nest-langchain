@@ -5,7 +5,7 @@ import {
 } from '@nest-langchain/core';
 
 @Injectable()
-export class LangGraphService {
+export class LangGraphRunner {
   constructor(private readonly registry: LangChainRegistry) {}
 
   listGraphs() {

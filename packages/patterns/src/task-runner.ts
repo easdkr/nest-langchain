@@ -4,7 +4,7 @@ import type {
   TaskExecutionContext,
   TaskExecutionResult,
   TaskStepOptions,
-} from "./interfaces";
+} from './interfaces';
 
 export interface DiscoveredStep {
   name: string;
@@ -57,9 +57,9 @@ export class CollaborativeTaskRunner {
     context: TaskExecutionContext,
   ): Promise<unknown> {
     const prompt = await step.handler(input, context);
-    const pattern = step.options.pattern ?? "invoke";
+    const pattern = step.options.pattern ?? 'invoke';
 
-    if (pattern === "parallel") {
+    if (pattern === 'parallel') {
       const roles =
         step.options.models ?? this.options.models.map(({ role }) => role);
       const entries = await Promise.all(
@@ -72,7 +72,7 @@ export class CollaborativeTaskRunner {
       return Object.fromEntries(entries);
     }
 
-    if (pattern === "fallback") {
+    if (pattern === 'fallback') {
       return this.invokeFallback(step, prompt);
     }
 
@@ -82,8 +82,8 @@ export class CollaborativeTaskRunner {
       this.options.models[0]?.role;
     const model = this.model(role);
 
-    if (pattern === "structured") {
-      if (typeof model.withStructuredOutput !== "function") {
+    if (pattern === 'structured') {
+      if (typeof model.withStructuredOutput !== 'function') {
         throw new Error(
           `Model role "${role}" does not support structured output.`,
         );
@@ -96,8 +96,8 @@ export class CollaborativeTaskRunner {
         .invoke(prompt);
     }
 
-    if (pattern === "tool-call") {
-      if (typeof model.bindTools !== "function") {
+    if (pattern === 'tool-call') {
+      if (typeof model.bindTools !== 'function') {
         throw new Error(`Model role "${role}" does not support tool calling.`);
       }
 
@@ -141,7 +141,7 @@ export class CollaborativeTaskRunner {
     throw new Error(
       `Task step "${step.name}" exhausted fallback models: ${attempts
         .map((attempt) => `${attempt.role}: ${attempt.error}`)
-        .join(", ")}`,
+        .join(', ')}`,
     );
   }
 
@@ -176,7 +176,7 @@ function sortSteps(steps: DiscoveredStep[]): DiscoveredStep[] {
 
     if (index === -1) {
       throw new Error(
-        "Collaborative task contains circular or unknown dependencies.",
+        'Collaborative task contains circular or unknown dependencies.',
       );
     }
 
@@ -191,7 +191,7 @@ function sortSteps(steps: DiscoveredStep[]): DiscoveredStep[] {
 function normalizeToolOptions(
   options: TaskStepOptions,
 ): Record<string, unknown> {
-  return typeof options.toolChoice === "undefined"
+  return typeof options.toolChoice === 'undefined'
     ? {}
     : {
         toolChoice: options.toolChoice,
@@ -199,7 +199,7 @@ function normalizeToolOptions(
 }
 
 export function normalizeMessage(value: unknown): Record<string, unknown> {
-  if (isRecord(value) && "content" in value) {
+  if (isRecord(value) && 'content' in value) {
     return {
       content: stringifyContent(value.content),
     };
@@ -227,23 +227,23 @@ export function extractToolCalls(value: unknown): unknown[] {
 }
 
 function stringifyContent(value: unknown): string {
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     return value;
   }
 
   if (Array.isArray(value)) {
     return value
       .map((item) =>
-        isRecord(item) && typeof item.text === "string"
+        isRecord(item) && typeof item.text === 'string'
           ? item.text
           : JSON.stringify(item),
       )
-      .join("");
+      .join('');
   }
 
   return JSON.stringify(value);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
+  return typeof value === 'object' && value !== null;
 }

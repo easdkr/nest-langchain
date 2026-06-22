@@ -11,7 +11,10 @@ import type {
   VisualGraphLayoutStorage,
   VisualNodeKind,
 } from './interfaces';
-import { isBrowserLayoutStorage, ReadOnlyLayoutStorage } from './layout-storage';
+import {
+  isBrowserLayoutStorage,
+  ReadOnlyLayoutStorage,
+} from './layout-storage';
 import { renderDot, renderHtml, renderMermaid } from './renderers';
 
 @Module({})
@@ -63,7 +66,9 @@ export class VisualizationModule {
   static setup(
     path: string,
     app: NestApplicationLike,
-    documentOrOptions: VisualizationDocument | CreateVisualizationDocumentOptions,
+    documentOrOptions:
+      | VisualizationDocument
+      | CreateVisualizationDocumentOptions,
     options: VisualizationSetupOptions = {},
   ): void {
     const adapter = app.getHttpAdapter();
@@ -116,7 +121,8 @@ export class VisualizationModule {
       }
 
       const graphId = getParam(req, 'graphId');
-      const body = typeof req.body === 'undefined' ? await readJsonBody(req) : req.body;
+      const body =
+        typeof req.body === 'undefined' ? await readJsonBody(req) : req.body;
       const layout = normalizeLayout(graphId, body);
 
       if (isBrowserLayoutStorage(storage)) {
@@ -198,7 +204,9 @@ function registerPut(
 function getHttpInstance(
   adapter: ReturnType<NestApplicationLike['getHttpAdapter']>,
 ): any {
-  return typeof adapter.getInstance === 'function' ? adapter.getInstance() : adapter;
+  return typeof adapter.getInstance === 'function'
+    ? adapter.getInstance()
+    : adapter;
 }
 
 function sendJson(res: any, body: unknown, status = 200): void {
@@ -247,7 +255,9 @@ function normalizeLayout(graphId: string, value: unknown): VisualGraphLayout {
   return {
     graphId,
     version: typeof value.version === 'string' ? value.version : '1',
-    nodes: isRecord(value.nodes) ? (value.nodes as VisualGraphLayout['nodes']) : {},
+    nodes: isRecord(value.nodes)
+      ? (value.nodes as VisualGraphLayout['nodes'])
+      : {},
     viewport: isRecord(value.viewport)
       ? (value.viewport as VisualGraphLayout['viewport'])
       : undefined,

@@ -48,7 +48,9 @@ export class LangChainRegistry {
         : nameOrRunnable;
 
     if (!registered.runnable) {
-      throw new Error(`Runnable "${registered.name}" must provide an invoke method.`);
+      throw new Error(
+        `Runnable "${registered.name}" must provide an invoke method.`,
+      );
     }
 
     if (this.runnables.has(registered.name)) {
@@ -92,7 +94,9 @@ export class LangChainRegistry {
   }
 
   listGraphs(): Array<Omit<RegisteredGraph, 'runnable'>> {
-    return this.listRunnables().filter((registered) => registered.kind === 'graph');
+    return this.listRunnables().filter(
+      (registered) => registered.kind === 'graph',
+    );
   }
 
   async invoke<TInput = unknown, TOutput = unknown>(

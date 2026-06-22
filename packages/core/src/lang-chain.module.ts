@@ -24,7 +24,11 @@ export class LangChainModule {
         LangChainRegistry,
         DecoratedProviderScanner,
       ],
-      exports: [LANG_CHAIN_OPTIONS, LangChainRegistry, DecoratedProviderScanner],
+      exports: [
+        LANG_CHAIN_OPTIONS,
+        LangChainRegistry,
+        DecoratedProviderScanner,
+      ],
     };
   }
 
@@ -46,7 +50,11 @@ export class LangChainModule {
         DecoratedProviderScanner,
         ...(options.extraProviders ?? []),
       ],
-      exports: [LANG_CHAIN_OPTIONS, LangChainRegistry, DecoratedProviderScanner],
+      exports: [
+        LANG_CHAIN_OPTIONS,
+        LangChainRegistry,
+        DecoratedProviderScanner,
+      ],
     };
   }
 }

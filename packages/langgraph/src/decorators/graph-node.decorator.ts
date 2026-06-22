@@ -6,4 +6,3 @@ import type { GraphNodeOptions } from '../interfaces';
 export function GraphNode(options: GraphNodeOptions = {}): MethodDecorator {
   return SetMetadata(GRAPH_NODE_METADATA, options);
 }
-

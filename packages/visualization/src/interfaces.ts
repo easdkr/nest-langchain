@@ -84,5 +84,7 @@ export interface VisualGraphLayoutStorage {
   save(graphId: string, layout: VisualGraphLayout): Promise<void>;
 }
 
-export type NestApplicationLike = Pick<INestApplication, 'get' | 'getHttpAdapter'>;
-
+export type NestApplicationLike = Pick<
+  INestApplication,
+  'get' | 'getHttpAdapter'
+>;

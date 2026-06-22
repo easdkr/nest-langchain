@@ -1,12 +1,12 @@
-import "reflect-metadata";
+import 'reflect-metadata';
 
-import type { INestApplication } from "@nestjs/common";
-import { NestFactory } from "@nestjs/core";
-import { afterEach, describe, expect, it } from "vitest";
+import type { INestApplication } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { afterEach, describe, expect, it } from 'vitest';
 
-import { AppModule } from "../src/app.module";
+import { AppModule } from '../src/app.module';
 
-describe("demo-langgraph e2e", () => {
+describe('demo-langgraph e2e', () => {
   let app: INestApplication | undefined;
 
   afterEach(async () => {
@@ -14,7 +14,7 @@ describe("demo-langgraph e2e", () => {
     app = undefined;
   });
 
-  it("lists and invokes the decorated LangGraph through HTTP", async () => {
+  it('lists and invokes the decorated LangGraph through HTTP', async () => {
     app = await NestFactory.create(AppModule, { logger: false });
     await app.listen(0);
     const baseUrl = await app.getUrl();
@@ -28,23 +28,35 @@ describe("demo-langgraph e2e", () => {
     }>;
 
     expect(graphs[0]).toMatchObject({
-      name: "joke",
-      kind: "graph",
-      nodes: ["draftJoke", "localizeJoke"],
+      name: 'support-intake',
+      kind: 'graph',
+      nodes: ['classifyRequest', 'draftResponse'],
     });
 
-    const invokeResponse = await fetch(
-      `${baseUrl}/graphs/joke?topic=nestjs&language=en`,
-    );
+    const invokeResponse = await fetch(`${baseUrl}/graphs/support-intake`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: 'Checkout fails with a saved card error.',
+        customerTier: 'enterprise',
+        channel: 'web',
+      }),
+    });
     expect(invokeResponse.ok).toBe(true);
     const body = (await invokeResponse.json()) as {
-      topic: string;
-      language: string;
-      answer: string;
+      message: string;
+      intent: string;
+      priority: string;
+      routingKey: string;
+      response: string;
     };
 
-    expect(body.topic).toBe("nestjs");
-    expect(body.language).toBe("en");
-    expect(body.answer).toContain("nestjs");
+    expect(body.message).toContain('Checkout');
+    expect(body.intent).toBe('billing');
+    expect(body.priority).toBe('high');
+    expect(body.routingKey).toBe('support-billing');
+    expect(body.response).toContain('support-billing');
   });
 });

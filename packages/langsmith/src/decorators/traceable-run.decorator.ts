@@ -10,7 +10,9 @@ import type {
 import { LangSmithContext } from '../langsmith.context';
 import { getLangSmithRuntimeOptions } from '../langsmith.runtime';
 
-export function TraceableRun(options: TraceableRunOptions = {}): MethodDecorator {
+export function TraceableRun(
+  options: TraceableRunOptions = {},
+): MethodDecorator {
   return (_target, propertyKey, descriptor) => {
     const original = descriptor.value;
 
@@ -18,7 +20,10 @@ export function TraceableRun(options: TraceableRunOptions = {}): MethodDecorator
       throw new TypeError('@TraceableRun can only decorate methods.');
     }
 
-    descriptor.value = function tracedMethod(this: unknown, ...args: unknown[]) {
+    descriptor.value = function tracedMethod(
+      this: unknown,
+      ...args: unknown[]
+    ) {
       const runtimeOptions = getLangSmithRuntimeOptions();
       const methodName = String(propertyKey);
       const metadata = buildMetadata(methodName, args, runtimeOptions, options);

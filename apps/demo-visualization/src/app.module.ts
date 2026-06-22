@@ -2,12 +2,11 @@ import { Module } from '@nestjs/common';
 import { LangGraphModule } from '@nest-langchain/langgraph';
 
 import { AppController } from './app.controller';
-import { JokeGraph } from './graphs/joke.graph';
+import { SupportWorkflowGraph } from './graphs/support-workflow.graph';
 
 @Module({
   imports: [LangGraphModule.forRoot({ global: true })],
   controllers: [AppController],
-  providers: [JokeGraph],
+  providers: [SupportWorkflowGraph],
 })
 export class AppModule {}
-

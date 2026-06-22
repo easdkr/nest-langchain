@@ -27,8 +27,10 @@ export interface LangChainModuleOptions {
   defaultConfig?: RunnableConfigLike;
 }
 
-export interface LangChainModuleAsyncOptions
-  extends Pick<ModuleMetadata, 'imports'> {
+export interface LangChainModuleAsyncOptions extends Pick<
+  ModuleMetadata,
+  'imports'
+> {
   global?: boolean;
   inject?: Array<string | symbol | Type<unknown>>;
   useFactory: (
@@ -38,7 +40,10 @@ export interface LangChainModuleAsyncOptions
 }
 
 export interface RunnableLike<TInput = unknown, TOutput = unknown> {
-  invoke(input: TInput, config?: RunnableConfigLike): Promise<TOutput> | TOutput;
+  invoke(
+    input: TInput,
+    config?: RunnableConfigLike,
+  ): Promise<TOutput> | TOutput;
 }
 
 export interface RegisteredRunnable {
@@ -53,4 +58,8 @@ export interface RegisteredRunnable {
 
 export type RegisteredGraph = RegisteredRunnable;
 
-export type NestImport = Type<unknown> | DynamicModule | Promise<DynamicModule> | ForwardReference;
+export type NestImport =
+  | Type<unknown>
+  | DynamicModule
+  | Promise<DynamicModule>
+  | ForwardReference;

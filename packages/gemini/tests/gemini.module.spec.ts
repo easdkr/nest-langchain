@@ -1,18 +1,15 @@
 import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { describe, expect, it, vi } from 'vitest';
 
-import {
-  GeminiProviderModule,
-  NEST_LANGCHAIN_GEMINI_CHAT_MODEL,
-} from '../src';
+import { GeminiProviderModule, NEST_LANGCHAIN_GEMINI_CHAT_MODEL } from '../src';
 
 vi.mock('@langchain/google-genai', () => ({
   ChatGoogleGenerativeAI: vi.fn(function ChatGoogleGenerativeAIMock(
     config: Record<string, unknown>,
   ) {
     return {
-    config,
-    provider: 'gemini',
+      config,
+      provider: 'gemini',
     };
   }),
 }));

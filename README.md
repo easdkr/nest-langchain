@@ -65,6 +65,15 @@ pnpm --filter @nest-langchain/demo-patterns start
 pnpm --filter @nest-langchain/demo-visualization start
 ```
 
+The demos run without provider API keys. They use deterministic support and launch-review workflows so the package behavior can be checked locally:
+
+```bash
+curl "http://localhost:3000/runnables"
+curl -X POST "http://localhost:3000/support/triage" \
+  -H "content-type: application/json" \
+  -d '{"message":"Checkout fails with a saved card error.","customerTier":"enterprise","channel":"web"}'
+```
+
 The visualization demo hosts graph docs at:
 
 ```text
@@ -79,37 +88,43 @@ PUT /ai/graphs/layouts/:graphId
 ## LangGraph Example
 
 ```ts
-import { Injectable } from "@nestjs/common";
-import { Annotation } from "@langchain/langgraph";
-import { GraphNode, LangGraph } from "@nest-langchain/langgraph";
+import { Annotation } from '@langchain/langgraph';
+import { GraphNode, LangGraph } from '@nest-langchain/langgraph';
 
-const JokeState = Annotation.Root({
-  topic: Annotation<string>(),
-  result: Annotation<string>(),
+const SupportState = Annotation.Root({
+  message: Annotation<string>(),
+  intent: Annotation<'billing' | 'technical' | 'general'>(),
+  response: Annotation<string>(),
 });
 
 @LangGraph({
-  name: "joke",
-  state: JokeState,
-  entry: "generateAnswer",
-  finish: "generateAnswer",
+  name: 'support-intake',
+  state: SupportState,
 })
-@Injectable()
-export class JokeGraph {
-  @GraphNode()
-  generateAnswer(state: typeof JokeState.State) {
-    return { result: `${state.topic} is ready for a graph.` };
+export class SupportIntakeGraph {
+  @GraphNode({ entry: true })
+  classifyRequest(state: typeof SupportState.State) {
+    return {
+      intent: state.message.includes('card') ? 'billing' : 'general',
+    };
+  }
+
+  @GraphNode({ finish: true })
+  draftResponse(state: typeof SupportState.State) {
+    return {
+      response: `Route ${state.intent} request to support.`,
+    };
   }
 }
 ```
 
 ```ts
-import { Module } from "@nestjs/common";
-import { LangGraphModule } from "@nest-langchain/langgraph";
+import { Module } from '@nestjs/common';
+import { LangGraphModule } from '@nest-langchain/langgraph';
 
 @Module({
   imports: [LangGraphModule.forRoot({ global: true })],
-  providers: [JokeGraph],
+  providers: [SupportIntakeGraph],
 })
 export class AppModule {}
 ```
@@ -118,15 +133,15 @@ export class AppModule {}
 
 ```ts
 VisualizationModule.setup(
-  "/ai/graphs",
+  '/ai/graphs',
   app,
   {
-    title: "AI Graphs",
+    title: 'AI Graphs',
   },
   {
     editable: true,
     layout: {
-      storage: new FileLayoutStorage(".nest-langchain/layouts"),
+      storage: new FileLayoutStorage('.nest-langchain/layouts'),
     },
   },
 );
@@ -138,25 +153,24 @@ Layout editing does not rewrite graph source files. Shared layouts are sidecar a
 
 ```ts
 @CollaborativeTask({
-  name: "launch-review",
+  name: 'launch-review',
   models: [
-    { role: "planner", token: OPENAI_MODEL },
-    { role: "critic", token: ANTHROPIC_MODEL },
-    { role: "judge", token: GEMINI_MODEL },
+    { role: 'planner', token: OPENAI_MODEL },
+    { role: 'critic', token: ANTHROPIC_MODEL },
+    { role: 'judge', token: GEMINI_MODEL },
   ],
 })
-@Injectable()
 export class LaunchReviewTask {
   @TaskStep({
-    name: "drafts",
-    pattern: "parallel",
-    models: ["planner", "critic"],
+    name: 'drafts',
+    pattern: 'parallel',
+    models: ['planner', 'critic'],
   })
   drafts(input: { product: string }) {
     return `Draft a launch plan for ${input.product}.`;
   }
 
-  @TaskStep({ name: "decision", pattern: "structured", model: "judge" })
+  @TaskStep({ name: 'decision', pattern: 'structured', model: 'judge' })
   decision(input: unknown, context: TaskExecutionContext) {
     return `Decide from ${JSON.stringify(context.steps)}.`;
   }

@@ -1,10 +1,10 @@
-import { Module } from "@nestjs/common";
-import { CollaborativePatternsModule } from "@nest-langchain/patterns";
+import { Module } from '@nestjs/common';
+import { CollaborativePatternsModule } from '@nest-langchain/patterns';
 
-import { AppController } from "./app.controller";
-import { DeterministicChatModel } from "./models/deterministic-chat.model";
-import { LaunchReviewTask } from "./tasks/launch-review.task";
-import { CRITIC_MODEL, JUDGE_MODEL, PLANNER_MODEL } from "./tokens";
+import { AppController } from './app.controller';
+import { DeterministicChatModel } from './models/deterministic-chat.model';
+import { LaunchReviewTask } from './tasks/launch-review.task';
+import { CRITIC_MODEL, JUDGE_MODEL, PLANNER_MODEL } from './tokens';
 
 @Module({
   imports: [
@@ -17,15 +17,15 @@ import { CRITIC_MODEL, JUDGE_MODEL, PLANNER_MODEL } from "./tokens";
     LaunchReviewTask,
     {
       provide: PLANNER_MODEL,
-      useValue: new DeterministicChatModel("planner"),
+      useValue: new DeterministicChatModel('planner'),
     },
     {
       provide: CRITIC_MODEL,
-      useValue: new DeterministicChatModel("critic"),
+      useValue: new DeterministicChatModel('critic'),
     },
     {
       provide: JUDGE_MODEL,
-      useValue: new DeterministicChatModel("judge"),
+      useValue: new DeterministicChatModel('judge'),
     },
   ],
 })

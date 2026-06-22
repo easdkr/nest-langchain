@@ -1,32 +1,43 @@
 import 'reflect-metadata';
 
 import { Injectable } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
 import { Annotation, StateGraph } from '@langchain/langgraph';
 import { LangChainRegistry } from '@nest-langchain/core';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ConditionalEdge, GraphNode, LangGraph } from '../src/decorators';
+import { LangGraphExplorer } from '../src/langgraph.explorer';
 import { LangGraphModule } from '../src/langgraph.module';
-import { LangGraphService } from '../src/langgraph.service';
+import { LangGraphRunner } from '../src/langgraph.runner';
 
 const DemoState = Annotation.Root({
   input: Annotation<string>(),
   output: Annotation<string>(),
 });
 
+@Injectable()
+class DemoGreeter {
+  greet(input: string) {
+    return `hello ${input}`;
+  }
+}
+
 @LangGraph({
   name: 'demo',
   state: DemoState,
-  entry: 'answer',
-  finish: 'answer',
 })
-@Injectable()
 class DemoGraph {
-  @GraphNode()
+  constructor(private readonly greeter: DemoGreeter) {}
+
+  @GraphNode({
+    entry: true,
+    finish: true,
+  })
   answer(state: typeof DemoState.State) {
     return {
-      output: `hello ${state.input}`,
+      output: this.greeter.greet(state.input),
     };
   }
 }
@@ -39,13 +50,12 @@ const ConditionalState = Annotation.Root({
 @LangGraph({
   name: 'conditional',
   state: ConditionalState,
-  entry: 'decide',
   edges: [],
-  finish: ['left', 'right'],
 })
-@Injectable()
 class ConditionalGraph {
-  @GraphNode()
+  @GraphNode({
+    entry: true,
+  })
   decide() {
     return {};
   }
@@ -61,14 +71,18 @@ class ConditionalGraph {
     return state.route;
   }
 
-  @GraphNode()
+  @GraphNode({
+    finish: true,
+  })
   left() {
     return {
       output: 'left branch',
     };
   }
 
-  @GraphNode()
+  @GraphNode({
+    finish: true,
+  })
   right() {
     return {
       output: 'right branch',
@@ -84,7 +98,7 @@ describe('LangGraphExplorer', () => {
   it('discovers decorated graph providers and registers compiled graphs', async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [LangGraphModule.forRoot()],
-      providers: [DemoGraph],
+      providers: [DemoGraph, DemoGreeter],
     }).compile();
 
     await moduleRef.init();
@@ -121,12 +135,12 @@ describe('LangGraphExplorer', () => {
     const registry = moduleRef.get(LangChainRegistry);
 
     await expect(
-      registry.invokeGraph<
-        { route: 'left' | 'right' },
-        { output: string }
-      >('conditional', {
-        route: 'left',
-      }),
+      registry.invokeGraph<{ route: 'left' | 'right' }, { output: string }>(
+        'conditional',
+        {
+          route: 'left',
+        },
+      ),
     ).resolves.toMatchObject({
       output: 'left branch',
     });
@@ -139,15 +153,15 @@ describe('LangGraphExplorer', () => {
     await moduleRef.close();
   });
 
-  it('invokes registered graphs through LangGraphService', async () => {
+  it('invokes registered graphs through LangGraphRunner', async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [LangGraphModule.forRoot()],
-      providers: [DemoGraph],
+      providers: [DemoGraph, DemoGreeter],
     }).compile();
 
     await moduleRef.init();
 
-    const service = moduleRef.get(LangGraphService);
+    const service = moduleRef.get(LangGraphRunner);
 
     await expect(
       service.invoke<{ input: string }, { output: string }>('demo', {
@@ -164,18 +178,16 @@ describe('LangGraphExplorer', () => {
     const checkpointer = {
       marker: 'checkpointer',
     };
-    const compile = vi
-      .spyOn(StateGraph.prototype, 'compile')
-      .mockReturnValue({
-        invoke: async (input: unknown) => input,
-      } as never);
+    const compile = vi.spyOn(StateGraph.prototype, 'compile').mockReturnValue({
+      invoke: async (input: unknown) => input,
+    } as never);
     const moduleRef = await Test.createTestingModule({
       imports: [
         LangGraphModule.forRoot({
           checkpointer,
         }),
       ],
-      providers: [DemoGraph],
+      providers: [DemoGraph, DemoGreeter],
     }).compile();
 
     await moduleRef.init();
@@ -185,5 +197,37 @@ describe('LangGraphExplorer', () => {
     });
 
     await moduleRef.close();
+  });
+
+  it('fails fast when a graph declares multiple entry nodes', async () => {
+    @LangGraph({
+      name: 'invalid-entry',
+      state: DemoState,
+    })
+    class InvalidEntryGraph {
+      @GraphNode({
+        entry: true,
+      })
+      first() {
+        return {};
+      }
+
+      @GraphNode({
+        entry: true,
+      })
+      second() {
+        return {};
+      }
+    }
+
+    const explorer = new LangGraphExplorer(
+      {
+        getProviders: () => [{ instance: new InvalidEntryGraph() }],
+      } as never,
+      new Reflector(),
+      new LangChainRegistry(),
+    );
+
+    expect(() => explorer.onModuleInit()).toThrow('multiple entry nodes');
   });
 });

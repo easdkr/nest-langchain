@@ -1,6 +1,6 @@
 {
   "name": "@nest-langchain/tools",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "NestJS decorators and discovery for LangChain tools.",
   "license": "MIT",
   "author": "easdkr",
@@ -48,4 +48,3 @@
     "zod": "^4.4.3"
   }
 }
-

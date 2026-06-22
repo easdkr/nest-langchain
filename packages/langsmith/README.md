@@ -36,7 +36,7 @@ import { Injectable } from '@nestjs/common';
 import { LangSmithContext, TraceableRun } from '@nest-langchain/langsmith';
 
 @Injectable()
-export class SupportService {
+export class SupportHandler {
   handleRequest(tenantId: string, input: { message: string }) {
     return LangSmithContext.run({ tenantId }, () => this.reply(input));
   }

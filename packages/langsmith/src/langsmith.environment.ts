@@ -37,7 +37,8 @@ export class LangSmithEnvironment {
       LANGSMITH_ENDPOINT: process.env.LANGSMITH_ENDPOINT,
       LANGSMITH_PROJECT: process.env.LANGSMITH_PROJECT,
       LANGSMITH_WORKSPACE_ID: process.env.LANGSMITH_WORKSPACE_ID,
-      LANGCHAIN_CALLBACKS_BACKGROUND: process.env.LANGCHAIN_CALLBACKS_BACKGROUND,
+      LANGCHAIN_CALLBACKS_BACKGROUND:
+        process.env.LANGCHAIN_CALLBACKS_BACKGROUND,
       LANGSMITH_TRACING_BACKGROUND: process.env.LANGSMITH_TRACING_BACKGROUND,
     };
   }
@@ -70,4 +71,3 @@ function redact(value: string | undefined): string | undefined {
 
   return `${value.slice(0, 4)}...${value.slice(-4)}`;
 }
-

@@ -14,9 +14,10 @@ pnpm --filter @nest-langchain/demo-langgraph start
 
 ```bash
 curl "http://localhost:3000/graphs"
-curl "http://localhost:3000/graphs/joke?topic=LangGraph&language=ko"
-curl -X POST "http://localhost:3000/graphs/joke/invoke" \
+curl -X POST "http://localhost:3000/graphs/support-intake" \
   -H "content-type: application/json" \
-  -d '{"topic":"LangSmith","language":"en"}'
+  -d '{"message":"Checkout fails with a saved card error.","customerTier":"enterprise","channel":"web"}'
+curl -X POST "http://localhost:3000/graphs/support-intake/invoke" \
+  -H "content-type: application/json" \
+  -d '{"message":"Delivery tracking is late.","customerTier":"pro","channel":"chat"}'
 ```
-

@@ -31,7 +31,7 @@ import { Injectable } from '@nestjs/common';
 import { PromptRegistry } from '@nest-langchain/prompts';
 
 @Injectable()
-export class SupportPromptService {
+export class SupportPrompts {
   constructor(private readonly prompts: PromptRegistry) {}
 
   reply(customer: string, topic: string) {

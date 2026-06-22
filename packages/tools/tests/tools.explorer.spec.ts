@@ -6,10 +6,24 @@ import { LangChainRegistry } from '@nest-langchain/core';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
-import { LangTool, ToolsModule } from '../src';
+import { LangTool, ToolsModule, Toolset } from '../src';
 
 @Injectable()
+class MathService {
+  double(value: number) {
+    return value * 2;
+  }
+}
+
+@Toolset({
+  tags: ['math'],
+  metadata: {
+    area: 'demo',
+  },
+})
 class MathTools {
+  constructor(private readonly math: MathService) {}
+
   @LangTool({
     name: 'double',
     description: 'Double a number',
@@ -18,7 +32,7 @@ class MathTools {
     }),
   })
   double(input: { value: number }) {
-    return input.value * 2;
+    return this.math.double(input.value);
   }
 }
 
@@ -26,7 +40,7 @@ describe('ToolsModule', () => {
   it('discovers decorated methods and registers LangChain tools in the core registry', async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [ToolsModule.forRoot()],
-      providers: [MathTools],
+      providers: [MathTools, MathService],
     }).compile();
 
     await moduleRef.init();
@@ -37,6 +51,11 @@ describe('ToolsModule', () => {
       {
         name: 'double',
         kind: 'tool',
+        tags: ['math'],
+        metadata: {
+          area: 'demo',
+          source: 'tools',
+        },
       },
     ]);
 
@@ -45,4 +64,3 @@ describe('ToolsModule', () => {
     await moduleRef.close();
   });
 });
-

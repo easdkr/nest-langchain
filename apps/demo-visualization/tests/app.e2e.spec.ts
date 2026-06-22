@@ -1,16 +1,16 @@
-import "reflect-metadata";
+import 'reflect-metadata';
 
-import type { INestApplication } from "@nestjs/common";
-import { NestFactory } from "@nestjs/core";
+import type { INestApplication } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 import {
   MemoryLayoutStorage,
   VisualizationModule,
-} from "@nest-langchain/visualization";
-import { afterEach, describe, expect, it } from "vitest";
+} from '@nest-langchain/visualization';
+import { afterEach, describe, expect, it } from 'vitest';
 
-import { AppModule } from "../src/app.module";
+import { AppModule } from '../src/app.module';
 
-describe("demo-visualization e2e", () => {
+describe('demo-visualization e2e', () => {
   let app: INestApplication | undefined;
 
   afterEach(async () => {
@@ -18,13 +18,13 @@ describe("demo-visualization e2e", () => {
     app = undefined;
   });
 
-  it("hosts graph docs and layout APIs under /ai/graphs", async () => {
+  it('hosts graph docs and layout APIs under /ai/graphs', async () => {
     app = await NestFactory.create(AppModule, { logger: false });
 
     VisualizationModule.setup(
-      "/ai/graphs",
+      '/ai/graphs',
       app,
-      { title: "Nest LangChain Demo Graphs" },
+      { title: 'Nest LangChain Demo Graphs' },
       {
         editable: true,
         layout: {
@@ -38,7 +38,7 @@ describe("demo-visualization e2e", () => {
 
     const htmlResponse = await fetch(`${baseUrl}/ai/graphs`);
     expect(htmlResponse.ok).toBe(true);
-    await expect(htmlResponse.text()).resolves.toContain("/ai/graphs/json");
+    await expect(htmlResponse.text()).resolves.toContain('/ai/graphs/json');
 
     const jsonResponse = await fetch(`${baseUrl}/ai/graphs/json`);
     expect(jsonResponse.ok).toBe(true);
@@ -48,42 +48,63 @@ describe("demo-visualization e2e", () => {
         nodes: Array<{ id: string }>;
       }>;
     };
-    expect(doc.graphs[0]).toMatchObject({ id: "joke" });
-    expect(doc.graphs[0]?.nodes[0]?.id).toBe("joke:writeAnswer");
+    expect(doc.graphs[0]).toMatchObject({ id: 'support-workflow' });
+    expect(doc.graphs[0]?.nodes[0]?.id).toBe(
+      'support-workflow:classifyRequest',
+    );
 
     const mermaidResponse = await fetch(`${baseUrl}/ai/graphs/mermaid`);
     expect(mermaidResponse.ok).toBe(true);
-    await expect(mermaidResponse.text()).resolves.toContain("joke_writeAnswer");
+    await expect(mermaidResponse.text()).resolves.toContain(
+      'support_workflow_classifyRequest',
+    );
 
-    const layoutResponse = await fetch(`${baseUrl}/ai/graphs/layouts/joke`, {
-      method: "PUT",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        version: "1",
-        nodes: {
-          "joke:writeAnswer": {
-            x: 11,
-            y: 22,
-            pinned: true,
+    const layoutResponse = await fetch(
+      `${baseUrl}/ai/graphs/layouts/support-workflow`,
+      {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          version: '1',
+          nodes: {
+            'support-workflow:classifyRequest': {
+              x: 11,
+              y: 22,
+              pinned: true,
+            },
           },
-        },
-      }),
-    });
+        }),
+      },
+    );
     expect(layoutResponse.ok).toBe(true);
 
     const savedLayoutResponse = await fetch(
-      `${baseUrl}/ai/graphs/layouts/joke`,
+      `${baseUrl}/ai/graphs/layouts/support-workflow`,
     );
     expect(savedLayoutResponse.ok).toBe(true);
     await expect(savedLayoutResponse.json()).resolves.toMatchObject({
-      graphId: "joke",
+      graphId: 'support-workflow',
       nodes: {
-        "joke:writeAnswer": {
+        'support-workflow:classifyRequest': {
           x: 11,
           y: 22,
           pinned: true,
         },
       },
+    });
+
+    const invokeResponse = await fetch(`${baseUrl}/graphs/support-workflow`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        message: 'Delivery tracking is late for an enterprise customer.',
+        customerTier: 'enterprise',
+      }),
+    });
+    expect(invokeResponse.ok).toBe(true);
+    await expect(invokeResponse.json()).resolves.toMatchObject({
+      intent: 'delivery',
+      owner: 'enterprise-success',
     });
   });
 });

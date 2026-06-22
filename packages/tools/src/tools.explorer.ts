@@ -4,6 +4,7 @@ import { tool } from '@langchain/core/tools';
 import { LangChainRegistry } from '@nest-langchain/core';
 
 import { LANG_TOOL_METADATA, TOOLS_MODULE_OPTIONS } from './constants';
+import { getToolsetOptions } from './decorators/toolset.decorator';
 import type { LangToolOptions, ToolsModuleOptions } from './interfaces';
 
 @Injectable()
@@ -34,6 +35,7 @@ export class ToolsExplorer implements OnModuleInit {
   }
 
   private registerTools(instance: Record<string, unknown>): void {
+    const toolset = getToolsetOptions(instance.constructor);
     const prototype = Object.getPrototypeOf(instance);
     const methodNames = Object.getOwnPropertyNames(prototype).filter((key) => {
       if (key === 'constructor') {
@@ -72,8 +74,9 @@ export class ToolsExplorer implements OnModuleInit {
         runnable: langchainTool,
         nodes: [],
         edges: [],
-        tags: [],
+        tags: toolset.tags ?? [],
         metadata: {
+          ...toolset.metadata,
           description: options.description,
           source: 'tools',
         },

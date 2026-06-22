@@ -20,4 +20,3 @@ describe('PromptRegistry', () => {
     ).resolves.toBe('Answer June about refunds');
   });
 });
-

@@ -1,5 +1,5 @@
-import type { Type } from "@nestjs/common";
-import type { RunnableConfigLike, RunnableLike } from "@nest-langchain/core";
+import type { Type } from '@nestjs/common';
+import type { RunnableConfigLike, RunnableLike } from '@nest-langchain/core';
 
 export type ProviderToken = string | symbol | Type<unknown>;
 
@@ -17,11 +17,11 @@ export interface CollaborativeTaskOptions {
 }
 
 export type TaskStepPattern =
-  | "invoke"
-  | "parallel"
-  | "structured"
-  | "tool-call"
-  | "fallback";
+  | 'invoke'
+  | 'parallel'
+  | 'structured'
+  | 'tool-call'
+  | 'fallback';
 
 export interface TaskStepOptions {
   name?: string;

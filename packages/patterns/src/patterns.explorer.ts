@@ -1,7 +1,7 @@
-import { Inject, Injectable, OnModuleInit, Optional } from "@nestjs/common";
-import { DiscoveryService, ModuleRef, Reflector } from "@nestjs/core";
-import { tool } from "@langchain/core/tools";
-import { LangChainRegistry, type RunnableEdge } from "@nest-langchain/core";
+import { Inject, Injectable, OnModuleInit, Optional } from '@nestjs/common';
+import { DiscoveryService, ModuleRef, Reflector } from '@nestjs/core';
+import { tool } from '@langchain/core/tools';
+import { LangChainRegistry, type RunnableEdge } from '@nest-langchain/core';
 
 import {
   COLLABORATIVE_TASK_METADATA,
@@ -10,7 +10,7 @@ import {
   DEEP_AGENT_TOOL_METADATA,
   PATTERNS_MODULE_OPTIONS,
   TASK_STEP_METADATA,
-} from "./constants";
+} from './constants';
 import type {
   CollaborativePatternsModuleOptions,
   CollaborativeTaskOptions,
@@ -21,9 +21,9 @@ import type {
   RunnableModelLike,
   TaskModelBinding,
   TaskStepOptions,
-} from "./interfaces";
-import { PatternsService } from "./patterns.service";
-import { CollaborativeTaskRunner, type DiscoveredStep } from "./task-runner";
+} from './interfaces';
+import { PatternsRegistry } from './patterns.registry';
+import { CollaborativeTaskRunner, type DiscoveredStep } from './task-runner';
 
 @Injectable()
 export class PatternsExplorer implements OnModuleInit {
@@ -31,7 +31,7 @@ export class PatternsExplorer implements OnModuleInit {
     private readonly discoveryService: DiscoveryService,
     private readonly reflector: Reflector,
     private readonly registry: LangChainRegistry,
-    private readonly patterns: PatternsService,
+    private readonly patterns: PatternsRegistry,
     private readonly moduleRef: ModuleRef,
     @Optional()
     @Inject(PATTERNS_MODULE_OPTIONS)
@@ -68,6 +68,8 @@ export class PatternsExplorer implements OnModuleInit {
 
     const taskName = taskOptions.name ?? instance.constructor.name;
     const steps = this.discoverSteps(instance);
+    validateCollaborativeTask(taskName, taskOptions, steps);
+
     const models = this.resolveModels(taskOptions.models);
     const runner = new CollaborativeTaskRunner(
       taskName,
@@ -79,7 +81,7 @@ export class PatternsExplorer implements OnModuleInit {
 
     this.registry.registerRunnable({
       name: taskName,
-      kind: "chain",
+      kind: 'chain',
       runnable: runner,
       nodes: steps.map((step) => step.name),
       edges,
@@ -87,7 +89,7 @@ export class PatternsExplorer implements OnModuleInit {
       metadata: {
         ...taskOptions.metadata,
         description: taskOptions.description,
-        source: "patterns",
+        source: 'patterns',
         models: taskOptions.models.map((model) => model.role),
       },
     });
@@ -117,19 +119,26 @@ export class PatternsExplorer implements OnModuleInit {
     const agentName = agentOptions.name ?? instance.constructor.name;
     const tools = this.discoverDeepAgentTools(instance);
     const subagents = this.discoverDeepAgentSubagents(
+      agentName,
       instance,
       agentOptions,
       tools,
     );
+    validateDeepAgent(agentName, agentOptions, tools, subagents);
     const createOptions = {
       ...(agentOptions.createOptions ?? {}),
       name: agentName,
       model: agentOptions.model
         ? this.resolveModel(agentOptions.models ?? [], agentOptions.model)
         : undefined,
-      tools: filterNamed(tools, agentOptions.tools),
+      tools: filterNamed(agentName, 'tool', tools, agentOptions.tools),
       systemPrompt: agentOptions.systemPrompt,
-      subagents: filterNamed(subagents, agentOptions.subagents),
+      subagents: filterNamed(
+        agentName,
+        'subagent',
+        subagents,
+        agentOptions.subagents,
+      ),
       skills: agentOptions.skills,
       contextSchema: agentOptions.contextSchema,
       responseFormat: agentOptions.responseFormat,
@@ -142,7 +151,7 @@ export class PatternsExplorer implements OnModuleInit {
       checkpointer: agentOptions.checkpointer,
       store: agentOptions.store,
     };
-    const { createDeepAgent } = await import("deepagents");
+    const { createDeepAgent } = await import('deepagents');
     const runnable = createDeepAgent(removeUndefined(createOptions) as never);
     const nodes = [
       ...tools.map((item) => item.name),
@@ -151,7 +160,7 @@ export class PatternsExplorer implements OnModuleInit {
 
     this.registry.registerGraph({
       name: agentName,
-      kind: "graph",
+      kind: 'graph',
       runnable,
       nodes,
       edges: [],
@@ -159,7 +168,7 @@ export class PatternsExplorer implements OnModuleInit {
       metadata: {
         ...agentOptions.metadata,
         description: agentOptions.description,
-        source: "deepagents",
+        source: 'deepagents',
         models: (agentOptions.models ?? []).map((model) => model.role),
         tools: tools.map((item) => item.name),
         subagents: subagents.map((item) => item.name),
@@ -186,7 +195,7 @@ export class PatternsExplorer implements OnModuleInit {
       );
       const handler = instance[methodName];
 
-      if (!options || typeof handler !== "function") {
+      if (!options || typeof handler !== 'function') {
         return [];
       }
 
@@ -210,7 +219,7 @@ export class PatternsExplorer implements OnModuleInit {
       );
       const handler = instance[methodName];
 
-      if (!options || typeof handler !== "function") {
+      if (!options || typeof handler !== 'function') {
         return [];
       }
 
@@ -227,6 +236,7 @@ export class PatternsExplorer implements OnModuleInit {
   }
 
   private discoverDeepAgentSubagents(
+    agentName: string,
     instance: Record<string, unknown>,
     agentOptions: DeepAgentOptions,
     tools: Array<{ name: string; tool: Record<string, unknown> }>,
@@ -250,7 +260,12 @@ export class PatternsExplorer implements OnModuleInit {
           model: options.model
             ? this.resolveModel(agentOptions.models ?? [], options.model)
             : undefined,
-          tools: filterNamed(tools, options.tools),
+          tools: filterNamed(
+            `${agentName} subagent "${options.name}"`,
+            'tool',
+            tools,
+            options.tools,
+          ),
           skills: options.skills,
           contextSchema: options.contextSchema,
           responseFormat: options.responseFormat,
@@ -296,8 +311,103 @@ export class PatternsExplorer implements OnModuleInit {
 
 function methodNames(instance: Record<string, unknown>): string[] {
   return Object.getOwnPropertyNames(Object.getPrototypeOf(instance)).filter(
-    (key) => key !== "constructor" && typeof instance[key] === "function",
+    (key) => key !== 'constructor' && typeof instance[key] === 'function',
   );
+}
+
+function validateCollaborativeTask(
+  taskName: string,
+  options: CollaborativeTaskOptions,
+  steps: DiscoveredStep[],
+): void {
+  if (options.models.length === 0) {
+    throw new Error(
+      `Collaborative task "${taskName}" must declare at least one model.`,
+    );
+  }
+
+  if (steps.length === 0) {
+    throw new Error(
+      `Collaborative task "${taskName}" must declare at least one @TaskStep method.`,
+    );
+  }
+
+  assertUnique(
+    taskName,
+    'model role',
+    options.models.map((model) => model.role),
+  );
+  assertUnique(
+    taskName,
+    'step name',
+    steps.map((step) => step.name),
+  );
+
+  const modelRoles = new Set(options.models.map((model) => model.role));
+  const stepNames = new Set(steps.map((step) => step.name));
+
+  for (const step of steps) {
+    for (const dependency of step.options.dependsOn ?? []) {
+      if (!stepNames.has(dependency)) {
+        throw new Error(
+          `Collaborative task "${taskName}" step "${step.name}" depends on unknown step "${dependency}".`,
+        );
+      }
+    }
+
+    for (const role of [step.options.model, ...(step.options.models ?? [])]) {
+      if (role && !modelRoles.has(role)) {
+        throw new Error(
+          `Collaborative task "${taskName}" step "${step.name}" references unknown model role "${role}".`,
+        );
+      }
+    }
+  }
+}
+
+function validateDeepAgent(
+  agentName: string,
+  options: DeepAgentOptions,
+  tools: Array<{ name: string }>,
+  subagents: Array<{ name: string }>,
+): void {
+  assertUnique(
+    agentName,
+    'deep agent tool',
+    tools.map((item) => item.name),
+  );
+  assertUnique(
+    agentName,
+    'deep agent subagent',
+    subagents.map((item) => item.name),
+  );
+  assertKnownNames(agentName, 'tool', tools, options.tools);
+  assertKnownNames(agentName, 'subagent', subagents, options.subagents);
+}
+
+function assertUnique(
+  ownerName: string,
+  label: string,
+  values: readonly string[],
+): void {
+  const seen = new Set<string>();
+  const duplicates = new Set<string>();
+
+  for (const value of values) {
+    if (seen.has(value)) {
+      duplicates.add(value);
+    }
+
+    seen.add(value);
+  }
+
+  if (duplicates.size > 0) {
+    throw new Error(
+      `Collaborative task "${ownerName}" declares duplicate ${label}s: ${[
+        ...duplicates,
+      ].join(', ')}`,
+    );
+  }
 }
 
 function taskEdges(steps: DiscoveredStep[]): RunnableEdge[] {
@@ -308,21 +418,47 @@ function taskEdges(steps: DiscoveredStep[]): RunnableEdge[] {
   );
 }
 
+function assertKnownNames<T extends { name: string }>(
+  ownerName: string,
+  label: string,
+  items: T[],
+  names?: string[],
+): void {
+  if (!names) {
+    return;
+  }
+
+  const known = new Set(items.map((item) => item.name));
+  const unknown = names.filter((name) => !known.has(name));
+
+  if (unknown.length > 0) {
+    throw new Error(
+      `${ownerName} references unknown ${label} "${unknown[0]}". Known ${label}s: ${[
+        ...known,
+      ].join(', ')}`,
+    );
+  }
+}
+
 function filterNamed<T extends { name: string }>(
+  ownerName: string,
+  label: string,
   items: T[],
   names?: string[],
 ): Array<T extends { tool: infer TTool } ? TTool : T> {
+  assertKnownNames(ownerName, label, items, names);
+
   const filtered = names
     ? items.filter((item) => names.includes(item.name))
     : items;
 
-  return filtered.map((item) => ("tool" in item ? item.tool : item)) as Array<
+  return filtered.map((item) => ('tool' in item ? item.tool : item)) as Array<
     T extends { tool: infer TTool } ? TTool : T
   >;
 }
 
 function removeUndefined<T extends Record<string, unknown>>(value: T): T {
   return Object.fromEntries(
-    Object.entries(value).filter(([, entry]) => typeof entry !== "undefined"),
+    Object.entries(value).filter(([, entry]) => typeof entry !== 'undefined'),
   ) as T;
 }
