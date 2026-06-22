@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import { TraceableRun } from '@nest-langchain/langsmith';
 
 export interface TraceDemoInput {
@@ -5,6 +6,7 @@ export interface TraceDemoInput {
   accountId: string;
 }
 
+@Injectable()
 export class TraceDemoHandler {
   @TraceableRun({
     name: 'Summarize support case',
