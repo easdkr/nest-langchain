@@ -8,19 +8,20 @@ The core package stays thin. Optional packages own optional runtime dependencies
 
 ## Package Boundaries
 
-| Package                         | Owns                                                                                                                   | Must Not Own                                                 |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| `@nest-langchain/core`          | Nest module, registry, runnable-like contracts, generic provider scanner                                               | LangGraph, LangSmith, provider SDKs, visualization renderers |
-| `@nest-langchain/langgraph`     | graph decorators, LangGraph `StateGraph` compile/discovery, `LangGraphRunner`, checkpointer wiring, graph metadata     | LangSmith tracing, provider SDKs                             |
-| `@nest-langchain/langsmith`     | tracing module, `@TraceableRun`, env setup, request metadata, redaction, sampling hooks                                | graph compilation, provider SDKs                             |
-| `@nest-langchain/tools`         | `@LangTool`, provider method discovery, LangChain tool wrappers                                                        | graph compilation, tracing, provider SDKs                    |
-| `@nest-langchain/prompts`       | `PromptsModule`, named prompt registry, prompt template formatting                                                     | graph compilation, tracing, provider SDKs                    |
-| `@nest-langchain/patterns`      | `@CollaborativeTask`, `@TaskStep`, `@DeepAgent`, `@DeepAgentTool`, `@DeepAgentSubagent`, provider collaboration runner | provider SDKs, LangSmith, direct LangGraph dependency        |
-| `@nest-langchain/visualization` | hosted docs UI, JSON/Mermaid/DOT export, layout APIs/storage                                                           | graph execution, source rewrite                              |
-| `@nest-langchain/openai`        | OpenAI provider DI token/factory                                                                                       | graph DSL, registry ownership                                |
-| `@nest-langchain/anthropic`     | Anthropic provider DI token/factory                                                                                    | graph DSL, registry ownership                                |
-| `@nest-langchain/gemini`        | Gemini provider DI token/factory                                                                                       | graph DSL, registry ownership                                |
-| `@nest-langchain/bedrock`       | AWS Bedrock provider DI token/factory                                                                                  | graph DSL, registry ownership                                |
+| Package                             | Owns                                                                                                                   | Must Not Own                                                 |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `@nest-langchain/core`              | Nest module, registry, runnable-like contracts, generic provider scanner                                               | LangGraph, LangSmith, provider SDKs, visualization renderers |
+| `@nest-langchain/langgraph`         | graph decorators, LangGraph `StateGraph` compile/discovery, `LangGraphRunner`, checkpointer wiring, graph metadata     | LangSmith tracing, provider SDKs                             |
+| `@nest-langchain/langsmith`         | tracing module, `@TraceableRun`, env setup, request metadata, redaction, sampling hooks                                | graph compilation, provider SDKs                             |
+| `@nest-langchain/tools`             | `@LangTool`, provider method discovery, LangChain tool wrappers                                                        | graph compilation, tracing, provider SDKs                    |
+| `@nest-langchain/prompts`           | `PromptsModule`, named prompt registry, prompt template formatting                                                     | graph compilation, tracing, provider SDKs                    |
+| `@nest-langchain/patterns`          | `@CollaborativeTask`, `@TaskStep`, `@DeepAgent`, `@DeepAgentTool`, `@DeepAgentSubagent`, provider collaboration runner | provider SDKs, LangSmith, direct LangGraph dependency        |
+| `@nest-langchain/visualization`     | hosted docs UI, JSON/Mermaid/DOT export, layout APIs/storage                                                           | graph execution, source rewrite                              |
+| `@nest-langchain/openai`            | OpenAI provider DI token/factory                                                                                       | graph DSL, registry ownership                                |
+| `@nest-langchain/openai-compatible` | OpenAI-compatible provider DI token/factory for named endpoints                                                        | graph DSL, registry ownership                                |
+| `@nest-langchain/anthropic`         | Anthropic provider DI token/factory                                                                                    | graph DSL, registry ownership                                |
+| `@nest-langchain/gemini`            | Gemini provider DI token/factory                                                                                       | graph DSL, registry ownership                                |
+| `@nest-langchain/bedrock`           | AWS Bedrock provider DI token/factory                                                                                  | graph DSL, registry ownership                                |
 
 ## Runtime Flow
 
@@ -101,7 +102,7 @@ See [langgraph-patterns.md](langgraph-patterns.md) for the supported mapping.
 - `@CollaborativeTask` binds logical model roles to Nest provider tokens.
 - `@TaskStep` supports `invoke`, `parallel`, `structured`, `tool-call`, and `fallback` patterns.
 - `PatternsRegistry` lists and invokes discovered tasks through the core registry.
-- Model providers are supplied by the app, for example from `@nest-langchain/openai`, `@nest-langchain/anthropic`, `@nest-langchain/gemini`, or `@nest-langchain/bedrock`.
+- Model providers are supplied by the app, for example from `@nest-langchain/openai`, `@nest-langchain/openai-compatible`, `@nest-langchain/anthropic`, `@nest-langchain/gemini`, or `@nest-langchain/bedrock`.
 
 Deep Agents support is decorator-based but optional:
 

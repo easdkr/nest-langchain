@@ -16,6 +16,7 @@ Nest app
        @nest-langchain/patterns
        @nest-langchain/visualization
        @nest-langchain/openai
+       @nest-langchain/openai-compatible
        @nest-langchain/anthropic
        @nest-langchain/gemini
        @nest-langchain/bedrock

@@ -20,6 +20,12 @@ const packages = {
   openai: JSON.parse(
     await readFile(join("packages", "openai", "package.json"), "utf8"),
   ),
+  openaiCompatible: JSON.parse(
+    await readFile(
+      join("packages", "openai-compatible", "package.json"),
+      "utf8",
+    ),
+  ),
   anthropic: JSON.parse(
     await readFile(join("packages", "anthropic", "package.json"), "utf8"),
   ),
@@ -55,6 +61,7 @@ const forbiddenCoreDeps = [
   "@nest-langchain/visualization",
   "@nest-langchain/patterns",
   "@nest-langchain/openai",
+  "@nest-langchain/openai-compatible",
   "@nest-langchain/anthropic",
   "@nest-langchain/gemini",
   "@nest-langchain/bedrock",
@@ -92,6 +99,15 @@ assert(
 assertProviderBoundary(
   packages.openai,
   "@nest-langchain/openai",
+  "@langchain/openai",
+);
+assert(
+  Object.hasOwn(runtimeDeps(packages.openaiCompatible), "@langchain/openai"),
+  "@nest-langchain/openai-compatible must own @langchain/openai",
+);
+assertProviderBoundary(
+  packages.openaiCompatible,
+  "@nest-langchain/openai-compatible",
   "@langchain/openai",
 );
 assertProviderBoundary(
