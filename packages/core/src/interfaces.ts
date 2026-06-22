@@ -13,6 +13,10 @@ export interface RunnableConfigLike {
   [key: string]: unknown;
 }
 
+export interface RunnableStreamOptionsLike {
+  [key: string]: unknown;
+}
+
 export type RunnableEdge = readonly [from: string, to: string];
 export type RunnableKind =
   | 'runnable'
@@ -44,6 +48,17 @@ export interface RunnableLike<TInput = unknown, TOutput = unknown> {
     input: TInput,
     config?: RunnableConfigLike,
   ): Promise<TOutput> | TOutput;
+
+  stream?(
+    input: TInput,
+    config?: RunnableConfigLike,
+  ): AsyncIterable<unknown> | Promise<AsyncIterable<unknown>>;
+
+  streamEvents?(
+    input: TInput,
+    config?: RunnableConfigLike,
+    options?: RunnableStreamOptionsLike,
+  ): AsyncIterable<unknown> | Promise<AsyncIterable<unknown>>;
 }
 
 export interface RegisteredRunnable {

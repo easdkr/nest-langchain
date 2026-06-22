@@ -7,6 +7,7 @@ import type {
   RegisteredGraph,
   RunnableConfigLike,
   RunnableLike,
+  RunnableStreamOptionsLike,
 } from './interfaces';
 
 @Injectable()
@@ -119,6 +120,65 @@ export class LangChainRegistry {
     return this.invoke(name, input, config);
   }
 
+  stream<TInput = unknown, TChunk = unknown>(
+    name: string,
+    input: TInput,
+    config?: RunnableConfigLike,
+  ): AsyncIterable<TChunk> {
+    const registered = this.getRunnable(name);
+    const stream = registered.runnable.stream;
+
+    if (typeof stream !== 'function') {
+      throw new Error(`Runnable "${name}" does not support stream().`);
+    }
+
+    const mergedConfig = this.mergeConfig(config);
+
+    return resolveAsyncIterable(
+      stream.call(registered.runnable, input, mergedConfig),
+    ) as AsyncIterable<TChunk>;
+  }
+
+  streamEvents<TInput = unknown, TEvent = unknown>(
+    name: string,
+    input: TInput,
+    config?: RunnableConfigLike,
+    options?: RunnableStreamOptionsLike,
+  ): AsyncIterable<TEvent> {
+    const registered = this.getRunnable(name);
+    const streamEvents = registered.runnable.streamEvents;
+
+    if (typeof streamEvents !== 'function') {
+      throw new Error(`Runnable "${name}" does not support streamEvents().`);
+    }
+
+    const mergedConfig = this.mergeConfig(config);
+    const streamConfig = this.mergeStreamOptions(mergedConfig, options);
+
+    return resolveAsyncIterable(
+      streamEvents.call(registered.runnable, input, streamConfig, options),
+    ) as AsyncIterable<TEvent>;
+  }
+
+  streamGraph<TInput = unknown, TChunk = unknown>(
+    name: string,
+    input: TInput,
+    config?: RunnableConfigLike,
+  ): AsyncIterable<TChunk> {
+    this.getGraph(name);
+    return this.stream<TInput, TChunk>(name, input, config);
+  }
+
+  streamGraphEvents<TInput = unknown, TEvent = unknown>(
+    name: string,
+    input: TInput,
+    config?: RunnableConfigLike,
+    options?: RunnableStreamOptionsLike,
+  ): AsyncIterable<TEvent> {
+    this.getGraph(name);
+    return this.streamEvents<TInput, TEvent>(name, input, config, options);
+  }
+
   private mergeConfig(config?: RunnableConfigLike): RunnableConfigLike {
     const defaultConfig = this.options.defaultConfig ?? {};
 
@@ -135,5 +195,40 @@ export class LangChainRegistry {
       },
       tags: [...(defaultConfig.tags ?? []), ...(config?.tags ?? [])],
     };
+  }
+
+  private mergeStreamOptions(
+    config: RunnableConfigLike,
+    options?: RunnableStreamOptionsLike,
+  ): RunnableConfigLike {
+    if (!options) {
+      return config;
+    }
+
+    const optionConfig = options as RunnableConfigLike;
+
+    return {
+      ...config,
+      ...options,
+      configurable: {
+        ...config.configurable,
+        ...optionConfig.configurable,
+      },
+      metadata: {
+        ...config.metadata,
+        ...optionConfig.metadata,
+      },
+      tags: [...(config.tags ?? []), ...(optionConfig.tags ?? [])],
+    };
+  }
+}
+
+async function* resolveAsyncIterable<T>(
+  value: AsyncIterable<T> | Promise<AsyncIterable<T>>,
+): AsyncIterable<T> {
+  const iterable = await value;
+
+  for await (const item of iterable) {
+    yield item;
   }
 }

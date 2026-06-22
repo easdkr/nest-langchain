@@ -15,6 +15,7 @@ import { LangGraphRunner } from '../src/langgraph.runner';
 const DemoState = Annotation.Root({
   input: Annotation<string>(),
   output: Annotation<string>(),
+  threadId: Annotation<string>(),
 });
 
 @Injectable()
@@ -35,9 +36,13 @@ class DemoGraph {
     entry: true,
     finish: true,
   })
-  answer(state: typeof DemoState.State) {
+  answer(
+    state: typeof DemoState.State,
+    config?: { configurable?: { thread_id?: string } },
+  ) {
     return {
       output: this.greeter.greet(state.input),
+      threadId: config?.configurable?.thread_id ?? 'missing-thread',
     };
   }
 }
@@ -174,6 +179,132 @@ describe('LangGraphExplorer', () => {
     await moduleRef.close();
   });
 
+  it('streams registered graph chunks through LangGraphRunner', async () => {
+    const moduleRef = await Test.createTestingModule({
+      imports: [LangGraphModule.forRoot()],
+      providers: [DemoGraph, DemoGreeter],
+    }).compile();
+
+    await moduleRef.init();
+
+    const runner = moduleRef.get(LangGraphRunner);
+    const chunks = await collect(
+      runner.stream<
+        { input: string },
+        { answer?: { output?: string; threadId?: string }; output?: string }
+      >(
+        'demo',
+        {
+          input: 'stream',
+        },
+        {
+          configurable: {
+            thread_id: 'thread-stream',
+          },
+        },
+      ),
+    );
+
+    expect(chunks.length).toBeGreaterThan(0);
+    expect(JSON.stringify(chunks)).toContain('hello stream');
+    expect(JSON.stringify(chunks)).toContain('thread-stream');
+
+    await moduleRef.close();
+  });
+
+  it('streams registered graph events through LangGraphRunner', async () => {
+    const moduleRef = await Test.createTestingModule({
+      imports: [LangGraphModule.forRoot()],
+      providers: [DemoGraph, DemoGreeter],
+    }).compile();
+
+    await moduleRef.init();
+
+    const runner = moduleRef.get(LangGraphRunner);
+    const events = await collect(
+      take(
+        runner.streamEvents<
+          { input: string },
+          { event?: string; metadata?: Record<string, unknown> }
+        >(
+          'demo',
+          {
+            input: 'events',
+          },
+          {
+            configurable: {
+              thread_id: 'thread-events',
+            },
+          },
+          {
+            version: 'v2',
+          },
+        ),
+        3,
+      ),
+    );
+
+    expect(events.length).toBeGreaterThan(0);
+    expect(events.some((event) => typeof event.event === 'string')).toBe(true);
+
+    await moduleRef.close();
+  });
+
+  it('delegates runner streaming methods to graph registry methods', async () => {
+    const calls: unknown[][] = [];
+    const runner = new LangGraphRunner({
+      streamGraph: (...args: unknown[]) => {
+        calls.push(['streamGraph', ...args]);
+
+        return asyncIterable([{ chunk: true }]);
+      },
+      streamGraphEvents: (...args: unknown[]) => {
+        calls.push(['streamGraphEvents', ...args]);
+
+        return asyncIterable([{ event: true }]);
+      },
+    } as never);
+
+    await expect(
+      collect(
+        runner.stream(
+          'delegated',
+          { value: 1 },
+          {
+            configurable: { thread_id: 'thread-1' },
+          },
+        ),
+      ),
+    ).resolves.toEqual([{ chunk: true }]);
+    await expect(
+      collect(
+        runner.streamEvents(
+          'delegated',
+          { value: 2 },
+          {
+            configurable: { thread_id: 'thread-2' },
+          },
+          { version: 'v2' },
+        ),
+      ),
+    ).resolves.toEqual([{ event: true }]);
+    expect(calls).toEqual([
+      [
+        'streamGraph',
+        'delegated',
+        { value: 1 },
+        { configurable: { thread_id: 'thread-1' } },
+      ],
+      [
+        'streamGraphEvents',
+        'delegated',
+        { value: 2 },
+        { configurable: { thread_id: 'thread-2' } },
+        { version: 'v2' },
+      ],
+    ]);
+  });
+
   it('passes configured checkpointers to LangGraph compile', async () => {
     const checkpointer = {
       marker: 'checkpointer',
@@ -231,3 +362,37 @@ describe('LangGraphExplorer', () => {
     expect(() => explorer.onModuleInit()).toThrow('multiple entry nodes');
   });
 });
+
+function asyncIterable<T>(items: T[]): AsyncIterable<T> {
+  return {
+    async *[Symbol.asyncIterator]() {
+      yield* items;
+    },
+  };
+}
+
+async function* take<T>(
+  iterable: AsyncIterable<T>,
+  limit: number,
+): AsyncIterable<T> {
+  let count = 0;
+
+  for await (const item of iterable) {
+    yield item;
+    count += 1;
+
+    if (count >= limit) {
+      return;
+    }
+  }
+}
+
+async function collect<T>(iterable: AsyncIterable<T>): Promise<T[]> {
+  const items: T[] = [];
+
+  for await (const item of iterable) {
+    items.push(item);
+  }
+
+  return items;
+}

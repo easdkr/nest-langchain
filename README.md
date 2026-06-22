@@ -7,7 +7,7 @@ NestJS에서 LangChain 생태계 기능을 선택 설치 방식으로 쓰기 위
 ## Packages
 
 - `@nest-langchain/core`: Nest dynamic module, runnable registry, 공통 scanner/계약
-- `@nest-langchain/langgraph`: `@LangGraph`, `@GraphNode`, `@GraphEdge`, `@ConditionalEdge`, Command/Send/parent handoff helpers
+- `@nest-langchain/langgraph`: `@LangGraph`, `@GraphNode`, `@GraphEdge`, `@ConditionalEdge`, graph invoke/stream execution, Command/Send/parent handoff helpers
 - `@nest-langchain/langsmith`: `LangSmithModule`, `@TraceableRun`, request metadata/redaction/sampling hook
 - `@nest-langchain/tools`: `@LangTool`, Nest provider method discovery, LangChain tool 등록
 - `@nest-langchain/prompts`: `PromptsModule`, named prompt registry, LangChain prompt template format
@@ -148,6 +148,10 @@ VisualizationModule.setup(
 ```
 
 Layout editing does not rewrite graph source files. Shared layouts are sidecar artifacts; runtime/user-specific layouts can use custom storage.
+
+`LangGraphRunner` supports final-result `invoke()` and async-iterable
+`stream()` / `streamEvents()` execution. Transport framing such as NDJSON and
+SSE stays in the Nest application layer.
 
 ## Collaborative Task Example
 

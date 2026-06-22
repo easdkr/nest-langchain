@@ -29,6 +29,11 @@ export class AppModule {}
 
 ## Execution
 
+Use `invoke()` when the caller only needs the final graph result. Use `stream()`
+for graph state chunks, and `streamEvents()` when the caller needs LangGraph
+event streams for progress UI, NDJSON, or SSE responses. LangSmith is not
+required for any of these execution paths.
+
 ```ts
 import { Injectable } from '@nestjs/common';
 import { LangGraphRunner } from '@nest-langchain/langgraph';
@@ -44,6 +49,133 @@ export class AgentRunner {
       },
     });
   }
+
+  stream(input: unknown) {
+    return this.graphs.stream('support-agent', input, {
+      configurable: {
+        thread_id: 'thread-1',
+      },
+    });
+  }
+
+  streamEvents(input: unknown) {
+    return this.graphs.streamEvents(
+      'support-agent',
+      input,
+      {
+        configurable: {
+          thread_id: 'thread-1',
+        },
+      },
+      {
+        version: 'v2',
+      },
+    );
+  }
+}
+```
+
+Transport framing is application-owned. The package returns async iterables; a
+Nest controller can adapt them to NDJSON or SSE without bypassing the registry.
+
+### NDJSON
+
+```ts
+import { Body, Controller, Post, Res } from '@nestjs/common';
+import { LangGraphRunner } from '@nest-langchain/langgraph';
+import type { Response } from 'express';
+
+interface WorkflowRequest {
+  requestId: string;
+  prompt: string;
+}
+
+@Controller()
+export class WorkflowController {
+  constructor(private readonly graphs: LangGraphRunner) {}
+
+  @Post('workflow/stream')
+  async streamWorkflow(@Body() body: WorkflowRequest, @Res() res: Response) {
+    res.setHeader('content-type', 'application/x-ndjson; charset=utf-8');
+
+    const events = this.graphs.streamEvents(
+      'detail-page-workflow',
+      body,
+      {
+        configurable: {
+          thread_id: body.requestId,
+        },
+      },
+      {
+        version: 'v2',
+      },
+    );
+
+    for await (const event of events) {
+      res.write(`${JSON.stringify(event)}\n`);
+    }
+
+    res.end();
+  }
+}
+```
+
+### SSE
+
+```ts
+import { Body, Controller, MessageEvent, Sse } from '@nestjs/common';
+import { LangGraphRunner } from '@nest-langchain/langgraph';
+import { Observable, map } from 'rxjs';
+
+interface WorkflowRequest {
+  requestId: string;
+  prompt: string;
+}
+
+@Controller()
+export class WorkflowController {
+  constructor(private readonly graphs: LangGraphRunner) {}
+
+  @Sse('workflow/events')
+  streamWorkflowEvents(
+    @Body() body: WorkflowRequest,
+  ): Observable<MessageEvent> {
+    return fromAsyncIterable(
+      this.graphs.streamEvents(
+        'detail-page-workflow',
+        body,
+        {
+          configurable: {
+            thread_id: body.requestId,
+          },
+        },
+        {
+          version: 'v2',
+        },
+      ),
+    ).pipe(
+      map((event) => ({
+        type: 'workflow',
+        data: event,
+      })),
+    );
+  }
+}
+
+function fromAsyncIterable<T>(iterable: AsyncIterable<T>): Observable<T> {
+  return new Observable<T>((subscriber) => {
+    void (async () => {
+      try {
+        for await (const item of iterable) {
+          subscriber.next(item);
+        }
+
+        subscriber.complete();
+      } catch (error) {
+        subscriber.error(error);
+      }
+    })();
+  });
 }
 ```
 

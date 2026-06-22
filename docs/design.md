@@ -39,11 +39,26 @@ The core package stays thin. Optional packages own optional runtime dependencies
 Core only requires a runnable-like object:
 
 ```ts
+interface RunnableStreamOptionsLike {
+  [key: string]: unknown;
+}
+
 interface RunnableLike<TInput = unknown, TOutput = unknown> {
   invoke(
     input: TInput,
     config?: RunnableConfigLike,
   ): Promise<TOutput> | TOutput;
+
+  stream?(
+    input: TInput,
+    config?: RunnableConfigLike,
+  ): AsyncIterable<unknown> | Promise<AsyncIterable<unknown>>;
+
+  streamEvents?(
+    input: TInput,
+    config?: RunnableConfigLike,
+    options?: RunnableStreamOptionsLike,
+  ): AsyncIterable<unknown> | Promise<AsyncIterable<unknown>>;
 }
 ```
 
@@ -62,7 +77,12 @@ This keeps core compatible with LangChain runnables, LangGraph compiled graphs, 
 
 Compiled graphs are registered into core as `kind: 'graph'`.
 
-`LangGraphRunner` is the Nest execution surface for compiled graphs. It delegates to `LangChainRegistry.invokeGraph()` and preserves runnable config such as `configurable.thread_id` for checkpointer-backed execution.
+`LangGraphRunner` is the Nest execution surface for compiled graphs. It delegates
+to `LangChainRegistry.invokeGraph()`, `streamGraph()`, and
+`streamGraphEvents()` while preserving runnable config such as
+`configurable.thread_id` for checkpointer-backed invoke and streaming
+execution. Applications own HTTP framing such as NDJSON or SSE; the packages
+return async iterables and do not require LangSmith for streaming.
 
 LangGraph execution-control patterns stay in this package because they depend directly on `@langchain/langgraph` primitives:
 

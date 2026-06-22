@@ -39,9 +39,17 @@ export class AppModule implements OnModuleInit {
   onModuleInit() {
     this.registry.registerRunnable('echo', {
       invoke: (input) => ({ input }),
+      stream: async function* (input) {
+        yield { input, chunk: 1 };
+      },
     });
   }
 }
 ```
+
+`invoke()` is the only required runnable method. `stream()` and
+`streamEvents()` are optional structural methods, so core stays independent of
+LangGraph and LangChain runtime types while still allowing integration packages
+to expose streaming execution.
 
 LangGraph decorator가 필요하면 `@nest-langchain/langgraph`를, LangSmith tracing이 필요하면 `@nest-langchain/langsmith`를 별도로 설치합니다.
