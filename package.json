@@ -15,10 +15,15 @@
     "lint": "pnpm typecheck",
     "check:boundaries": "node scripts/check-package-boundaries.mjs",
     "check": "pnpm check:boundaries && pnpm typecheck && pnpm test && pnpm build",
+    "changeset": "changeset",
+    "changeset:version": "changeset version",
+    "release": "changeset publish",
+    "guardrails:install": "node scripts/install-agent-guardrails.mjs",
     "format": "prettier --write \"**/*.{ts,js,json,md,yaml,yml}\"",
     "format:check": "prettier --check \"**/*.{ts,js,json,md,yaml,yml}\""
   },
   "devDependencies": {
+    "@changesets/cli": "^2.31.0",
     "@types/node": "^24.10.1",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3",
