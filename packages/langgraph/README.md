@@ -119,6 +119,13 @@ application controller.
 
 The helpers are thin wrappers around official LangGraph primitives.
 
+### Command Pattern
+
+Use the Command Pattern when a node needs to update state and choose the next
+node in the same return value. `commandTo()` returns a LangGraph `Command`, and
+`@GraphNode({ ends })` declares the possible dynamic destinations so LangGraph
+can validate the graph.
+
 ```ts
 import { Annotation } from '@langchain/langgraph';
 import {
@@ -183,6 +190,53 @@ export class ReviewGraph {
   @GraphNode()
   resume() {
     return resumeWith({ owner: 'human-review' });
+  }
+}
+```
+
+For decorator-first routing, use `@CommandNode` when the target graph is
+explicit, `@RouteCommandNode` for same-graph routing, and `@ParentHandoffNode`
+when a subgraph must hand control back to a parent graph. If the decorated
+method already returns a LangGraph `Command`, the decorator passes it through;
+otherwise it wraps the method result as the command update.
+
+```ts
+import {
+  CommandNode,
+  ParentHandoffNode,
+  RouteCommandNode,
+} from '@nest-langchain/langgraph';
+
+export class DecoratedRoutes {
+  @CommandNode({
+    name: 'remoteRoute',
+    to: 'remoteNode',
+    graph: 'remoteGraph',
+  })
+  remoteRoute() {
+    return {
+      output: 'remote',
+    };
+  }
+
+  @RouteCommandNode({
+    name: 'route',
+    to: 'next',
+  })
+  route() {
+    return {
+      output: 'local',
+    };
+  }
+
+  @ParentHandoffNode({
+    name: 'escalate',
+    to: 'supervisor',
+  })
+  escalate() {
+    return {
+      reason: 'needs-supervisor',
+    };
   }
 }
 ```
