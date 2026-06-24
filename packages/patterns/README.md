@@ -88,6 +88,14 @@ Supported step patterns:
 Definitions fail fast on duplicate model roles, duplicate step names, unknown
 dependencies, and unknown model role references.
 
+## Looking For LangGraph Command Pattern?
+
+LangGraph execution-control patterns live in `@nest-langchain/langgraph`, not in
+this package. Use `commandTo`, `@GraphNode({ ends })`, `CommandNode`,
+`RouteCommandNode`, and `ParentHandoffNode` from `@nest-langchain/langgraph` for
+Command routing, parent handoff, `Send` fan-out, interrupts, resume, and
+subgraph transforms.
+
 ## Deep Agents
 
 ```ts
