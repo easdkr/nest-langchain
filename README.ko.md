@@ -2,30 +2,28 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-Production-oriented NestJS integrations for the LangChain ecosystem.
+LangChain 생태계를 NestJS에서 운영 환경에 맞게 사용할 수 있도록 만든 통합 패키지 모음입니다.
 
-The package family is intentionally split. `@nest-langchain/core` stays thin and
-owns only the Nest registry/contracts. Optional packages own LangGraph,
-LangSmith, tools, prompts, visualization, task patterns, and provider SDKs.
+이 패키지군은 의도적으로 분리되어 있습니다. `@nest-langchain/core`는 얇게 유지하며 Nest registry/contract만 소유합니다. LangGraph, LangSmith, tools, prompts, visualization, task patterns, provider SDK 통합은 선택 패키지가 각각 소유합니다.
 
-## Packages
+## 패키지
 
-| Package                             | Owns                                                          | Demo                                 |
-| ----------------------------------- | ------------------------------------------------------------- | ------------------------------------ |
-| `@nest-langchain/core`              | registry, runnable contracts, shared scanner                  | `@nest-langchain/demo-basic`         |
-| `@nest-langchain/langgraph`         | LangGraph decorators, discovery, runner, Command/Send helpers | `@nest-langchain/demo-langgraph`     |
-| `@nest-langchain/langsmith`         | LangSmith runtime config, context, trace decorator            | `@nest-langchain/demo-langsmith`     |
-| `@nest-langchain/tools`             | decorated Nest methods as LangChain tools                     | `@nest-langchain/demo-tools-prompts` |
-| `@nest-langchain/prompts`           | named LangChain prompt templates                              | `@nest-langchain/demo-tools-prompts` |
-| `@nest-langchain/patterns`          | collaborative task and Deep Agents decorators                 | `@nest-langchain/demo-patterns`      |
-| `@nest-langchain/visualization`     | hosted graph docs UI and graph JSON/Mermaid/DOT endpoints     | `@nest-langchain/demo-visualization` |
-| `@nest-langchain/openai`            | OpenAI chat model DI token                                    | `@nest-langchain/demo-providers`     |
-| `@nest-langchain/openai-compatible` | OpenAI-compatible chat model DI tokens                        | `@nest-langchain/demo-providers`     |
-| `@nest-langchain/anthropic`         | Anthropic chat model DI token                                 | `@nest-langchain/demo-providers`     |
-| `@nest-langchain/gemini`            | Gemini chat model DI token                                    | `@nest-langchain/demo-providers`     |
-| `@nest-langchain/bedrock`           | AWS Bedrock chat model DI token                               | `@nest-langchain/demo-providers`     |
+| Package                             | 담당 영역                                                   | Demo                                 |
+| ----------------------------------- | ----------------------------------------------------------- | ------------------------------------ |
+| `@nest-langchain/core`              | registry, runnable contract, 공통 scanner                   | `@nest-langchain/demo-basic`         |
+| `@nest-langchain/langgraph`         | LangGraph decorator, discovery, runner, Command/Send helper | `@nest-langchain/demo-langgraph`     |
+| `@nest-langchain/langsmith`         | LangSmith runtime config, context, trace decorator          | `@nest-langchain/demo-langsmith`     |
+| `@nest-langchain/tools`             | Nest method를 LangChain tool로 노출                         | `@nest-langchain/demo-tools-prompts` |
+| `@nest-langchain/prompts`           | 이름 기반 LangChain prompt template                         | `@nest-langchain/demo-tools-prompts` |
+| `@nest-langchain/patterns`          | collaborative task와 Deep Agents decorator                  | `@nest-langchain/demo-patterns`      |
+| `@nest-langchain/visualization`     | 서버 호스팅 graph docs UI와 JSON/Mermaid/DOT endpoint       | `@nest-langchain/demo-visualization` |
+| `@nest-langchain/openai`            | OpenAI chat model DI token                                  | `@nest-langchain/demo-providers`     |
+| `@nest-langchain/openai-compatible` | OpenAI-compatible chat model DI token                       | `@nest-langchain/demo-providers`     |
+| `@nest-langchain/anthropic`         | Anthropic chat model DI token                               | `@nest-langchain/demo-providers`     |
+| `@nest-langchain/gemini`            | Gemini chat model DI token                                  | `@nest-langchain/demo-providers`     |
+| `@nest-langchain/bedrock`           | AWS Bedrock chat model DI token                             | `@nest-langchain/demo-providers`     |
 
-## Install Shapes
+## 설치 형태
 
 ```bash
 # registry only
@@ -57,13 +55,11 @@ pnpm add @nest-langchain/gemini @langchain/google-genai
 pnpm add @nest-langchain/bedrock @langchain/aws
 ```
 
-Provider packages expose Nest DI tokens and do not require
-`@nest-langchain/core`. Packages that discover or register runnables, such as
-`langgraph`, `tools`, `patterns`, and `visualization`, peer against core.
+Provider 패키지는 Nest DI token을 노출하며 `@nest-langchain/core`를 요구하지 않습니다. `langgraph`, `tools`, `patterns`, `visualization`처럼 runnable을 발견하거나 등록하는 패키지는 core를 peer dependency로 사용합니다.
 
-## Demos
+## 데모
 
-Install once, then run any demo:
+한 번 설치한 뒤 원하는 demo를 실행합니다.
 
 ```bash
 pnpm install
@@ -94,10 +90,7 @@ curl -X POST "http://localhost:3000/graphs/support-intake/events" \
   -d '{"message":"Delivery tracking is late.","customerTier":"pro","channel":"chat"}'
 ```
 
-`demo-langgraph` starts without model keys, uses deterministic drafting by
-default, and switches to OpenAI or OpenAI-compatible drafting when the matching
-environment variables are present. High-risk requests return an interrupt and
-resume through `POST /graphs/support-intake/resume`.
+`demo-langgraph`는 model key 없이 시작할 수 있고, 기본값으로 deterministic drafting을 사용합니다. 관련 환경 변수가 있으면 OpenAI 또는 OpenAI-compatible drafting으로 전환합니다. 고위험 요청은 interrupt를 반환하고 `POST /graphs/support-intake/resume`으로 이어서 실행합니다.
 
 LangSmith tracing:
 
@@ -137,11 +130,9 @@ pnpm --filter @nest-langchain/demo-providers start
 curl "http://localhost:3006/providers"
 ```
 
-`demo-providers` starts without API keys. It imports a provider module only when
-the required env vars are present, then exposes `POST /providers/:name/invoke`
-for actual model calls.
+`demo-providers`는 API key 없이 시작합니다. 필요한 env var가 있을 때만 provider module을 import하고, 실제 model 호출은 `POST /providers/:name/invoke`로 노출합니다.
 
-## Core Registry Example
+## Core Registry 예시
 
 ```ts
 import { Module, OnModuleInit } from '@nestjs/common';
@@ -169,7 +160,7 @@ export class AppModule implements OnModuleInit {
 }
 ```
 
-## LangGraph Example
+## LangGraph 예시
 
 ```ts
 import { Annotation } from '@langchain/langgraph';
@@ -202,7 +193,7 @@ export class SupportIntakeGraph {
 }
 ```
 
-## Hosted Visualization Example
+## Hosted Visualization 예시
 
 ```ts
 import {
@@ -225,10 +216,9 @@ VisualizationModule.setup(
 );
 ```
 
-Layout editing does not rewrite graph source files. Shared layouts are sidecar
-artifacts; runtime/user-specific layouts can use custom storage.
+Layout editing은 graph source file을 다시 쓰지 않습니다. 공유 layout은 sidecar artifact로 저장하고, runtime/user-specific layout은 custom storage를 사용할 수 있습니다.
 
-## Provider Token Example
+## Provider Token 예시
 
 ```ts
 import { Inject, Injectable, Module } from '@nestjs/common';
@@ -257,11 +247,11 @@ export class SupportDraftService {
 }
 ```
 
-## More Docs
+## 추가 문서
 
-- [Architecture](docs/architecture.md)
-- [Package boundaries](docs/package-boundaries.md)
-- [LangGraph patterns](docs/langgraph-patterns.md)
-- [Visualization](docs/visualization.md)
-- [LangSmith privacy and redaction](docs/langsmith.md)
-- [Publishing](docs/publishing.md)
+- [Architecture](docs/architecture.ko.md)
+- [Package boundaries](docs/package-boundaries.ko.md)
+- [LangGraph patterns](docs/langgraph-patterns.ko.md)
+- [Visualization](docs/visualization.ko.md)
+- [LangSmith privacy and redaction](docs/langsmith.ko.md)
+- [Publishing](docs/publishing.ko.md)

@@ -2,11 +2,9 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-NestJS discovery for LangChain tools.
+LangChain tool을 위한 NestJS discovery package입니다.
 
-This package scans decorated Nest providers, wraps methods with
-`@langchain/core/tools`, and registers them in `@nest-langchain/core` so they can
-be listed and invoked through the shared registry.
+이 패키지는 decorated Nest provider를 scan하고, method를 `@langchain/core/tools`로 감싸며, shared registry를 통해 나열하고 실행할 수 있도록 `@nest-langchain/core`에 등록합니다.
 
 ## Install
 
@@ -57,8 +55,7 @@ export class MathTools {
 }
 ```
 
-`@Toolset()` applies Nest injectable metadata, so the class can use constructor
-injection. The class must still be listed in a Nest module `providers` array.
+`@Toolset()`은 Nest injectable metadata를 적용하므로 class는 constructor injection을 사용할 수 있습니다. 그래도 class는 Nest module의 `providers` array에 등록되어 있어야 합니다.
 
 ## Invoke Through Core
 
@@ -89,7 +86,6 @@ curl -X POST "http://localhost:3005/tools/support-priority" \
 
 ## Boundary
 
-- Owns `@langchain/core` and `zod`.
-- Peers against `@nest-langchain/core` because discovered tools are registered
-  into the core registry.
-- Does not depend on LangGraph, LangSmith, or provider SDKs.
+- `@langchain/core`와 `zod`를 소유합니다.
+- 발견된 tool이 core registry에 등록되므로 `@nest-langchain/core`를 peer로 둡니다.
+- LangGraph, LangSmith, provider SDK에 의존하지 않습니다.

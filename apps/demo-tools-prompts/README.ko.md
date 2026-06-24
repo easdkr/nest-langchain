@@ -2,10 +2,9 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-HTTP demo for `@nest-langchain/tools` and `@nest-langchain/prompts`.
+`@nest-langchain/tools`와 `@nest-langchain/prompts`를 위한 HTTP demo입니다.
 
-It runs without provider API keys. The app registers prompt templates, discovers
-a decorated Nest tool provider, and invokes both through package APIs.
+Provider API key 없이 실행됩니다. 이 app은 prompt template을 등록하고, decorated Nest tool provider를 발견하며, package API를 통해 둘 다 실행합니다.
 
 ```bash
 pnpm --filter @nest-langchain/demo-tools-prompts start

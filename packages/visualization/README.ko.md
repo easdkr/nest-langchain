@@ -2,12 +2,9 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-Hosted graph documentation for Nest LangChain registries.
+Nest LangChain registry를 위한 hosted graph documentation입니다.
 
-This package mounts a Swagger-like graph UI and machine-readable graph endpoints
-inside a Nest application. It reads graph/runnable metadata from
-`@nest-langchain/core` and can store layout positions in memory, files, browser
-storage, or a custom storage backend.
+이 패키지는 Swagger와 비슷한 graph UI와 machine-readable graph endpoint를 Nest application 안에 mount합니다. `@nest-langchain/core`의 graph/runnable metadata를 읽고 layout position을 memory, file, browser storage, custom storage backend에 저장할 수 있습니다.
 
 ## Install
 
@@ -47,7 +44,7 @@ async function bootstrap() {
 }
 ```
 
-Use `BrowserLayoutStorage` when layout edits should stay client-side:
+Layout edit를 client-side에만 두려면 `BrowserLayoutStorage`를 사용합니다.
 
 ```ts
 VisualizationModule.setup(
@@ -72,9 +69,7 @@ VisualizationModule.setup(
 - `GET /ai/graphs/layouts/:graphId`
 - `PUT /ai/graphs/layouts/:graphId`
 
-Layout edits do not rewrite graph source files. Shared layouts should use
-sidecar storage, and production persistence can implement
-`VisualGraphLayoutStorage`.
+Layout edit는 graph source file을 다시 쓰지 않습니다. Shared layout은 sidecar storage를 사용하는 것이 좋고, production persistence는 `VisualGraphLayoutStorage`를 구현하면 됩니다.
 
 ## Demo
 
@@ -88,12 +83,10 @@ curl -X POST "http://localhost:3000/graphs/support-workflow" \
   -d '{"message":"Delivery tracking is late for an enterprise customer.","customerTier":"enterprise"}'
 ```
 
-Open `http://localhost:3000/ai/graphs` in a browser to inspect and edit the
-graph layout.
+Browser에서 `http://localhost:3000/ai/graphs`를 열면 graph layout을 inspect하고 edit할 수 있습니다.
 
 ## Boundary
 
-- Peers against `@nest-langchain/core` because it reads registry metadata.
-- Does not depend on LangGraph directly; any runnable or graph registered in
-  core can be documented.
-- Keeps layout state outside source files.
+- Registry metadata를 읽으므로 `@nest-langchain/core`를 peer로 둡니다.
+- LangGraph에 직접 의존하지 않습니다. Core에 등록된 runnable 또는 graph라면 문서화할 수 있습니다.
+- Layout state를 source file 밖에 유지합니다.

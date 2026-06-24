@@ -2,7 +2,7 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-HTTP demo for `@nest-langchain/patterns`. It runs a launch review task with planner, critic, and judge model roles backed by deterministic local model stubs, so it does not need provider API keys.
+`@nest-langchain/patterns`를 위한 HTTP demo입니다. Deterministic local model stub으로 backing된 planner, critic, judge model role을 사용해 launch review task를 실행하므로 provider API key가 필요하지 않습니다.
 
 Run:
 

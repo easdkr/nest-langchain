@@ -2,14 +2,9 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-NestJS decorators for provider collaboration and modern LangChain task
-patterns.
+Provider collaboration과 modern LangChain task pattern을 위한 NestJS decorator입니다.
 
-This package discovers decorated task classes, validates task graphs at module
-startup, and invokes provider roles through Nest DI tokens. Provider SDKs stay
-outside this package; pass tokens from `@nest-langchain/openai`,
-`@nest-langchain/anthropic`, `@nest-langchain/gemini`,
-`@nest-langchain/bedrock`, or custom providers.
+이 패키지는 decorated task class를 발견하고 module startup에서 task graph를 검증하며 Nest DI token을 통해 provider role을 호출합니다. Provider SDK는 이 패키지 밖에 둡니다. `@nest-langchain/openai`, `@nest-langchain/anthropic`, `@nest-langchain/gemini`, `@nest-langchain/bedrock` 또는 custom provider의 token을 전달하세요.
 
 ## Install
 
@@ -17,7 +12,7 @@ outside this package; pass tokens from `@nest-langchain/openai`,
 pnpm add @nest-langchain/core @nest-langchain/patterns @langchain/core
 ```
 
-Install Deep Agents only when using `@DeepAgent`:
+`@DeepAgent`를 사용할 때만 Deep Agents를 설치합니다.
 
 ```bash
 pnpm add deepagents
@@ -87,16 +82,11 @@ Supported step patterns:
 - `tool-call`
 - `fallback`
 
-Definitions fail fast on duplicate model roles, duplicate step names, unknown
-dependencies, and unknown model role references.
+Definition은 duplicate model role, duplicate step name, unknown dependency, unknown model role reference에서 fail fast합니다.
 
 ## Looking For LangGraph Command Pattern?
 
-LangGraph execution-control patterns live in `@nest-langchain/langgraph`, not in
-this package. Use `commandTo`, `@GraphNode({ ends })`, `CommandNode`,
-`RouteCommandNode`, and `ParentHandoffNode` from `@nest-langchain/langgraph` for
-Command routing, parent handoff, `Send` fan-out, interrupts, resume, and
-subgraph transforms.
+LangGraph execution-control pattern은 이 package가 아니라 `@nest-langchain/langgraph`에 있습니다. Command routing, parent handoff, `Send` fan-out, interrupt, resume, subgraph transform에는 `@nest-langchain/langgraph`의 `commandTo`, `@GraphNode({ ends })`, `CommandNode`, `RouteCommandNode`, `ParentHandoffNode`를 사용하세요.
 
 ## Deep Agents
 
@@ -155,7 +145,6 @@ curl -X POST "http://localhost:3004/tasks/launch-review" \
 
 ## Boundary
 
-- Owns `@langchain/core` and exposes `deepagents` as an optional peer.
-- Peers against `@nest-langchain/core` because discovered tasks are registered
-  through the core package family.
-- Does not depend on provider SDKs, LangGraph, or LangSmith.
+- `@langchain/core`를 소유하고 `deepagents`를 optional peer로 노출합니다.
+- Discovered task가 core package family를 통해 등록되므로 `@nest-langchain/core`를 peer로 둡니다.
+- Provider SDK, LangGraph, LangSmith에 의존하지 않습니다.

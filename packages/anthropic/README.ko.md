@@ -2,10 +2,9 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-Anthropic chat model provider for NestJS dependency injection.
+NestJS dependency injection을 위한 Anthropic chat model provider입니다.
 
-This package creates a `ChatAnthropic` instance from `@langchain/anthropic` and
-exports it through a stable Nest token.
+이 패키지는 `@langchain/anthropic`의 `ChatAnthropic` instance를 만들고 안정적인 Nest token으로 export합니다.
 
 ## Install
 
@@ -31,7 +30,7 @@ import { AnthropicProviderModule } from '@nest-langchain/anthropic';
 export class AiModule {}
 ```
 
-Environment fallbacks:
+Environment fallback:
 
 - `ANTHROPIC_API_KEY`
 - `CLAUDE_API_KEY`
@@ -68,6 +67,6 @@ curl -X POST "http://localhost:3006/providers/anthropic/invoke" \
 
 ## Boundary
 
-- Owns `@langchain/anthropic`.
-- Does not depend on `@nest-langchain/core`, LangGraph, or LangSmith.
-- Exposes the model as a Nest DI token for direct injection or task-pattern use.
+- `@langchain/anthropic`를 소유합니다.
+- `@nest-langchain/core`, LangGraph, LangSmith에 의존하지 않습니다.
+- 직접 injection 또는 task-pattern 사용을 위해 model을 Nest DI token으로 노출합니다.

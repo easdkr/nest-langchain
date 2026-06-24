@@ -2,7 +2,7 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-HTTP demo for provider packages:
+Provider package를 위한 HTTP demo입니다.
 
 - `@nest-langchain/openai`
 - `@nest-langchain/openai-compatible`
@@ -10,9 +10,7 @@ HTTP demo for provider packages:
 - `@nest-langchain/gemini`
 - `@nest-langchain/bedrock`
 
-The app starts without provider API keys. It imports a provider module only when
-the required environment variables are present, then exposes the configured
-model through the provider package DI token.
+이 app은 provider API key 없이 시작합니다. 필요한 environment variable이 있을 때만 provider module을 import하고, configured model을 provider package DI token을 통해 노출합니다.
 
 ```bash
 pnpm --filter @nest-langchain/demo-providers start
@@ -31,7 +29,7 @@ curl -X POST "http://localhost:3006/providers/openai/invoke" \
   -d '{"prompt":"Write one sentence about NestJS provider tokens."}'
 ```
 
-OpenAI-compatible providers use the default compatible token:
+OpenAI-compatible provider는 default compatible token을 사용합니다.
 
 ```bash
 OPENAI_COMPATIBLE_API_KEY=...

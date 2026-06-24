@@ -1,5 +1,7 @@
 # LangSmith Privacy And Redaction
 
+[English](langsmith.md) | [한국어](langsmith.ko.md)
+
 `@nest-langchain/langsmith` keeps tracing opt-in. `LangSmithModule.forRoot()` defaults `enabled` to `false`; enable it explicitly for environments where traces may leave the process.
 
 ## Runtime Metadata

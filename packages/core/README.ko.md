@@ -2,13 +2,9 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-Thin NestJS registry and shared contracts for optional LangChain ecosystem
-packages.
+Optional LangChain ecosystem package를 위한 얇은 NestJS registry와 shared contract입니다.
 
-`@nest-langchain/core` owns only the Nest module, runnable registry, structural
-runnable contracts, and decorated-provider scanner. It deliberately does not
-depend on LangGraph, LangSmith, provider SDKs, prompt templates, tools, or the
-visualization renderer.
+`@nest-langchain/core`는 Nest module, runnable registry, structural runnable contract, decorated-provider scanner만 소유합니다. LangGraph, LangSmith, provider SDK, prompt template, tool, visualization renderer에는 의도적으로 의존하지 않습니다.
 
 ## Install
 
@@ -16,7 +12,7 @@ visualization renderer.
 pnpm add @nest-langchain/core
 ```
 
-Peer dependencies are expected to come from the host Nest application:
+Peer dependency는 host Nest application에서 제공합니다.
 
 ```bash
 pnpm add @nestjs/common @nestjs/core reflect-metadata rxjs
@@ -70,13 +66,11 @@ export class SupportRegistry implements OnModuleInit {
 }
 ```
 
-`invoke()` is the only required method. `stream()` and `streamEvents()` are
-optional structural methods, so integration packages can expose streaming
-without forcing core to import LangChain runtime types.
+`invoke()`만 필수 method입니다. `stream()`과 `streamEvents()`는 optional structural method이므로, integration package는 core에 LangChain runtime type을 강제하지 않고 streaming을 노출할 수 있습니다.
 
 ## Optional Packages
 
-Core stays thin; install the package that owns the feature you need.
+Core는 얇게 유지됩니다. 필요한 feature를 소유한 package를 설치하세요.
 
 | Feature                         | Packages                                                                              |
 | ------------------------------- | ------------------------------------------------------------------------------------- |
@@ -92,9 +86,7 @@ Core stays thin; install the package that owns the feature you need.
 | Gemini model token              | `@nest-langchain/gemini @langchain/google-genai`                                      |
 | AWS Bedrock model token         | `@nest-langchain/bedrock @langchain/aws`                                              |
 
-Provider packages intentionally expose Nest DI tokens and do not require core.
-Packages that discover or register runnables, such as `langgraph`, `tools`,
-`patterns`, and `visualization`, peer against core.
+Provider package는 의도적으로 Nest DI token을 노출하며 core를 요구하지 않습니다. `langgraph`, `tools`, `patterns`, `visualization`처럼 runnable을 발견하거나 등록하는 package는 core를 peer dependency로 사용합니다.
 
 ## Demo
 
@@ -110,7 +102,7 @@ curl -X POST "http://localhost:3000/support/triage" \
 
 ## Package Boundary
 
-- Core does not import provider SDKs.
-- Core does not import LangGraph or LangSmith.
-- Core owns registry behavior only.
-- Optional packages own their runtime dependencies and Nest integration surface.
+- Core는 provider SDK를 import하지 않습니다.
+- Core는 LangGraph 또는 LangSmith를 import하지 않습니다.
+- Core는 registry behavior만 소유합니다.
+- Optional package가 자기 runtime dependency와 Nest integration surface를 소유합니다.

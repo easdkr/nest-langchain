@@ -2,11 +2,9 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-Demo for the `@nest-langchain/langsmith` tracing module and `@TraceableRun`
-decorator. It normalizes a support case and returns a response with the account
-ID redacted.
+`@nest-langchain/langsmith`의 tracing module과 `@TraceableRun` decorator를 보여주는 demo입니다. Support case를 normalize하고 account ID를 redaction한 결과를 반환합니다.
 
-Tracing is off by default.
+기본값은 tracing off입니다.
 
 ```bash
 pnpm --filter @nest-langchain/demo-langsmith start

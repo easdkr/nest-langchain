@@ -1,5 +1,7 @@
 # Architecture
 
+[English](architecture.md) | [한국어](architecture.ko.md)
+
 `nest-langchain` is organized as a thin core plus optional integration packages.
 Consumers install only the feature packages they need.
 

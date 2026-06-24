@@ -2,10 +2,9 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-NestJS prompt registry for LangChain prompt templates.
+LangChain prompt template를 위한 NestJS prompt registry입니다.
 
-This package stores named prompt definitions, builds `PromptTemplate` instances
-from `@langchain/core/prompts`, and exposes formatting through a Nest provider.
+이 패키지는 named prompt definition을 저장하고, `@langchain/core/prompts`의 `PromptTemplate` instance를 만들며, Nest provider를 통해 formatting을 노출합니다.
 
 ## Install
 
@@ -59,8 +58,7 @@ export class SupportPrompts {
 }
 ```
 
-Duplicate prompt names fail fast during registration. Unknown prompt names throw
-when read or formatted.
+중복 prompt name은 registration 중에 fail fast합니다. 알 수 없는 prompt name은 read 또는 format 시 throw합니다.
 
 ## Demo
 
@@ -75,7 +73,6 @@ curl -X POST "http://localhost:3005/prompts/support-reply" \
 
 ## Boundary
 
-- Owns prompt-template behavior from `@langchain/core`.
-- Does not require `@nest-langchain/core`; prompts are a standalone Nest
-  registry.
-- Does not depend on provider SDKs, LangGraph, or LangSmith.
+- `@langchain/core`의 prompt-template behavior를 소유합니다.
+- `@nest-langchain/core`를 요구하지 않으며 standalone Nest registry입니다.
+- Provider SDK, LangGraph, LangSmith에 의존하지 않습니다.
