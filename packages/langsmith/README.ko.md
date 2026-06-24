@@ -2,11 +2,9 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-LangSmith runtime configuration and trace decorators for NestJS.
+NestJS를 위한 LangSmith runtime configuration과 trace decorator입니다.
 
-This package centralizes LangSmith environment setup, request metadata, input
-redaction, sampling, and the `@TraceableRun()` decorator. It can be used beside
-LangGraph, but LangGraph is not required.
+이 패키지는 LangSmith environment setup, request metadata, input redaction, sampling, `@TraceableRun()` decorator를 한곳에 모읍니다. LangGraph와 함께 사용할 수 있지만 LangGraph가 필수는 아닙니다.
 
 ## Install
 
@@ -61,9 +59,7 @@ export class SupportHandler {
 
 ## Runtime Defaults
 
-`LangSmithModule.forRoot()` defaults to `enabled: false`, so adding the module
-does not turn tracing on by accident. The module applies environment variables
-only during Nest module initialization.
+`LangSmithModule.forRoot()`의 기본값은 `enabled: false`입니다. Module을 추가해도 tracing이 실수로 켜지지 않습니다. 이 module은 Nest module initialization 중에만 environment variable을 적용합니다.
 
 ## Demo
 
@@ -77,6 +73,6 @@ curl -X POST "http://localhost:3000/trace" \
 
 ## Boundary
 
-- Owns `langsmith`.
-- Peers against `@nest-langchain/core` for package-family consistency.
-- Does not depend on LangGraph or provider SDKs.
+- `langsmith`를 소유합니다.
+- Package family consistency를 위해 `@nest-langchain/core`를 peer로 둡니다.
+- LangGraph 또는 provider SDK에 의존하지 않습니다.

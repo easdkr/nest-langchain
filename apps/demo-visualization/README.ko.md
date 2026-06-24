@@ -2,8 +2,7 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-Demo showing how `@nest-langchain/visualization` hosts graph UI and APIs at a
-server path like Swagger documentation.
+`@nest-langchain/visualization`이 Swagger 문서처럼 server path에 graph UI와 API를 호스팅하는 예제입니다.
 
 ```bash
 pnpm --filter @nest-langchain/demo-visualization start

@@ -2,19 +2,18 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-Production-style NestJS demo for `@nest-langchain/langgraph`.
+`@nest-langchain/langgraph`를 위한 production-style NestJS demo입니다.
 
-The app models a support-intake workflow with:
+이 app은 support-intake workflow를 다음 요소로 구성합니다.
 
-- `Command` routing through `commandTo` and `@GraphNode({ ends })`
-- a `support-policy` subgraph called through `callSubgraph`
-- dynamic review workers through `sendTo`/`fanOut`
-- human approval through `interruptFor` and `resumeWith`
+- `commandTo`와 `@GraphNode({ ends })`를 통한 `Command` routing
+- `callSubgraph`로 호출되는 `support-policy` subgraph
+- `sendTo`/`fanOut`을 통한 dynamic review worker
+- `interruptFor`와 `resumeWith`를 통한 human approval
 - optional LangSmith tracing
-- optional OpenAI or OpenAI-compatible response drafting
+- optional OpenAI 또는 OpenAI-compatible response drafting
 
-It starts without model keys. When no model provider is configured, the final
-draft is deterministic so local runs and CI remain stable.
+Model key 없이 시작할 수 있습니다. Model provider가 설정되지 않으면 final draft는 deterministic하게 생성되어 local run과 CI가 안정적으로 유지됩니다.
 
 ## Run
 
@@ -35,8 +34,7 @@ OPENAI_COMPATIBLE_MODEL=example-chat
 pnpm --filter @nest-langchain/demo-langgraph start
 ```
 
-If both provider configurations are present, OpenAI is preferred. LangSmith can
-be enabled with `LANGSMITH_TRACING=true` and `LANGSMITH_API_KEY`.
+두 provider configuration이 모두 있으면 OpenAI가 우선됩니다. LangSmith는 `LANGSMITH_TRACING=true`와 `LANGSMITH_API_KEY`로 활성화할 수 있습니다.
 
 ## Endpoints
 
@@ -47,8 +45,7 @@ be enabled with `LANGSMITH_TRACING=true` and `LANGSMITH_API_KEY`.
 - `POST /graphs/support-intake/events`
 - `POST /graphs/:name/invoke`
 
-`POST /graphs/:name/invoke` is the raw registry endpoint. Prefer the typed
-`support-intake` endpoints for application-style usage.
+`POST /graphs/:name/invoke`는 raw registry endpoint입니다. Application-style usage에는 typed `support-intake` endpoint를 선호하세요.
 
 ## Completed Flow
 
@@ -61,7 +58,7 @@ curl -X POST "http://localhost:3000/graphs/support-intake" \
   -d '{"message":"Delivery tracking is late.","customerTier":"pro","channel":"chat"}'
 ```
 
-Medium and low-risk requests complete in one call and return:
+Medium/low-risk request는 한 번의 call로 완료되고 다음 형태를 반환합니다.
 
 ```json
 {
@@ -86,8 +83,7 @@ Medium and low-risk requests complete in one call and return:
 
 ## Approval Flow
 
-High-risk requests pause with an interrupt. Reuse the returned `threadId` to
-resume the same checkpointer-backed run.
+High-risk request는 interrupt와 함께 멈춥니다. 반환된 `threadId`를 재사용해 같은 checkpointer-backed run을 resume합니다.
 
 ```bash
 curl -X POST "http://localhost:3000/graphs/support-intake" \
@@ -99,8 +95,7 @@ curl -X POST "http://localhost:3000/graphs/support-intake/resume" \
   -d '{"threadId":"support_...","decision":{"approved":true,"reviewer":"ops-lead","note":"Send the escalation draft."}}'
 ```
 
-The demo uses LangGraph `MemorySaver` for local checkpointing. Use a durable
-checkpointer, such as Postgres or MongoDB, for production deployments.
+이 demo는 local checkpointing에 LangGraph `MemorySaver`를 사용합니다. Production deployment에서는 Postgres 또는 MongoDB 같은 durable checkpointer를 사용하세요.
 
 ## Event Stream
 
@@ -110,4 +105,4 @@ curl -N -X POST "http://localhost:3000/graphs/support-intake/events" \
   -d '{"message":"Delivery tracking is late.","customerTier":"pro","channel":"chat"}'
 ```
 
-The endpoint returns newline-delimited JSON events from `LangGraphRunner`.
+이 endpoint는 `LangGraphRunner`에서 newline-delimited JSON event를 반환합니다.

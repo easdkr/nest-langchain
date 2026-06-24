@@ -2,10 +2,9 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-AWS Bedrock chat model provider for NestJS dependency injection.
+NestJS dependency injection을 위한 AWS Bedrock chat model provider입니다.
 
-This package creates a `ChatBedrockConverse` instance from `@langchain/aws` and
-exports it through a stable Nest token.
+이 패키지는 `@langchain/aws`의 `ChatBedrockConverse` instance를 만들고 안정적인 Nest token으로 export합니다.
 
 ## Install
 
@@ -36,10 +35,9 @@ Region resolution order:
 1. `region` option
 2. `AWS_REGION`
 3. `AWS_DEFAULT_REGION`
-4. active `AWS_PROFILE` region from the AWS config file
+4. AWS config file의 active `AWS_PROFILE` region
 
-Pass `credentials` when the host app does not use the default AWS provider
-chain.
+Host app이 default AWS provider chain을 사용하지 않는다면 `credentials`를 전달하세요.
 
 ## Injection
 
@@ -72,6 +70,6 @@ curl -X POST "http://localhost:3006/providers/bedrock/invoke" \
 
 ## Boundary
 
-- Owns `@langchain/aws`.
-- Does not depend on `@nest-langchain/core`, LangGraph, or LangSmith.
-- Exposes the model as a Nest DI token for direct injection or task-pattern use.
+- `@langchain/aws`를 소유합니다.
+- `@nest-langchain/core`, LangGraph, LangSmith에 의존하지 않습니다.
+- 직접 injection 또는 task-pattern 사용을 위해 model을 Nest DI token으로 노출합니다.

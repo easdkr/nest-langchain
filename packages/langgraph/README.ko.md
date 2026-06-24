@@ -2,11 +2,9 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-NestJS decorators and discovery for LangGraph.
+LangGraph를 위한 NestJS decorator와 discovery package입니다.
 
-This package discovers decorated Nest providers, compiles LangGraph
-`StateGraph` instances, and registers them in `@nest-langchain/core`. It keeps
-LangGraph runtime behavior in this package instead of pushing it into core.
+이 패키지는 decorated Nest provider를 발견하고 LangGraph `StateGraph` instance를 compile한 뒤 `@nest-langchain/core`에 등록합니다. LangGraph runtime behavior는 core로 밀어 넣지 않고 이 패키지에 둡니다.
 
 ## Install
 
@@ -32,7 +30,7 @@ import { LangGraphModule } from '@nest-langchain/langgraph';
 export class AppModule {}
 ```
 
-`checkpointer` is passed to LangGraph `compile({ checkpointer })`.
+`checkpointer`는 LangGraph `compile({ checkpointer })`로 전달됩니다.
 
 ## Define A Graph
 
@@ -67,8 +65,7 @@ export class SupportGraph {
 }
 ```
 
-Decorated graph classes are Nest providers. Register them in the module
-`providers` array.
+Decorated graph class는 Nest provider입니다. Module `providers` array에 등록하세요.
 
 ## Execute Graphs
 
@@ -113,20 +110,15 @@ export class AgentRunner {
 }
 ```
 
-`invoke()` returns the final graph result. `stream()` and `streamEvents()` return
-async iterables; HTTP framing such as NDJSON and SSE should stay in the
-application controller.
+`invoke()`는 final graph result를 반환합니다. `stream()`과 `streamEvents()`는 async iterable을 반환합니다. NDJSON 또는 SSE 같은 HTTP framing은 application controller에 두는 것이 좋습니다.
 
 ## LangGraph Helpers
 
-The helpers are thin wrappers around official LangGraph primitives.
+Helper는 official LangGraph primitive 위의 얇은 wrapper입니다.
 
 ### Command Pattern
 
-Use the Command Pattern when a node needs to update state and choose the next
-node in the same return value. `commandTo()` returns a LangGraph `Command`, and
-`@GraphNode({ ends })` declares the possible dynamic destinations so LangGraph
-can validate the graph.
+Node가 state를 update하면서 다음 node도 같은 return value에서 골라야 할 때 Command Pattern을 사용합니다. `commandTo()`는 LangGraph `Command`를 반환하고, `@GraphNode({ ends })`는 가능한 dynamic destination을 선언하여 LangGraph가 graph를 검증할 수 있게 합니다.
 
 ```ts
 import { Annotation } from '@langchain/langgraph';
@@ -196,11 +188,7 @@ export class ReviewGraph {
 }
 ```
 
-For decorator-first routing, use `@CommandNode` when the target graph is
-explicit, `@RouteCommandNode` for same-graph routing, and `@ParentHandoffNode`
-when a subgraph must hand control back to a parent graph. If the decorated
-method already returns a LangGraph `Command`, the decorator passes it through;
-otherwise it wraps the method result as the command update.
+Decorator-first routing에서는 target graph가 명시적이면 `@CommandNode`, same-graph routing에는 `@RouteCommandNode`, subgraph가 parent graph로 control을 돌려줘야 하면 `@ParentHandoffNode`를 사용합니다. Decorated method가 이미 LangGraph `Command`를 반환하면 그대로 통과시키고, 아니면 method result를 command update로 감쌉니다.
 
 ```ts
 import {
@@ -243,11 +231,9 @@ export class DecoratedRoutes {
 }
 ```
 
-Parent handoff helpers do not auto-infer local `ends`; parent destinations live
-outside the child graph that LangGraph validates.
+Parent handoff helper는 local `ends`를 자동 추론하지 않습니다. Parent destination은 LangGraph가 검증하는 child graph 밖에 있습니다.
 
-`@nest-langchain/demo-langgraph` runs the same patterns through HTTP: command
-routing, `Send` fan-out, interrupt/resume, and explicit subgraph transforms.
+`@nest-langchain/demo-langgraph`는 command routing, `Send` fan-out, interrupt/resume, explicit subgraph transform을 HTTP로 실행합니다.
 
 ## Demo
 
@@ -260,8 +246,7 @@ curl -X POST "http://localhost:3000/graphs/support-intake" \
   -d '{"message":"Checkout fails with a saved card error.","customerTier":"enterprise","channel":"web"}'
 ```
 
-Use `@nest-langchain/demo-visualization` to inspect the same registry surface
-through hosted graph docs:
+Hosted graph docs로 같은 registry surface를 보려면 `@nest-langchain/demo-visualization`을 사용하세요.
 
 ```bash
 pnpm --filter @nest-langchain/demo-visualization start
@@ -270,7 +255,6 @@ open "http://localhost:3000/ai/graphs"
 
 ## Boundary
 
-- Owns `@langchain/langgraph`.
-- Peers against `@nest-langchain/core` because compiled graphs are registered in
-  the core registry.
-- Does not depend on LangSmith or provider SDKs.
+- `@langchain/langgraph`를 소유합니다.
+- Compiled graph가 core registry에 등록되므로 `@nest-langchain/core`를 peer로 둡니다.
+- LangSmith 또는 provider SDK에 의존하지 않습니다.

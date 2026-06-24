@@ -1,5 +1,7 @@
 # LangGraph Patterns
 
+[English](langgraph-patterns.md) | [한국어](langgraph-patterns.ko.md)
+
 This project keeps LangGraph execution-control patterns in `@nest-langchain/langgraph`, not in core.
 
 ## Supported Primitives

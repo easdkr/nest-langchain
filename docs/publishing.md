@@ -1,5 +1,7 @@
 # Publishing
 
+[English](publishing.md) | [한국어](publishing.ko.md)
+
 This repository is structured for independent npm packages under the
 `@nest-langchain/*` scope. Releases should go through Changesets and CI, not
 local npm commands.

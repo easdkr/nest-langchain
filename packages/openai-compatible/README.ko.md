@@ -2,11 +2,9 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-OpenAI-compatible Chat Completions provider for NestJS dependency injection.
+NestJS dependency injection을 위한 OpenAI-compatible Chat Completions provider입니다.
 
-Use this package for providers that expose an OpenAI-compatible API, including
-MiniMax, Kimi/Moonshot, GLM/Z.AI, OpenRouter, Together, Fireworks, and internal
-gateway endpoints.
+MiniMax, Kimi/Moonshot, GLM/Z.AI, OpenRouter, Together, Fireworks, internal gateway처럼 OpenAI-compatible API를 제공하는 provider에 사용합니다.
 
 ## Install
 
@@ -73,12 +71,11 @@ export class ProductWorkflow {
 }
 ```
 
-`InjectOpenAICompatibleModel()` is a constructor-parameter helper. For dynamic
-lookup, use `getOpenAICompatibleModelToken(name)`.
+`InjectOpenAICompatibleModel()`은 constructor parameter helper입니다. Dynamic lookup에는 `getOpenAICompatibleModelToken(name)`을 사용합니다.
 
 ## Environment Fallbacks
 
-For `name: 'minimax'`, the module checks both long and short env names:
+`name: 'minimax'`에서는 긴 env name과 짧은 env name을 모두 확인합니다.
 
 ```text
 OPENAI_COMPATIBLE_MINIMAX_API_KEY
@@ -90,7 +87,7 @@ MINIMAX_BASE_URL
 MINIMAX_MODEL
 ```
 
-The unnamed default model reads:
+이름 없는 default model은 다음 값을 읽습니다.
 
 ```text
 OPENAI_COMPATIBLE_API_KEY
@@ -98,7 +95,7 @@ OPENAI_COMPATIBLE_BASE_URL
 OPENAI_COMPATIBLE_MODEL
 ```
 
-When a provider uses non-matching env names, bind them explicitly:
+Provider가 다른 env name을 사용한다면 명시적으로 binding합니다.
 
 ```ts
 OpenAICompatibleProviderModule.forRoot({
@@ -111,12 +108,9 @@ OpenAICompatibleProviderModule.forRoot({
 
 ## Client Options
 
-- `configuration` is forwarded to the OpenAI client used by
-  `@langchain/openai`.
-- `baseURL` and `baseUrl` both work; the resolved value is written into
-  `configuration.baseURL`.
-- `defaultHeaders`, `timeout`, `maxRetries`, and `modelKwargs` are forwarded to
-  `ChatOpenAI`.
+- `configuration`은 `@langchain/openai`가 사용하는 OpenAI client로 전달됩니다.
+- `baseURL`과 `baseUrl` 모두 동작하며, resolved value는 `configuration.baseURL`에 기록됩니다.
+- `defaultHeaders`, `timeout`, `maxRetries`, `modelKwargs`는 `ChatOpenAI`로 전달됩니다.
 
 ## Demo
 
@@ -133,6 +127,6 @@ curl -X POST "http://localhost:3006/providers/openai-compatible/invoke" \
 
 ## Boundary
 
-- Owns `@langchain/openai`.
-- Does not depend on `@nest-langchain/core`, LangGraph, or LangSmith.
-- Supports multiple named provider tokens in a single Nest module.
+- `@langchain/openai`를 소유합니다.
+- `@nest-langchain/core`, LangGraph, LangSmith에 의존하지 않습니다.
+- 하나의 Nest module 안에서 여러 named provider token을 지원합니다.

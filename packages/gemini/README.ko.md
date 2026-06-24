@@ -2,10 +2,9 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-Gemini chat model provider for NestJS dependency injection.
+NestJS dependency injection을 위한 Gemini chat model provider입니다.
 
-This package creates a `ChatGoogleGenerativeAI` instance from
-`@langchain/google-genai` and exports it through a stable Nest token.
+이 패키지는 `@langchain/google-genai`의 `ChatGoogleGenerativeAI` instance를 만들고 안정적인 Nest token으로 export합니다.
 
 ## Install
 
@@ -31,8 +30,7 @@ import { GeminiProviderModule } from '@nest-langchain/gemini';
 export class AiModule {}
 ```
 
-When `apiKey` is omitted, the module reads `GOOGLE_API_KEY` and then
-`GEMINI_API_KEY`.
+`apiKey`가 없으면 module은 `GOOGLE_API_KEY`를 먼저 읽고 그다음 `GEMINI_API_KEY`를 읽습니다.
 
 ## Injection
 
@@ -65,6 +63,6 @@ curl -X POST "http://localhost:3006/providers/gemini/invoke" \
 
 ## Boundary
 
-- Owns `@langchain/google-genai`.
-- Does not depend on `@nest-langchain/core`, LangGraph, or LangSmith.
-- Exposes the model as a Nest DI token for direct injection or task-pattern use.
+- `@langchain/google-genai`를 소유합니다.
+- `@nest-langchain/core`, LangGraph, LangSmith에 의존하지 않습니다.
+- 직접 injection 또는 task-pattern 사용을 위해 model을 Nest DI token으로 노출합니다.

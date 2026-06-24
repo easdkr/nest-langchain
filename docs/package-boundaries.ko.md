@@ -2,17 +2,17 @@
 
 [English](package-boundaries.md) | [한국어](package-boundaries.ko.md)
 
-`@nest-langchain/core` is intentionally small.
+`@nest-langchain/core`는 의도적으로 작게 유지합니다.
 
-Allowed in core:
+Core에서 허용되는 것:
 
 - Nest module registration
 - `LangChainRegistry`
-- runnable-like contracts
-- generic provider scanner utilities
-- test helpers that do not import optional integrations
+- runnable-like contract
+- generic provider scanner utility
+- optional integration을 import하지 않는 test helper
 
-Forbidden in core:
+Core에서 금지되는 것:
 
 - `@langchain/langgraph`
 - `langsmith`
@@ -20,13 +20,13 @@ Forbidden in core:
 - `@langchain/anthropic`
 - `@langchain/google-genai`
 - `@langchain/aws`
-- provider SDKs
+- provider SDK
 - `@langchain/core`
-- visualization/rendering dependencies
+- visualization/rendering dependency
 
-Each optional feature must live in its own package and declare its runtime dependency as a peer dependency.
+각 optional feature는 자기 package에 있어야 하고 runtime dependency를 peer dependency로 선언해야 합니다.
 
-Current optional dependency ownership:
+현재 optional dependency ownership:
 
 | Package                             | Runtime Dependency It Owns                    |
 | ----------------------------------- | --------------------------------------------- |
@@ -41,8 +41,8 @@ Current optional dependency ownership:
 | `@nest-langchain/gemini`            | `@langchain/google-genai`                     |
 | `@nest-langchain/bedrock`           | `@langchain/aws`                              |
 
-`@nest-langchain/prompts` does not need `@nest-langchain/core`; it exposes a prompt registry that can be injected through its own Nest module.
+`@nest-langchain/prompts`는 `@nest-langchain/core`가 필요하지 않습니다. 자체 Nest module로 주입 가능한 prompt registry를 노출합니다.
 
-Provider packages do not require `@nest-langchain/core`; they expose provider-specific Nest tokens and model factories only.
+Provider package도 `@nest-langchain/core`를 요구하지 않습니다. provider-specific Nest token과 model factory만 노출합니다.
 
-`@nest-langchain/patterns` requires `@nest-langchain/core` because collaborative tasks and Deep Agent adapters register runnable metadata into the core registry. It must not own provider SDKs, LangSmith, or a direct LangGraph dependency. Deep Agents support is enabled only when the application installs `deepagents` and uses `@DeepAgent`.
+`@nest-langchain/patterns`는 collaborative task와 Deep Agent adapter가 runnable metadata를 core registry에 등록하므로 `@nest-langchain/core`가 필요합니다. provider SDK, LangSmith, direct LangGraph dependency를 소유하면 안 됩니다. Deep Agents support는 application이 `deepagents`를 설치하고 `@DeepAgent`를 사용할 때만 활성화됩니다.

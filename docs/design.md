@@ -1,5 +1,7 @@
 # NestJS LangChain Integration Design
 
+[English](design.md) | [한국어](design.ko.md)
+
 ## Goal
 
 Provide NestJS-first packages for LangChain ecosystem features without forcing every consumer to install every integration.
