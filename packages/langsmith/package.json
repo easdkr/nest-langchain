@@ -1,6 +1,6 @@
 {
   "name": "@nest-langchain/langsmith",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "LangSmith tracing module and decorators for NestJS.",
   "license": "MIT",
   "author": "easdkr",
@@ -29,7 +29,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "peerDependencies": {
-    "@nest-langchain/core": "^0.1.0",
+    "@nest-langchain/core": "^0.1.2",
     "@nestjs/common": "^10 || ^11",
     "langsmith": "^0.7.10",
     "reflect-metadata": "^0.2.0"
@@ -39,5 +39,21 @@
     "@nestjs/common": "^11.1.27",
     "langsmith": "^0.7.10",
     "reflect-metadata": "^0.2.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/easdkr/nest-langchain.git",
+    "directory": "packages/langsmith"
+  },
+  "homepage": "https://github.com/easdkr/nest-langchain#readme",
+  "bugs": {
+    "url": "https://github.com/easdkr/nest-langchain/issues"
+  },
+  "keywords": [
+    "nestjs",
+    "langchain",
+    "langsmith",
+    "tracing",
+    "observability"
+  ]
 }

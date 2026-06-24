@@ -1,14 +1,16 @@
 # @nest-langchain/openai-compatible
 
-OpenAI-compatible Chat Completions providers를 Nest DI token으로 노출하는 선택 패키지입니다.
+OpenAI-compatible Chat Completions provider for NestJS dependency injection.
 
-MiniMax, Kimi/Moonshot, GLM/Z.AI, OpenRouter, Together, Fireworks처럼 OpenAI Chat Completions 호환 endpoint를 제공하는 모델을 같은 방식으로 주입할 수 있습니다.
+Use this package for providers that expose an OpenAI-compatible API, including
+MiniMax, Kimi/Moonshot, GLM/Z.AI, OpenRouter, Together, Fireworks, and internal
+gateway endpoints.
+
+## Install
 
 ```bash
 pnpm add @nest-langchain/openai-compatible @langchain/openai
 ```
-
-`@nest-langchain/core`와 `@nest-langchain/langgraph`는 provider SDK를 직접 의존하지 않습니다.
 
 ## Register Models
 
@@ -26,6 +28,9 @@ import { OpenAICompatibleProviderModule } from '@nest-langchain/openai-compatibl
           baseURL: 'https://api.minimax.io/v1',
           model: 'MiniMax-M3',
           temperature: 1,
+          modelKwargs: {
+            reasoning_split: true,
+          },
         },
         {
           name: 'kimi',
@@ -46,11 +51,7 @@ import { OpenAICompatibleProviderModule } from '@nest-langchain/openai-compatibl
 export class AiModule {}
 ```
 
-GLM Coding Plan처럼 provider가 별도 coding endpoint를 요구하는 경우에는 해당 endpoint를 `baseURL`에 넣습니다.
-
-## Constructor Injection
-
-모델은 Nest DI provider로 등록됩니다. 소비 코드는 생성자 주입을 사용합니다.
+## Injection
 
 ```ts
 import { Injectable } from '@nestjs/common';
@@ -70,29 +71,24 @@ export class ProductWorkflow {
 }
 ```
 
-`InjectOpenAICompatibleModel()`은 생성자 파라미터용 helper입니다. property injection 예시는 제공하지 않습니다.
+`InjectOpenAICompatibleModel()` is a constructor-parameter helper. For dynamic
+lookup, use `getOpenAICompatibleModelToken(name)`.
 
 ## Environment Fallbacks
 
-명시 옵션이 없으면 이름 기반 환경 변수를 읽습니다.
-
-For `name: 'minimax'`:
+For `name: 'minimax'`, the module checks both long and short env names:
 
 ```text
 OPENAI_COMPATIBLE_MINIMAX_API_KEY
 OPENAI_COMPATIBLE_MINIMAX_BASE_URL
 OPENAI_COMPATIBLE_MINIMAX_MODEL
-```
 
-또는 짧은 provider prefix도 읽습니다.
-
-```text
 MINIMAX_API_KEY
 MINIMAX_BASE_URL
 MINIMAX_MODEL
 ```
 
-기본 unnamed model은 다음 env를 읽습니다.
+The unnamed default model reads:
 
 ```text
 OPENAI_COMPATIBLE_API_KEY
@@ -100,7 +96,7 @@ OPENAI_COMPATIBLE_BASE_URL
 OPENAI_COMPATIBLE_MODEL
 ```
 
-Kimi처럼 API key env 이름이 provider 이름과 다르면 명시할 수 있습니다.
+When a provider uses non-matching env names, bind them explicitly:
 
 ```ts
 OpenAICompatibleProviderModule.forRoot({
@@ -111,20 +107,30 @@ OpenAICompatibleProviderModule.forRoot({
 });
 ```
 
-## Provider-Specific Parameters
+## Client Options
 
-OpenAI-compatible providers sometimes expose extra Chat Completions parameters. Pass those through `modelKwargs`.
+- `configuration` is forwarded to the OpenAI client used by
+  `@langchain/openai`.
+- `baseURL` and `baseUrl` both work; the resolved value is written into
+  `configuration.baseURL`.
+- `defaultHeaders`, `timeout`, `maxRetries`, and `modelKwargs` are forwarded to
+  `ChatOpenAI`.
 
-```ts
-OpenAICompatibleProviderModule.forRoot({
-  name: 'minimax',
-  apiKey: process.env.MINIMAX_API_KEY,
-  baseURL: 'https://api.minimax.io/v1',
-  model: 'MiniMax-M3',
-  modelKwargs: {
-    reasoning_split: true,
-  },
-});
+## Demo
+
+```bash
+OPENAI_COMPATIBLE_API_KEY=...
+OPENAI_COMPATIBLE_BASE_URL=https://api.example.com/v1
+OPENAI_COMPATIBLE_MODEL=example-chat
+pnpm --filter @nest-langchain/demo-providers start
+
+curl -X POST "http://localhost:3006/providers/openai-compatible/invoke" \
+  -H "content-type: application/json" \
+  -d '{"prompt":"Write one sentence about compatible model endpoints."}'
 ```
 
-`configuration` is forwarded to the underlying OpenAI client used by `@langchain/openai`, with `baseURL` set from the module options.
+## Boundary
+
+- Owns `@langchain/openai`.
+- Does not depend on `@nest-langchain/core`, LangGraph, or LangSmith.
+- Supports multiple named provider tokens in a single Nest module.

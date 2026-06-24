@@ -1,36 +1,67 @@
 # @nest-langchain/visualization
 
-Nest 서버의 특정 path에 AI graph 문서 UI와 machine-readable graph endpoint를 붙이는 선택 패키지입니다.
+Hosted graph documentation for Nest LangChain registries.
+
+This package mounts a Swagger-like graph UI and machine-readable graph endpoints
+inside a Nest application. It reads graph/runnable metadata from
+`@nest-langchain/core` and can store layout positions in memory, files, browser
+storage, or a custom storage backend.
+
+## Install
 
 ```bash
 pnpm add @nest-langchain/core @nest-langchain/visualization
 ```
 
-```ts
-const document = VisualizationModule.createDocument(app, {
-  title: 'AI Graphs',
-});
-
-VisualizationModule.setup('/ai/graphs', app, document, {
-  editable: true,
-  layout: {
-    storage: new FileLayoutStorage('.nest-langchain/layouts'),
-  },
-});
-```
-
-사용자별 layout만 브라우저에 저장하려면 server-side storage 대신 `BrowserLayoutStorage`를 사용합니다.
+## Setup
 
 ```ts
-VisualizationModule.setup('/ai/graphs', app, document, {
-  editable: true,
-  layout: {
-    storage: new BrowserLayoutStorage('nest-langchain:layout:'),
-  },
-});
+import { NestFactory } from '@nestjs/core';
+import {
+  FileLayoutStorage,
+  VisualizationModule,
+} from '@nest-langchain/visualization';
+
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  VisualizationModule.setup(
+    '/ai/graphs',
+    app,
+    {
+      title: 'AI Graphs',
+    },
+    {
+      editable: true,
+      layout: {
+        storage: new FileLayoutStorage('.nest-langchain/layouts'),
+      },
+    },
+  );
+
+  await app.listen(3000);
+}
 ```
 
-기본 endpoint:
+Use `BrowserLayoutStorage` when layout edits should stay client-side:
+
+```ts
+VisualizationModule.setup(
+  '/ai/graphs',
+  app,
+  { title: 'AI Graphs' },
+  {
+    editable: true,
+    layout: {
+      storage: new BrowserLayoutStorage('nest-langchain:layout:'),
+    },
+  },
+);
+```
+
+## Endpoints
 
 - `GET /ai/graphs`
 - `GET /ai/graphs/json`
@@ -39,4 +70,28 @@ VisualizationModule.setup('/ai/graphs', app, document, {
 - `GET /ai/graphs/layouts/:graphId`
 - `PUT /ai/graphs/layouts/:graphId`
 
-Layout 변경은 실행 graph source file을 수정하지 않습니다. 공용 layout이 필요하면 sidecar JSON storage를 선택하고, 운영 DB 저장은 `VisualGraphLayoutStorage` interface를 구현한 custom storage를 사용합니다.
+Layout edits do not rewrite graph source files. Shared layouts should use
+sidecar storage, and production persistence can implement
+`VisualGraphLayoutStorage`.
+
+## Demo
+
+```bash
+pnpm --filter @nest-langchain/demo-visualization start
+
+curl "http://localhost:3000/ai/graphs/json"
+curl "http://localhost:3000/ai/graphs/mermaid"
+curl -X POST "http://localhost:3000/graphs/support-workflow" \
+  -H "content-type: application/json" \
+  -d '{"message":"Delivery tracking is late for an enterprise customer.","customerTier":"enterprise"}'
+```
+
+Open `http://localhost:3000/ai/graphs` in a browser to inspect and edit the
+graph layout.
+
+## Boundary
+
+- Peers against `@nest-langchain/core` because it reads registry metadata.
+- Does not depend on LangGraph directly; any runnable or graph registered in
+  core can be documented.
+- Keeps layout state outside source files.

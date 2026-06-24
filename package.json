@@ -2,16 +2,16 @@
   "name": "nest-langchain-monorepo",
   "version": "0.1.0",
   "private": true,
-  "description": "NestJS integration package skeleton for optional LangChain ecosystem packages.",
+  "description": "Production-oriented NestJS integrations for LangChain, LangGraph, LangSmith, provider models, tools, prompts, and graph visualization.",
   "packageManager": "pnpm@10.18.0",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
-    "build": "pnpm -r build",
+    "build": "pnpm -r --workspace-concurrency=1 build",
     "clean": "pnpm -r exec rm -rf dist coverage",
-    "test": "pnpm -r test",
-    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r --workspace-concurrency=1 test",
+    "typecheck": "pnpm -r --workspace-concurrency=1 typecheck",
     "lint": "pnpm typecheck",
     "check:boundaries": "node scripts/check-package-boundaries.mjs",
     "check": "pnpm check:boundaries && pnpm typecheck && pnpm test && pnpm build",
@@ -23,5 +23,21 @@
     "prettier": "^3.6.2",
     "typescript": "^5.9.3",
     "vitest": "^4.0.15"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/easdkr/nest-langchain.git"
+  },
+  "homepage": "https://github.com/easdkr/nest-langchain#readme",
+  "bugs": {
+    "url": "https://github.com/easdkr/nest-langchain/issues"
+  },
+  "keywords": [
+    "nestjs",
+    "langchain",
+    "langgraph",
+    "langsmith",
+    "ai",
+    "agents"
+  ]
 }

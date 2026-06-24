@@ -1,0 +1,40 @@
+{
+  "name": "@nest-langchain/demo-providers",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NestJS demo app for @nest-langchain provider packages.",
+  "main": "dist/main.js",
+  "scripts": {
+    "prebuild": "pnpm --filter @nest-langchain/openai build && pnpm --filter @nest-langchain/openai-compatible build && pnpm --filter @nest-langchain/anthropic build && pnpm --filter @nest-langchain/gemini build && pnpm --filter @nest-langchain/bedrock build",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "start": "node dist/main.js",
+    "start:dev": "pnpm --filter @nest-langchain/openai build && pnpm --filter @nest-langchain/openai-compatible build && pnpm --filter @nest-langchain/anthropic build && pnpm --filter @nest-langchain/gemini build && pnpm --filter @nest-langchain/bedrock build && tsx watch src/main.ts",
+    "test": "vitest run --passWithNoTests",
+    "pretest:e2e": "pnpm --filter @nest-langchain/openai build && pnpm --filter @nest-langchain/openai-compatible build && pnpm --filter @nest-langchain/anthropic build && pnpm --filter @nest-langchain/gemini build && pnpm --filter @nest-langchain/bedrock build",
+    "test:e2e": "vitest run tests",
+    "pretypecheck": "pnpm --filter @nest-langchain/openai build && pnpm --filter @nest-langchain/openai-compatible build && pnpm --filter @nest-langchain/anthropic build && pnpm --filter @nest-langchain/gemini build && pnpm --filter @nest-langchain/bedrock build",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@langchain/anthropic": "^1.5.0",
+    "@langchain/aws": "^1.4.1",
+    "@langchain/google-genai": "^2.2.0",
+    "@langchain/openai": "^1.5.1",
+    "@nest-langchain/anthropic": "workspace:*",
+    "@nest-langchain/bedrock": "workspace:*",
+    "@nest-langchain/gemini": "workspace:*",
+    "@nest-langchain/openai": "workspace:*",
+    "@nest-langchain/openai-compatible": "workspace:*",
+    "@nestjs/common": "^11.1.27",
+    "@nestjs/core": "^11.1.27",
+    "@nestjs/platform-express": "^11.1.27",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.15"
+  }
+}

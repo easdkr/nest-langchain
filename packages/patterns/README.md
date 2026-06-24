@@ -1,24 +1,52 @@
 # @nest-langchain/patterns
 
-Provider collaboration decorators for modern LangChain task patterns.
+NestJS decorators for provider collaboration and modern LangChain task
+patterns.
+
+This package discovers decorated task classes, validates task graphs at module
+startup, and invokes provider roles through Nest DI tokens. Provider SDKs stay
+outside this package; pass tokens from `@nest-langchain/openai`,
+`@nest-langchain/anthropic`, `@nest-langchain/gemini`,
+`@nest-langchain/bedrock`, or custom providers.
+
+## Install
 
 ```bash
 pnpm add @nest-langchain/core @nest-langchain/patterns @langchain/core
 ```
 
-This package does not own provider SDKs. Pass provider-specific Nest tokens from
-`@nest-langchain/openai`, `@nest-langchain/anthropic`, `@nest-langchain/gemini`,
-or `@nest-langchain/bedrock` into `@CollaborativeTask`.
-
-Install Deep Agents only when using `@DeepAgent`.
+Install Deep Agents only when using `@DeepAgent`:
 
 ```bash
 pnpm add deepagents
 ```
 
-## Collaborative Tasks
+## Module
 
 ```ts
+import { Module } from '@nestjs/common';
+import { CollaborativePatternsModule } from '@nest-langchain/patterns';
+
+@Module({
+  imports: [
+    CollaborativePatternsModule.forRoot({
+      global: true,
+    }),
+  ],
+  providers: [LaunchReviewTask],
+})
+export class AppModule {}
+```
+
+## Collaborative Task
+
+```ts
+import {
+  CollaborativeTask,
+  TaskExecutionContext,
+  TaskStep,
+} from '@nest-langchain/patterns';
+
 @CollaborativeTask({
   name: 'launch-review',
   models: [
@@ -43,29 +71,32 @@ export class LaunchReviewTask {
     model: 'judge',
     dependsOn: ['drafts'],
   })
-  decision(input: unknown, context: TaskExecutionContext) {
+  decision(_input: unknown, context: TaskExecutionContext) {
     return `Decide from ${JSON.stringify(context.steps)}.`;
   }
 }
 ```
 
-`@CollaborativeTask()` and `@DeepAgent()` apply Nest injectable metadata, so
-decorated task classes do not need a separate `@Injectable()` decorator. They
-must still be registered as Nest providers. During module startup, task
-definitions fail fast on duplicate model roles, duplicate step names, unknown
-step dependencies, and unknown model role references.
+Supported step patterns:
 
-Supported `@TaskStep` patterns:
+- `invoke`
+- `parallel`
+- `structured`
+- `tool-call`
+- `fallback`
 
-- `invoke`: single model call
-- `parallel`: fan out to multiple provider roles
-- `structured`: call `withStructuredOutput`
-- `tool-call`: call `bindTools`
-- `fallback`: try provider roles in order
+Definitions fail fast on duplicate model roles, duplicate step names, unknown
+dependencies, and unknown model role references.
 
 ## Deep Agents
 
 ```ts
+import {
+  DeepAgent,
+  DeepAgentSubagent,
+  DeepAgentTool,
+} from '@nest-langchain/patterns';
+
 @DeepAgent({
   name: 'market-research-agent',
   model: 'supervisor',
@@ -101,6 +132,20 @@ export class MarketResearchAgent {
 }
 ```
 
-Deep agent definitions also fail fast during module startup when selected tool
-or subagent names do not match decorated `@DeepAgentTool` or
-`@DeepAgentSubagent` methods.
+## Demo
+
+```bash
+pnpm --filter @nest-langchain/demo-patterns start
+
+curl "http://localhost:3004/tasks"
+curl -X POST "http://localhost:3004/tasks/launch-review" \
+  -H "content-type: application/json" \
+  -d '{"product":"Nest LangChain Patterns","market":"Korea B2B SaaS"}'
+```
+
+## Boundary
+
+- Owns `@langchain/core` and exposes `deepagents` as an optional peer.
+- Peers against `@nest-langchain/core` because discovered tasks are registered
+  through the core package family.
+- Does not depend on provider SDKs, LangGraph, or LangSmith.

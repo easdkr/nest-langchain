@@ -189,6 +189,110 @@ importers:
         specifier: ^4.0.15
         version: 4.1.9(@types/node@24.13.2)(vite@8.0.16(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.22.4)(yaml@2.9.0))
 
+  apps/demo-providers:
+    dependencies:
+      '@langchain/anthropic':
+        specifier: ^1.5.0
+        version: 1.5.0(@langchain/core@1.2.0(openai@6.44.0(zod@4.4.3)))
+      '@langchain/aws':
+        specifier: ^1.4.1
+        version: 1.4.1(@langchain/core@1.2.0(openai@6.44.0(zod@4.4.3)))
+      '@langchain/google-genai':
+        specifier: ^2.2.0
+        version: 2.2.0(@langchain/core@1.2.0(openai@6.44.0(zod@4.4.3)))
+      '@langchain/openai':
+        specifier: ^1.5.1
+        version: 1.5.1(@langchain/core@1.2.0(openai@6.44.0(zod@4.4.3)))
+      '@nest-langchain/anthropic':
+        specifier: workspace:*
+        version: link:../../packages/anthropic
+      '@nest-langchain/bedrock':
+        specifier: workspace:*
+        version: link:../../packages/bedrock
+      '@nest-langchain/gemini':
+        specifier: workspace:*
+        version: link:../../packages/gemini
+      '@nest-langchain/openai':
+        specifier: workspace:*
+        version: link:../../packages/openai
+      '@nest-langchain/openai-compatible':
+        specifier: workspace:*
+        version: link:../../packages/openai-compatible
+      '@nestjs/common':
+        specifier: ^11.1.27
+        version: 11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core':
+        specifier: ^11.1.27
+        version: 11.1.27(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.27)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/platform-express':
+        specifier: ^11.1.27
+        version: 11.1.27(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
+      rxjs:
+        specifier: ^7.8.2
+        version: 7.8.2
+    devDependencies:
+      '@types/node':
+        specifier: ^24.10.1
+        version: 24.13.2
+      tsx:
+        specifier: ^4.21.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.15
+        version: 4.1.9(@types/node@24.13.2)(vite@8.0.16(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.22.4)(yaml@2.9.0))
+
+  apps/demo-tools-prompts:
+    dependencies:
+      '@langchain/core':
+        specifier: ^1.2.0
+        version: 1.2.0(openai@6.44.0(zod@4.4.3))
+      '@nest-langchain/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@nest-langchain/prompts':
+        specifier: workspace:*
+        version: link:../../packages/prompts
+      '@nest-langchain/tools':
+        specifier: workspace:*
+        version: link:../../packages/tools
+      '@nestjs/common':
+        specifier: ^11.1.27
+        version: 11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core':
+        specifier: ^11.1.27
+        version: 11.1.27(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.27)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/platform-express':
+        specifier: ^11.1.27
+        version: 11.1.27(@nestjs/common@11.1.27(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
+      rxjs:
+        specifier: ^7.8.2
+        version: 7.8.2
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@types/node':
+        specifier: ^24.10.1
+        version: 24.13.2
+      tsx:
+        specifier: ^4.21.0
+        version: 4.22.4
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.15
+        version: 4.1.9(@types/node@24.13.2)(vite@8.0.16(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.22.4)(yaml@2.9.0))
+
   apps/demo-visualization:
     dependencies:
       '@langchain/core':

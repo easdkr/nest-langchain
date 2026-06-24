@@ -1,12 +1,18 @@
 # @nest-langchain/langsmith
 
-LangSmith tracing 설정과 `@TraceableRun` decorator를 제공하는 선택 패키지입니다.
+LangSmith runtime configuration and trace decorators for NestJS.
+
+This package centralizes LangSmith environment setup, request metadata, input
+redaction, sampling, and the `@TraceableRun()` decorator. It can be used beside
+LangGraph, but LangGraph is not required.
+
+## Install
 
 ```bash
 pnpm add @nest-langchain/core @nest-langchain/langsmith langsmith
 ```
 
-`@nest-langchain/core`는 LangSmith를 직접 의존하지 않습니다.
+## Module
 
 ```ts
 import { Module } from '@nestjs/common';
@@ -16,6 +22,7 @@ import { LangSmithModule } from '@nest-langchain/langsmith';
   imports: [
     LangSmithModule.forRoot({
       enabled: process.env.NODE_ENV === 'production',
+      apiKey: process.env.LANGSMITH_API_KEY,
       project: 'support-agent',
       redactInputs: (inputs) => ({
         ...inputs,
@@ -30,6 +37,8 @@ import { LangSmithModule } from '@nest-langchain/langsmith';
 })
 export class AppModule {}
 ```
+
+## Decorate Work
 
 ```ts
 import { Injectable } from '@nestjs/common';
@@ -47,3 +56,25 @@ export class SupportHandler {
   }
 }
 ```
+
+## Runtime Defaults
+
+`LangSmithModule.forRoot()` defaults to `enabled: false`, so adding the module
+does not turn tracing on by accident. The module applies environment variables
+only during Nest module initialization.
+
+## Demo
+
+```bash
+pnpm --filter @nest-langchain/demo-langsmith start
+
+curl -X POST "http://localhost:3000/trace" \
+  -H "content-type: application/json" \
+  -d '{"message":"Customer cannot complete checkout with saved card.","accountId":"acct_live_customer_42"}'
+```
+
+## Boundary
+
+- Owns `langsmith`.
+- Peers against `@nest-langchain/core` for package-family consistency.
+- Does not depend on LangGraph or provider SDKs.

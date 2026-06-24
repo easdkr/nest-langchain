@@ -1,23 +1,27 @@
 # nest-langchain
 
-NestJS에서 LangChain 생태계 기능을 선택 설치 방식으로 쓰기 위한 패키지 모노레포입니다.
+Production-oriented NestJS integrations for the LangChain ecosystem.
 
-핵심 원칙은 `@nest-langchain/core`를 얇게 유지하는 것입니다. core는 Nest module, registry, runnable 계약만 제공하고 LangGraph, LangSmith, tool, prompt, patterns, visualization, provider 연동은 별도 패키지에서 제공합니다.
+The package family is intentionally split. `@nest-langchain/core` stays thin and
+owns only the Nest registry/contracts. Optional packages own LangGraph,
+LangSmith, tools, prompts, visualization, task patterns, and provider SDKs.
 
 ## Packages
 
-- `@nest-langchain/core`: Nest dynamic module, runnable registry, 공통 scanner/계약
-- `@nest-langchain/langgraph`: `@LangGraph`, `@GraphNode`, `@GraphEdge`, `@ConditionalEdge`, graph invoke/stream execution, Command/Send/parent handoff helpers
-- `@nest-langchain/langsmith`: `LangSmithModule`, `@TraceableRun`, request metadata/redaction/sampling hook
-- `@nest-langchain/tools`: `@LangTool`, Nest provider method discovery, LangChain tool 등록
-- `@nest-langchain/prompts`: `PromptsModule`, named prompt registry, LangChain prompt template format
-- `@nest-langchain/patterns`: `@CollaborativeTask`, `@TaskStep`, `@DeepAgent`, provider collaboration/delegation patterns
-- `@nest-langchain/visualization`: `/ai/graphs` 같은 서버 path에 graph docs UI와 JSON/Mermaid/DOT/layout API 호스팅
-- `@nest-langchain/openai`: OpenAI provider token/factory
-- `@nest-langchain/openai-compatible`: OpenAI-compatible provider token/factory for MiniMax, Kimi, GLM, and similar endpoints
-- `@nest-langchain/anthropic`: Anthropic provider token/factory
-- `@nest-langchain/gemini`: Gemini provider token/factory
-- `@nest-langchain/bedrock`: AWS Bedrock provider token/factory
+| Package                             | Owns                                                          | Demo                                 |
+| ----------------------------------- | ------------------------------------------------------------- | ------------------------------------ |
+| `@nest-langchain/core`              | registry, runnable contracts, shared scanner                  | `@nest-langchain/demo-basic`         |
+| `@nest-langchain/langgraph`         | LangGraph decorators, discovery, runner, Command/Send helpers | `@nest-langchain/demo-langgraph`     |
+| `@nest-langchain/langsmith`         | LangSmith runtime config, context, trace decorator            | `@nest-langchain/demo-langsmith`     |
+| `@nest-langchain/tools`             | decorated Nest methods as LangChain tools                     | `@nest-langchain/demo-tools-prompts` |
+| `@nest-langchain/prompts`           | named LangChain prompt templates                              | `@nest-langchain/demo-tools-prompts` |
+| `@nest-langchain/patterns`          | collaborative task and Deep Agents decorators                 | `@nest-langchain/demo-patterns`      |
+| `@nest-langchain/visualization`     | hosted graph docs UI and graph JSON/Mermaid/DOT endpoints     | `@nest-langchain/demo-visualization` |
+| `@nest-langchain/openai`            | OpenAI chat model DI token                                    | `@nest-langchain/demo-providers`     |
+| `@nest-langchain/openai-compatible` | OpenAI-compatible chat model DI tokens                        | `@nest-langchain/demo-providers`     |
+| `@nest-langchain/anthropic`         | Anthropic chat model DI token                                 | `@nest-langchain/demo-providers`     |
+| `@nest-langchain/gemini`            | Gemini chat model DI token                                    | `@nest-langchain/demo-providers`     |
+| `@nest-langchain/bedrock`           | AWS Bedrock chat model DI token                               | `@nest-langchain/demo-providers`     |
 
 ## Install Shapes
 
@@ -25,7 +29,7 @@ NestJS에서 LangChain 생태계 기능을 선택 설치 방식으로 쓰기 위
 # registry only
 pnpm add @nest-langchain/core
 
-# LangGraph decorator support
+# LangGraph decorators and execution
 pnpm add @nest-langchain/core @nest-langchain/langgraph @langchain/core @langchain/langgraph
 
 # LangSmith tracing
@@ -37,11 +41,8 @@ pnpm add @nest-langchain/core @nest-langchain/tools @langchain/core zod
 # prompt templates
 pnpm add @nest-langchain/prompts @langchain/core
 
-# provider collaboration and modern LangChain task patterns
+# provider collaboration and task patterns
 pnpm add @nest-langchain/core @nest-langchain/patterns @langchain/core
-
-# Deep Agents decorators, only when @DeepAgent is used
-pnpm add deepagents
 
 # hosted graph docs
 pnpm add @nest-langchain/core @nest-langchain/visualization
@@ -54,37 +55,107 @@ pnpm add @nest-langchain/gemini @langchain/google-genai
 pnpm add @nest-langchain/bedrock @langchain/aws
 ```
 
+Provider packages expose Nest DI tokens and do not require
+`@nest-langchain/core`. Packages that discover or register runnables, such as
+`langgraph`, `tools`, `patterns`, and `visualization`, peer against core.
+
 ## Demos
+
+Install once, then run any demo:
 
 ```bash
 pnpm install
 pnpm check
-
-pnpm --filter @nest-langchain/demo-basic start
-pnpm --filter @nest-langchain/demo-langgraph start
-pnpm --filter @nest-langchain/demo-langsmith start
-pnpm --filter @nest-langchain/demo-patterns start
-pnpm --filter @nest-langchain/demo-visualization start
 ```
 
-The demos run without provider API keys. They use deterministic support and launch-review workflows so the package behavior can be checked locally:
+Core registry:
 
 ```bash
+pnpm --filter @nest-langchain/demo-basic start
 curl "http://localhost:3000/runnables"
 curl -X POST "http://localhost:3000/support/triage" \
   -H "content-type: application/json" \
-  -d '{"message":"Checkout fails with a saved card error.","customerTier":"enterprise","channel":"web"}'
+  -d '{"message":"Checkout fails with a card error","customerTier":"enterprise","channel":"web"}'
 ```
 
-The visualization demo hosts graph docs at:
+LangGraph:
 
-```text
-GET /ai/graphs
-GET /ai/graphs/json
-GET /ai/graphs/mermaid
-GET /ai/graphs/dot
-GET /ai/graphs/layouts/:graphId
-PUT /ai/graphs/layouts/:graphId
+```bash
+pnpm --filter @nest-langchain/demo-langgraph start
+curl "http://localhost:3000/graphs"
+curl -X POST "http://localhost:3000/graphs/support-intake" \
+  -H "content-type: application/json" \
+  -d '{"message":"Delivery tracking is late.","customerTier":"pro","channel":"chat"}'
+```
+
+LangSmith tracing:
+
+```bash
+pnpm --filter @nest-langchain/demo-langsmith start
+curl -X POST "http://localhost:3000/trace" \
+  -H "content-type: application/json" \
+  -d '{"message":"Customer cannot complete checkout with saved card.","accountId":"acct_live_customer_42"}'
+```
+
+Tools and prompts:
+
+```bash
+pnpm --filter @nest-langchain/demo-tools-prompts start
+curl "http://localhost:3005/prompts"
+curl "http://localhost:3005/tools"
+```
+
+Patterns:
+
+```bash
+pnpm --filter @nest-langchain/demo-patterns start
+curl "http://localhost:3004/tasks"
+```
+
+Hosted graph docs:
+
+```bash
+pnpm --filter @nest-langchain/demo-visualization start
+curl "http://localhost:3000/ai/graphs/json"
+```
+
+Provider tokens:
+
+```bash
+pnpm --filter @nest-langchain/demo-providers start
+curl "http://localhost:3006/providers"
+```
+
+`demo-providers` starts without API keys. It imports a provider module only when
+the required env vars are present, then exposes `POST /providers/:name/invoke`
+for actual model calls.
+
+## Core Registry Example
+
+```ts
+import { Module, OnModuleInit } from '@nestjs/common';
+import { LangChainModule, LangChainRegistry } from '@nest-langchain/core';
+
+@Module({
+  imports: [LangChainModule.forRoot({ global: true })],
+})
+export class AppModule implements OnModuleInit {
+  constructor(private readonly registry: LangChainRegistry) {}
+
+  onModuleInit() {
+    this.registry.registerRunnable(
+      'echo',
+      {
+        invoke: async (input) => ({ input }),
+      },
+      {
+        kind: 'chain',
+        nodes: ['echo'],
+        tags: ['demo'],
+      },
+    );
+  }
+}
 ```
 
 ## LangGraph Example
@@ -120,20 +191,14 @@ export class SupportIntakeGraph {
 }
 ```
 
-```ts
-import { Module } from '@nestjs/common';
-import { LangGraphModule } from '@nest-langchain/langgraph';
-
-@Module({
-  imports: [LangGraphModule.forRoot({ global: true })],
-  providers: [SupportIntakeGraph],
-})
-export class AppModule {}
-```
-
 ## Hosted Visualization Example
 
 ```ts
+import {
+  FileLayoutStorage,
+  VisualizationModule,
+} from '@nest-langchain/visualization';
+
 VisualizationModule.setup(
   '/ai/graphs',
   app,
@@ -149,41 +214,37 @@ VisualizationModule.setup(
 );
 ```
 
-Layout editing does not rewrite graph source files. Shared layouts are sidecar artifacts; runtime/user-specific layouts can use custom storage.
+Layout editing does not rewrite graph source files. Shared layouts are sidecar
+artifacts; runtime/user-specific layouts can use custom storage.
 
-`LangGraphRunner` supports final-result `invoke()` and async-iterable
-`stream()` / `streamEvents()` execution. Transport framing such as NDJSON and
-SSE stays in the Nest application layer.
-
-## Collaborative Task Example
+## Provider Token Example
 
 ```ts
-@CollaborativeTask({
-  name: 'launch-review',
-  models: [
-    { role: 'planner', token: OPENAI_MODEL },
-    { role: 'critic', token: ANTHROPIC_MODEL },
-    { role: 'judge', token: GEMINI_MODEL },
-  ],
-})
-export class LaunchReviewTask {
-  @TaskStep({
-    name: 'drafts',
-    pattern: 'parallel',
-    models: ['planner', 'critic'],
-  })
-  drafts(input: { product: string }) {
-    return `Draft a launch plan for ${input.product}.`;
-  }
+import { Inject, Injectable, Module } from '@nestjs/common';
+import { ChatOpenAI } from '@langchain/openai';
+import {
+  NEST_LANGCHAIN_OPENAI_CHAT_MODEL,
+  OpenAIProviderModule,
+} from '@nest-langchain/openai';
 
-  @TaskStep({ name: 'decision', pattern: 'structured', model: 'judge' })
-  decision(input: unknown, context: TaskExecutionContext) {
-    return `Decide from ${JSON.stringify(context.steps)}.`;
+@Module({
+  imports: [OpenAIProviderModule.forRoot()],
+  providers: [SupportDraftService],
+})
+export class AiModule {}
+
+@Injectable()
+export class SupportDraftService {
+  constructor(
+    @Inject(NEST_LANGCHAIN_OPENAI_CHAT_MODEL)
+    private readonly model: ChatOpenAI,
+  ) {}
+
+  draft(message: string) {
+    return this.model.invoke(message);
   }
 }
 ```
-
-`@DeepAgent`, `@DeepAgentTool`, and `@DeepAgentSubagent` are available from `@nest-langchain/patterns` when the application installs `deepagents`.
 
 ## More Docs
 

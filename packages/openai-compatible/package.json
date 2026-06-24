@@ -1,6 +1,6 @@
 {
   "name": "@nest-langchain/openai-compatible",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "OpenAI-compatible provider tokens and model factory wiring for Nest LangChain.",
   "license": "MIT",
   "author": "easdkr",
@@ -33,5 +33,21 @@
     "@langchain/openai": "^1.5.1",
     "@nestjs/common": "^11.1.27",
     "vitest": "^4.0.15"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/easdkr/nest-langchain.git",
+    "directory": "packages/openai-compatible"
+  },
+  "homepage": "https://github.com/easdkr/nest-langchain#readme",
+  "bugs": {
+    "url": "https://github.com/easdkr/nest-langchain/issues"
+  },
+  "keywords": [
+    "nestjs",
+    "langchain",
+    "openai-compatible",
+    "provider",
+    "chat-model"
+  ]
 }

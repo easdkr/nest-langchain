@@ -1,37 +1,93 @@
 # @nest-langchain/tools
 
-Nest provider method를 LangChain tool로 discovery/register하는 선택 패키지입니다.
+NestJS discovery for LangChain tools.
+
+This package scans decorated Nest providers, wraps methods with
+`@langchain/core/tools`, and registers them in `@nest-langchain/core` so they can
+be listed and invoked through the shared registry.
+
+## Install
 
 ```bash
 pnpm add @nest-langchain/core @nest-langchain/tools @langchain/core zod
 ```
 
-`@nest-langchain/core`는 tool implementation을 직접 의존하지 않습니다.
+## Module
 
 ```ts
-import { Toolset, LangTool } from '@nest-langchain/tools';
+import { Module } from '@nestjs/common';
+import { LangChainModule } from '@nest-langchain/core';
+import { ToolsModule } from '@nest-langchain/tools';
+
+@Module({
+  imports: [
+    LangChainModule.forRoot({ global: true }),
+    ToolsModule.forRoot({ global: true }),
+  ],
+  providers: [MathTools],
+})
+export class AppModule {}
+```
+
+## Define Tools
+
+```ts
+import { LangTool, Toolset } from '@nest-langchain/tools';
 import { z } from 'zod';
 
 @Toolset({
   tags: ['math'],
   metadata: {
-    area: 'support',
+    owner: 'support-platform',
   },
 })
 export class MathTools {
   @LangTool({
     name: 'double',
-    description: 'Double a number',
+    description: 'Double a number.',
     schema: z.object({
       value: z.number(),
     }),
   })
   double(input: { value: number }) {
-    return input.value * 2;
+    return String(input.value * 2);
   }
 }
 ```
 
-`@Toolset()` applies Nest injectable metadata for constructor injection and
-adds shared tags/metadata to tools discovered from the class. The class still
-has to be registered as a Nest provider.
+`@Toolset()` applies Nest injectable metadata, so the class can use constructor
+injection. The class must still be listed in a Nest module `providers` array.
+
+## Invoke Through Core
+
+```ts
+import { Injectable } from '@nestjs/common';
+import { LangChainRegistry } from '@nest-langchain/core';
+
+@Injectable()
+export class ToolRunner {
+  constructor(private readonly registry: LangChainRegistry) {}
+
+  run() {
+    return this.registry.invoke('double', { value: 21 });
+  }
+}
+```
+
+## Demo
+
+```bash
+pnpm --filter @nest-langchain/demo-tools-prompts start
+
+curl "http://localhost:3005/tools"
+curl -X POST "http://localhost:3005/tools/support-priority" \
+  -H "content-type: application/json" \
+  -d '{"message":"Enterprise checkout is blocked","tier":"enterprise"}'
+```
+
+## Boundary
+
+- Owns `@langchain/core` and `zod`.
+- Peers against `@nest-langchain/core` because discovered tools are registered
+  into the core registry.
+- Does not depend on LangGraph, LangSmith, or provider SDKs.

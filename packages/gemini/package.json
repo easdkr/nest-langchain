@@ -1,6 +1,6 @@
 {
   "name": "@nest-langchain/gemini",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Gemini provider tokens and model factory wiring for Nest LangChain.",
   "license": "MIT",
   "author": "easdkr",
@@ -32,5 +32,21 @@
   "devDependencies": {
     "@langchain/google-genai": "^2.2.0",
     "@nestjs/common": "^11.1.27"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/easdkr/nest-langchain.git",
+    "directory": "packages/gemini"
+  },
+  "homepage": "https://github.com/easdkr/nest-langchain#readme",
+  "bugs": {
+    "url": "https://github.com/easdkr/nest-langchain/issues"
+  },
+  "keywords": [
+    "nestjs",
+    "langchain",
+    "gemini",
+    "provider",
+    "chat-model"
+  ]
 }

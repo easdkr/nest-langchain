@@ -1,14 +1,71 @@
 # @nest-langchain/anthropic
 
-Anthropic model factory를 Nest DI token으로 노출하는 선택 패키지입니다.
+Anthropic chat model provider for NestJS dependency injection.
+
+This package creates a `ChatAnthropic` instance from `@langchain/anthropic` and
+exports it through a stable Nest token.
+
+## Install
 
 ```bash
 pnpm add @nest-langchain/anthropic @langchain/anthropic
 ```
 
-Environment variables:
+## Module
 
-- `ANTHROPIC_API_KEY`, or `CLAUDE_API_KEY` as a compatibility fallback
-- `ANTHROPIC_BASE_URL` for custom Anthropic-compatible endpoints
+```ts
+import { Module } from '@nestjs/common';
+import { AnthropicProviderModule } from '@nest-langchain/anthropic';
 
-`@nest-langchain/core`와 `@nest-langchain/langgraph`는 Anthropic을 직접 의존하지 않습니다.
+@Module({
+  imports: [
+    AnthropicProviderModule.forRoot({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+      model: 'claude-haiku-4-5-20251001',
+      temperature: 0,
+    }),
+  ],
+})
+export class AiModule {}
+```
+
+Environment fallbacks:
+
+- `ANTHROPIC_API_KEY`
+- `CLAUDE_API_KEY`
+- `ANTHROPIC_BASE_URL` for compatible Anthropic endpoints
+
+## Injection
+
+```ts
+import { Inject, Injectable } from '@nestjs/common';
+import { ChatAnthropic } from '@langchain/anthropic';
+import { NEST_LANGCHAIN_ANTHROPIC_CHAT_MODEL } from '@nest-langchain/anthropic';
+
+@Injectable()
+export class ReviewService {
+  constructor(
+    @Inject(NEST_LANGCHAIN_ANTHROPIC_CHAT_MODEL)
+    private readonly model: ChatAnthropic,
+  ) {}
+
+  async critique(input: string) {
+    return this.model.invoke(input);
+  }
+}
+```
+
+## Demo
+
+```bash
+ANTHROPIC_API_KEY=sk-ant-... pnpm --filter @nest-langchain/demo-providers start
+curl -X POST "http://localhost:3006/providers/anthropic/invoke" \
+  -H "content-type: application/json" \
+  -d '{"prompt":"Write one sentence about critique models."}'
+```
+
+## Boundary
+
+- Owns `@langchain/anthropic`.
+- Does not depend on `@nest-langchain/core`, LangGraph, or LangSmith.
+- Exposes the model as a Nest DI token for direct injection or task-pattern use.

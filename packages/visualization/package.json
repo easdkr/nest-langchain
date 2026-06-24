@@ -1,6 +1,6 @@
 {
   "name": "@nest-langchain/visualization",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Hosted graph documentation and layout APIs for Nest LangChain registries.",
   "license": "MIT",
   "author": "easdkr",
@@ -29,7 +29,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "peerDependencies": {
-    "@nest-langchain/core": "^0.1.0",
+    "@nest-langchain/core": "^0.1.2",
     "@nestjs/common": "^10 || ^11"
   },
   "peerDependenciesMeta": {
@@ -40,5 +40,21 @@
   "devDependencies": {
     "@nest-langchain/core": "workspace:*",
     "@nestjs/common": "^11.1.27"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/easdkr/nest-langchain.git",
+    "directory": "packages/visualization"
+  },
+  "homepage": "https://github.com/easdkr/nest-langchain#readme",
+  "bugs": {
+    "url": "https://github.com/easdkr/nest-langchain/issues"
+  },
+  "keywords": [
+    "nestjs",
+    "langchain",
+    "visualization",
+    "graphs",
+    "docs"
+  ]
 }

@@ -1,6 +1,6 @@
 {
   "name": "@nest-langchain/prompts",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "NestJS prompt registry helpers for LangChain prompt templates.",
   "license": "MIT",
   "author": "easdkr",
@@ -38,5 +38,21 @@
     "@nestjs/common": "^11.1.27",
     "@nestjs/testing": "^11.1.27",
     "reflect-metadata": "^0.2.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/easdkr/nest-langchain.git",
+    "directory": "packages/prompts"
+  },
+  "homepage": "https://github.com/easdkr/nest-langchain#readme",
+  "bugs": {
+    "url": "https://github.com/easdkr/nest-langchain/issues"
+  },
+  "keywords": [
+    "nestjs",
+    "langchain",
+    "prompts",
+    "prompt-template",
+    "ai"
+  ]
 }
