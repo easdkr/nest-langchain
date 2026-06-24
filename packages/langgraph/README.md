@@ -123,17 +123,18 @@ The helpers are thin wrappers around official LangGraph primitives.
 import { Annotation } from '@langchain/langgraph';
 import {
   commandTo,
+  ConditionalEdge,
   fanOut,
   GraphNode,
   LangGraph,
   parentHandoff,
   resumeWith,
-  sendTo,
 } from '@nest-langchain/langgraph';
 
 const ReviewState = Annotation.Root({
   approved: Annotation<boolean>(),
   owner: Annotation<string>(),
+  reviewAreas: Annotation<string[]>(),
 });
 
 @LangGraph({
@@ -152,11 +153,24 @@ export class ReviewGraph {
   }
 
   @GraphNode()
-  fanout() {
-    return fanOut([
-      sendTo('legalReview', { owner: 'legal' }),
-      sendTo('securityReview', { owner: 'security' }),
-    ]);
+  planReviews() {
+    return {
+      reviewAreas: ['legal', 'security'],
+    };
+  }
+
+  @ConditionalEdge({ from: 'planReviews' })
+  fanout(state: typeof ReviewState.State) {
+    return fanOut('reviewWorker', state.reviewAreas, (area) => ({
+      owner: area,
+    }));
+  }
+
+  @GraphNode({ name: 'reviewWorker' })
+  reviewWorker(state: typeof ReviewState.State) {
+    return {
+      owner: `${state.owner}:reviewed`,
+    };
   }
 
   @GraphNode()
@@ -175,6 +189,9 @@ export class ReviewGraph {
 
 Parent handoff helpers do not auto-infer local `ends`; parent destinations live
 outside the child graph that LangGraph validates.
+
+`@nest-langchain/demo-langgraph` runs the same patterns through HTTP: command
+routing, `Send` fan-out, interrupt/resume, and explicit subgraph transforms.
 
 ## Demo
 

@@ -83,10 +83,19 @@ LangGraph:
 ```bash
 pnpm --filter @nest-langchain/demo-langgraph start
 curl "http://localhost:3000/graphs"
+curl "http://localhost:3000/graphs/support-intake/config"
 curl -X POST "http://localhost:3000/graphs/support-intake" \
   -H "content-type: application/json" \
   -d '{"message":"Delivery tracking is late.","customerTier":"pro","channel":"chat"}'
+curl -X POST "http://localhost:3000/graphs/support-intake/events" \
+  -H "content-type: application/json" \
+  -d '{"message":"Delivery tracking is late.","customerTier":"pro","channel":"chat"}'
 ```
+
+`demo-langgraph` starts without model keys, uses deterministic drafting by
+default, and switches to OpenAI or OpenAI-compatible drafting when the matching
+environment variables are present. High-risk requests return an interrupt and
+resume through `POST /graphs/support-intake/resume`.
 
 LangSmith tracing:
 
