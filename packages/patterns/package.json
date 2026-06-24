@@ -1,6 +1,6 @@
 {
   "name": "@nest-langchain/patterns",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Decorators for provider collaboration and modern LangChain task patterns in NestJS.",
   "license": "MIT",
   "author": "easdkr",
