@@ -1,6 +1,6 @@
 {
   "name": "@nest-langchain/core",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Thin NestJS registry and shared contracts for optional LangChain integrations.",
   "license": "MIT",
   "author": "easdkr",

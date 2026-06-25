@@ -1,6 +1,6 @@
 {
   "name": "@nest-langchain/visualization",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Hosted graph documentation and layout APIs for Nest LangChain registries.",
   "license": "MIT",
   "author": "easdkr",
@@ -29,7 +29,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "peerDependencies": {
-    "@nest-langchain/core": "^0.1.3",
+    "@nest-langchain/core": "^0.1.4",
     "@nestjs/common": "^10 || ^11"
   },
   "peerDependenciesMeta": {

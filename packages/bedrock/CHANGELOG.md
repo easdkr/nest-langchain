@@ -1,5 +1,11 @@
 # @nest-langchain/bedrock
 
+## 0.1.3
+
+### Patch Changes
+
+- 5e96b18: Refresh public README guidance so package selection and setup instructions are easier to follow.
+
 ## 0.1.2
 
 ### Patch Changes

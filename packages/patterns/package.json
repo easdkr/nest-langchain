@@ -1,6 +1,6 @@
 {
   "name": "@nest-langchain/patterns",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Decorators for provider collaboration and modern LangChain task patterns in NestJS.",
   "license": "MIT",
   "author": "easdkr",
@@ -30,7 +30,7 @@
   },
   "peerDependencies": {
     "@langchain/core": "^1.2.0",
-    "@nest-langchain/core": "^0.1.3",
+    "@nest-langchain/core": "^0.1.4",
     "@nestjs/common": "^10 || ^11",
     "@nestjs/core": "^10 || ^11",
     "deepagents": "^1.10.5",

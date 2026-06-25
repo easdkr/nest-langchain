@@ -1,5 +1,13 @@
 # @nest-langchain/patterns
 
+## 0.3.4
+
+### Patch Changes
+
+- 5e96b18: Refresh public README guidance so package selection and setup instructions are easier to follow.
+- Updated dependencies [5e96b18]
+  - @nest-langchain/core@0.1.4
+
 ## 0.3.3
 
 ### Patch Changes
