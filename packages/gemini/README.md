@@ -62,9 +62,3 @@ curl -X POST "http://localhost:3006/providers/gemini/invoke" \
   -H "content-type: application/json" \
   -d '{"prompt":"Write one sentence about judgement models."}'
 ```
-
-## Boundary
-
-- Owns `@langchain/google-genai`.
-- Does not depend on `@nest-langchain/core`, LangGraph, or LangSmith.
-- Exposes the model as a Nest DI token for direct injection or task-pattern use.

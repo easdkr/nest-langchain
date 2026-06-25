@@ -2,9 +2,8 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-Registry demo that uses only `@nest-langchain/core`. It registers and invokes a
-support triage runnable without installing LangGraph, LangSmith, or provider
-packages.
+Registry demo for `@nest-langchain/core`. It registers and invokes a support
+triage runnable.
 
 ```bash
 pnpm --filter @nest-langchain/demo-basic start

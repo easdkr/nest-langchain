@@ -2,7 +2,7 @@
 
 [English](architecture.md) | [한국어](architecture.ko.md)
 
-`nest-langchain`은 얇은 core와 선택형 integration package로 구성됩니다. 사용자는 필요한 feature package만 설치합니다.
+`nest-langchain`은 Nest 앱에 LangChain 기능을 하나씩 추가할 수 있게 합니다. Registry로 시작하고, 앱에 필요한 feature module을 더하세요.
 
 ## Layering
 
@@ -23,11 +23,9 @@ Nest app
        @nest-langchain/bedrock
 ```
 
-`@nest-langchain/core`는 Nest module registration, provider discovery helper, runnable-like contract, `LangChainRegistry`만 소유합니다.
+Feature module은 Nest 앱을 다음 runtime library와 연결합니다.
 
-선택 패키지는 각자의 runtime dependency import를 소유합니다.
-
-| Package                         | Runtime Dependency Boundary                 |
+| Package                         | Runtime library                             |
 | ------------------------------- | ------------------------------------------- |
 | `@nest-langchain/langgraph`     | `@langchain/langgraph`                      |
 | `@nest-langchain/langsmith`     | `langsmith`                                 |
@@ -37,14 +35,14 @@ Nest app
 | `@nest-langchain/visualization` | hosted docs UI and graph metadata rendering |
 | provider packages               | provider-specific LangChain SDK             |
 
-## Runtime Registration
+## Runtime에서 일어나는 일
 
-1. Core가 `LangChainRegistry`를 등록합니다.
-2. Feature module이 자기 decorator/provider를 발견합니다.
-3. Feature module은 설치된 경우에만 runnable metadata를 core에 등록합니다.
-4. Application controller 또는 service가 feature package API를 사용합니다.
-5. Collaborative patterns는 provider collaboration task와 optional Deep Agents를 core에 등록합니다.
-6. Visualization은 core의 neutral metadata를 읽고 `VisualizationModule.setup(path, app, options)`가 호출되면 docs route를 제공합니다.
+1. `LangChainModule`이 `LangChainRegistry`를 등록합니다.
+2. Feature module이 자기 decorator와 provider를 발견합니다.
+3. 설치된 feature module이 runnable metadata를 registry에 추가합니다.
+4. Controller와 service가 feature package API를 호출합니다.
+5. Collaborative patterns는 task workflow와 Deep Agents metadata를 추가합니다.
+6. Visualization은 registry metadata를 읽고 `VisualizationModule.setup(path, app, options)`가 호출되면 docs route를 제공합니다.
 
 ## Visualization Layout
 
@@ -59,4 +57,4 @@ Graph source code가 실행의 source of truth입니다. Layout state는 present
 
 ## Detailed Design
 
-API 예시, runtime flow, verification rule은 [design.ko.md](design.ko.md)를 참고하세요.
+API 예시, runtime flow, verification command는 [design.ko.md](design.ko.md)를 참고하세요.

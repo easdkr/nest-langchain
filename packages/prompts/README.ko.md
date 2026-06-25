@@ -70,9 +70,3 @@ curl -X POST "http://localhost:3005/prompts/support-reply" \
   -H "content-type: application/json" \
   -d '{"customer":"Acme","topic":"checkout card failure","tone":"concise"}'
 ```
-
-## Boundary
-
-- `@langchain/core`의 prompt-template behavior를 소유합니다.
-- `@nest-langchain/core`를 요구하지 않으며 standalone Nest registry입니다.
-- Provider SDK, LangGraph, LangSmith에 의존하지 않습니다.

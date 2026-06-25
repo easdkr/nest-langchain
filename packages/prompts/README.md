@@ -72,10 +72,3 @@ curl -X POST "http://localhost:3005/prompts/support-reply" \
   -H "content-type: application/json" \
   -d '{"customer":"Acme","topic":"checkout card failure","tone":"concise"}'
 ```
-
-## Boundary
-
-- Owns prompt-template behavior from `@langchain/core`.
-- Does not require `@nest-langchain/core`; prompts are a standalone Nest
-  registry.
-- Does not depend on provider SDKs, LangGraph, or LangSmith.

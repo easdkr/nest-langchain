@@ -2,64 +2,57 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-Production-oriented NestJS integrations for the LangChain ecosystem.
-
-The package family is intentionally split. `@nest-langchain/core` stays thin and
-owns only the Nest registry/contracts. Optional packages own LangGraph,
-LangSmith, tools, prompts, visualization, task patterns, and provider SDKs.
+Add LangChain features to a NestJS app one piece at a time. Pick what you want
+to build, install the matching package, and wire it into your Nest module.
 
 ## Packages
 
-| Package                             | Owns                                                          | Demo                                 |
-| ----------------------------------- | ------------------------------------------------------------- | ------------------------------------ |
-| `@nest-langchain/core`              | registry, runnable contracts, shared scanner                  | `@nest-langchain/demo-basic`         |
-| `@nest-langchain/langgraph`         | LangGraph decorators, discovery, runner, Command/Send helpers | `@nest-langchain/demo-langgraph`     |
-| `@nest-langchain/langsmith`         | LangSmith runtime config, context, trace decorator            | `@nest-langchain/demo-langsmith`     |
-| `@nest-langchain/tools`             | decorated Nest methods as LangChain tools                     | `@nest-langchain/demo-tools-prompts` |
-| `@nest-langchain/prompts`           | named LangChain prompt templates                              | `@nest-langchain/demo-tools-prompts` |
-| `@nest-langchain/patterns`          | collaborative task and Deep Agents decorators                 | `@nest-langchain/demo-patterns`      |
-| `@nest-langchain/visualization`     | hosted graph docs UI and graph JSON/Mermaid/DOT endpoints     | `@nest-langchain/demo-visualization` |
-| `@nest-langchain/openai`            | OpenAI chat model DI token                                    | `@nest-langchain/demo-providers`     |
-| `@nest-langchain/openai-compatible` | OpenAI-compatible chat model DI tokens                        | `@nest-langchain/demo-providers`     |
-| `@nest-langchain/anthropic`         | Anthropic chat model DI token                                 | `@nest-langchain/demo-providers`     |
-| `@nest-langchain/gemini`            | Gemini chat model DI token                                    | `@nest-langchain/demo-providers`     |
-| `@nest-langchain/bedrock`           | AWS Bedrock chat model DI token                               | `@nest-langchain/demo-providers`     |
+| Package                             | Install When You Want To                         | Demo                                 |
+| ----------------------------------- | ------------------------------------------------ | ------------------------------------ |
+| `@nest-langchain/core`              | register and run your own runnables              | `@nest-langchain/demo-basic`         |
+| `@nest-langchain/langgraph`         | build and run LangGraph workflows                | `@nest-langchain/demo-langgraph`     |
+| `@nest-langchain/langsmith`         | add LangSmith tracing and request metadata       | `@nest-langchain/demo-langsmith`     |
+| `@nest-langchain/tools`             | expose Nest methods as LangChain tools           | `@nest-langchain/demo-tools-prompts` |
+| `@nest-langchain/prompts`           | manage named prompt templates                    | `@nest-langchain/demo-tools-prompts` |
+| `@nest-langchain/patterns`          | run collaborative task and Deep Agents workflows | `@nest-langchain/demo-patterns`      |
+| `@nest-langchain/visualization`     | host graph docs and layout endpoints             | `@nest-langchain/demo-visualization` |
+| `@nest-langchain/openai`            | inject an OpenAI chat model                      | `@nest-langchain/demo-providers`     |
+| `@nest-langchain/openai-compatible` | inject named OpenAI-compatible chat models       | `@nest-langchain/demo-providers`     |
+| `@nest-langchain/anthropic`         | inject an Anthropic chat model                   | `@nest-langchain/demo-providers`     |
+| `@nest-langchain/gemini`            | inject a Gemini chat model                       | `@nest-langchain/demo-providers`     |
+| `@nest-langchain/bedrock`           | inject an AWS Bedrock chat model                 | `@nest-langchain/demo-providers`     |
 
-## Install Shapes
+## Install Recipes
 
 ```bash
-# registry only
+# register and run your own runnable
 pnpm add @nest-langchain/core
 
-# LangGraph decorators and execution
+# build LangGraph workflows
 pnpm add @nest-langchain/core @nest-langchain/langgraph @langchain/core @langchain/langgraph
 
-# LangSmith tracing
+# trace runs with LangSmith
 pnpm add @nest-langchain/core @nest-langchain/langsmith langsmith
 
-# LangChain tools
+# expose Nest methods as tools
 pnpm add @nest-langchain/core @nest-langchain/tools @langchain/core zod
 
-# prompt templates
+# manage prompt templates
 pnpm add @nest-langchain/prompts @langchain/core
 
-# provider collaboration and task patterns
+# run collaborative task patterns
 pnpm add @nest-langchain/core @nest-langchain/patterns @langchain/core
 
-# hosted graph docs
+# serve graph documentation
 pnpm add @nest-langchain/core @nest-langchain/visualization
 
-# provider packages
+# inject chat model providers
 pnpm add @nest-langchain/openai @langchain/openai
 pnpm add @nest-langchain/openai-compatible @langchain/openai
 pnpm add @nest-langchain/anthropic @langchain/anthropic
 pnpm add @nest-langchain/gemini @langchain/google-genai
 pnpm add @nest-langchain/bedrock @langchain/aws
 ```
-
-Provider packages expose Nest DI tokens and do not require
-`@nest-langchain/core`. Packages that discover or register runnables, such as
-`langgraph`, `tools`, `patterns`, and `visualization`, peer against core.
 
 ## Demos
 
@@ -260,7 +253,7 @@ export class SupportDraftService {
 ## More Docs
 
 - [Architecture](docs/architecture.md)
-- [Package boundaries](docs/package-boundaries.md)
+- [Which package should I install?](docs/package-boundaries.md)
 - [LangGraph patterns](docs/langgraph-patterns.md)
 - [Visualization](docs/visualization.md)
 - [LangSmith privacy and redaction](docs/langsmith.md)

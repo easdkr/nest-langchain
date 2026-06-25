@@ -17,7 +17,7 @@ local npm commands.
    versions and changelogs.
 4. Review the Release PR for correct package versions, changelog text, and CI
    status.
-5. Merge the Release PR. CI owns the npm publish step.
+5. Merge the Release PR. CI runs the npm publish step.
 6. Verify the published packages with:
 
 ```bash

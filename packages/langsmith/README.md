@@ -74,9 +74,3 @@ curl -X POST "http://localhost:3000/trace" \
   -H "content-type: application/json" \
   -d '{"message":"Customer cannot complete checkout with saved card.","accountId":"acct_live_customer_42"}'
 ```
-
-## Boundary
-
-- Owns `langsmith`.
-- Peers against `@nest-langchain/core` for package-family consistency.
-- Does not depend on LangGraph or provider SDKs.

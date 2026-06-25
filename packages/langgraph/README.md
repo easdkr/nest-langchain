@@ -119,7 +119,7 @@ application controller.
 
 ## LangGraph Helpers
 
-The helpers are thin wrappers around official LangGraph primitives.
+The helpers wrap official LangGraph primitives directly.
 
 ### Command Pattern
 
@@ -267,10 +267,3 @@ through hosted graph docs:
 pnpm --filter @nest-langchain/demo-visualization start
 open "http://localhost:3000/ai/graphs"
 ```
-
-## Boundary
-
-- Owns `@langchain/langgraph`.
-- Peers against `@nest-langchain/core` because compiled graphs are registered in
-  the core registry.
-- Does not depend on LangSmith or provider SDKs.

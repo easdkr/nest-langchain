@@ -152,10 +152,3 @@ curl -X POST "http://localhost:3004/tasks/launch-review" \
   -H "content-type: application/json" \
   -d '{"product":"Nest LangChain Patterns","market":"Korea B2B SaaS"}'
 ```
-
-## Boundary
-
-- Owns `@langchain/core` and exposes `deepagents` as an optional peer.
-- Peers against `@nest-langchain/core` because discovered tasks are registered
-  through the core package family.
-- Does not depend on provider SDKs, LangGraph, or LangSmith.

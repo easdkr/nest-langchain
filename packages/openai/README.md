@@ -5,9 +5,9 @@
 OpenAI chat model provider for NestJS dependency injection.
 
 This package creates a `ChatOpenAI` instance from `@langchain/openai` and
-exports it through a stable Nest token. It does not register runnables in
-`@nest-langchain/core`; applications can inject the model directly or pass the
-token to higher-level packages such as `@nest-langchain/patterns`.
+exports it through a stable Nest token. Applications can inject the model
+directly or pass the token to higher-level packages such as
+`@nest-langchain/patterns`.
 
 ## Install
 
@@ -66,9 +66,3 @@ curl -X POST "http://localhost:3006/providers/openai/invoke" \
   -H "content-type: application/json" \
   -d '{"prompt":"Write one sentence about NestJS provider tokens."}'
 ```
-
-## Boundary
-
-- Owns `@langchain/openai`.
-- Does not depend on `@nest-langchain/core`, LangGraph, or LangSmith.
-- Exposes the model as a Nest DI token so the host app decides where to use it.
