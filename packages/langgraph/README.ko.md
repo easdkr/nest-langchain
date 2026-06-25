@@ -114,7 +114,7 @@ export class AgentRunner {
 
 ## LangGraph Helpers
 
-Helper는 official LangGraph primitive 위의 얇은 wrapper입니다.
+Helper는 official LangGraph primitive를 직접 감쌉니다.
 
 ### Command Pattern
 
@@ -252,9 +252,3 @@ Hosted graph docs로 같은 registry surface를 보려면 `@nest-langchain/demo-
 pnpm --filter @nest-langchain/demo-visualization start
 open "http://localhost:3000/ai/graphs"
 ```
-
-## Boundary
-
-- `@langchain/langgraph`를 소유합니다.
-- Compiled graph가 core registry에 등록되므로 `@nest-langchain/core`를 peer로 둡니다.
-- LangSmith 또는 provider SDK에 의존하지 않습니다.

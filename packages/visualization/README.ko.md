@@ -84,9 +84,3 @@ curl -X POST "http://localhost:3000/graphs/support-workflow" \
 ```
 
 Browser에서 `http://localhost:3000/ai/graphs`를 열면 graph layout을 inspect하고 edit할 수 있습니다.
-
-## Boundary
-
-- Registry metadata를 읽으므로 `@nest-langchain/core`를 peer로 둡니다.
-- LangGraph에 직접 의존하지 않습니다. Core에 등록된 runnable 또는 graph라면 문서화할 수 있습니다.
-- Layout state를 source file 밖에 유지합니다.

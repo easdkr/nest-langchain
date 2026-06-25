@@ -11,7 +11,7 @@
 2. Review와 CI 이후 feature PR을 `main`에 merge합니다.
 3. Changesets Release PR이 pending changeset을 모아 package version과 changelog를 갱신하게 둡니다.
 4. Release PR의 package version, changelog text, CI status를 검토합니다.
-5. Release PR을 merge합니다. npm publish step은 CI가 소유합니다.
+5. Release PR을 merge합니다. npm publish step은 CI가 실행합니다.
 6. Published package를 확인합니다.
 
 ```bash
@@ -38,7 +38,7 @@ Release work 전에 local release skill과 pre-push hook을 설치합니다.
 pnpm guardrails:install
 ```
 
-Release automation은 package boundary를 보존해야 합니다.
+Release automation은 package dependency check를 통과해야 합니다.
 
 - package directory만 publish합니다.
 - peer dependency range를 명시적으로 유지합니다.

@@ -86,10 +86,3 @@ curl -X POST "http://localhost:3005/tools/support-priority" \
   -H "content-type: application/json" \
   -d '{"message":"Enterprise checkout is blocked","tier":"enterprise"}'
 ```
-
-## Boundary
-
-- Owns `@langchain/core` and `zod`.
-- Peers against `@nest-langchain/core` because discovered tools are registered
-  into the core registry.
-- Does not depend on LangGraph, LangSmith, or provider SDKs.

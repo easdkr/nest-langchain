@@ -2,9 +2,7 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-Optional LangChain ecosystem package를 위한 얇은 NestJS registry와 shared contract입니다.
-
-`@nest-langchain/core`는 Nest module, runnable registry, structural runnable contract, decorated-provider scanner만 소유합니다. LangGraph, LangSmith, provider SDK, prompt template, tool, visualization renderer에는 의도적으로 의존하지 않습니다.
+NestJS 앱에서 runnable을 이름으로 등록하고 실행하고 싶을 때 `@nest-langchain/core`를 사용하세요.
 
 ## Install
 
@@ -12,7 +10,7 @@ Optional LangChain ecosystem package를 위한 얇은 NestJS registry와 shared 
 pnpm add @nest-langchain/core
 ```
 
-Peer dependency는 host Nest application에서 제공합니다.
+아직 없다면 Nest peer dependency를 앱에 함께 설치하세요.
 
 ```bash
 pnpm add @nestjs/common @nestjs/core reflect-metadata rxjs
@@ -38,7 +36,7 @@ import { LangChainModule } from '@nest-langchain/core';
 export class AppModule {}
 ```
 
-## Register A Runnable
+## Runnable 등록
 
 ```ts
 import { Injectable, OnModuleInit } from '@nestjs/common';
@@ -66,27 +64,25 @@ export class SupportRegistry implements OnModuleInit {
 }
 ```
 
-`invoke()`만 필수 method입니다. `stream()`과 `streamEvents()`는 optional structural method이므로, integration package는 core에 LangChain runtime type을 강제하지 않고 streaming을 노출할 수 있습니다.
+처음에는 `invoke()`만 구현하면 됩니다. Streaming이 필요한 runnable에만 `stream()` 또는 `streamEvents()`를 추가하세요.
 
-## Optional Packages
+## 다른 기능 추가
 
-Core는 얇게 유지됩니다. 필요한 feature를 소유한 package를 설치하세요.
+추가하려는 기능에 맞춰 package를 더 설치하세요.
 
-| Feature                         | Packages                                                                              |
+| 이런 작업을 할 때               | 설치                                                                                  |
 | ------------------------------- | ------------------------------------------------------------------------------------- |
-| LangGraph decorators and runner | `@nest-langchain/core @nest-langchain/langgraph @langchain/core @langchain/langgraph` |
-| LangSmith tracing               | `@nest-langchain/core @nest-langchain/langsmith langsmith`                            |
-| LangChain tools                 | `@nest-langchain/core @nest-langchain/tools @langchain/core zod`                      |
-| Prompt registry                 | `@nest-langchain/prompts @langchain/core`                                             |
-| Collaborative task patterns     | `@nest-langchain/core @nest-langchain/patterns @langchain/core`                       |
-| Hosted graph docs               | `@nest-langchain/core @nest-langchain/visualization`                                  |
-| OpenAI model token              | `@nest-langchain/openai @langchain/openai`                                            |
-| OpenAI-compatible model token   | `@nest-langchain/openai-compatible @langchain/openai`                                 |
-| Anthropic model token           | `@nest-langchain/anthropic @langchain/anthropic`                                      |
-| Gemini model token              | `@nest-langchain/gemini @langchain/google-genai`                                      |
-| AWS Bedrock model token         | `@nest-langchain/bedrock @langchain/aws`                                              |
-
-Provider package는 의도적으로 Nest DI token을 노출하며 core를 요구하지 않습니다. `langgraph`, `tools`, `patterns`, `visualization`처럼 runnable을 발견하거나 등록하는 package는 core를 peer dependency로 사용합니다.
+| LangGraph workflow 작성/실행    | `@nest-langchain/core @nest-langchain/langgraph @langchain/core @langchain/langgraph` |
+| LangSmith로 run tracing         | `@nest-langchain/core @nest-langchain/langsmith langsmith`                            |
+| Nest method를 tool로 노출       | `@nest-langchain/core @nest-langchain/tools @langchain/core zod`                      |
+| prompt template 관리            | `@nest-langchain/prompts @langchain/core`                                             |
+| collaborative task pattern 실행 | `@nest-langchain/core @nest-langchain/patterns @langchain/core`                       |
+| graph 문서 화면 제공            | `@nest-langchain/core @nest-langchain/visualization`                                  |
+| OpenAI model 주입               | `@nest-langchain/openai @langchain/openai`                                            |
+| OpenAI-compatible model 주입    | `@nest-langchain/openai-compatible @langchain/openai`                                 |
+| Anthropic model 주입            | `@nest-langchain/anthropic @langchain/anthropic`                                      |
+| Gemini model 주입               | `@nest-langchain/gemini @langchain/google-genai`                                      |
+| AWS Bedrock model 주입          | `@nest-langchain/bedrock @langchain/aws`                                              |
 
 ## Demo
 
@@ -99,10 +95,3 @@ curl -X POST "http://localhost:3000/support/triage" \
   -H "content-type: application/json" \
   -d '{"message":"Checkout fails with a card error","customerTier":"enterprise","channel":"web"}'
 ```
-
-## Package Boundary
-
-- Core는 provider SDK를 import하지 않습니다.
-- Core는 LangGraph 또는 LangSmith를 import하지 않습니다.
-- Core는 registry behavior만 소유합니다.
-- Optional package가 자기 runtime dependency와 Nest integration surface를 소유합니다.

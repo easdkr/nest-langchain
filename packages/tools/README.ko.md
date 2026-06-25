@@ -83,9 +83,3 @@ curl -X POST "http://localhost:3005/tools/support-priority" \
   -H "content-type: application/json" \
   -d '{"message":"Enterprise checkout is blocked","tier":"enterprise"}'
 ```
-
-## Boundary
-
-- `@langchain/core`와 `zod`를 소유합니다.
-- 발견된 tool이 core registry에 등록되므로 `@nest-langchain/core`를 peer로 둡니다.
-- LangGraph, LangSmith, provider SDK에 의존하지 않습니다.

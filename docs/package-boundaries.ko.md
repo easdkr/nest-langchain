@@ -1,48 +1,27 @@
-# Package Boundaries
+# 어떤 패키지를 설치해야 하나요?
 
 [English](package-boundaries.md) | [한국어](package-boundaries.ko.md)
 
-`@nest-langchain/core`는 의도적으로 작게 유지합니다.
+추가하려는 기능을 먼저 고르세요. 같은 행의 package와 runtime library를 설치하면 됩니다.
 
-Core에서 허용되는 것:
+| 하고 싶은 일                                 | 설치할 package                      | Runtime library                 |
+| -------------------------------------------- | ----------------------------------- | ------------------------------- |
+| 앱의 runnable을 이름으로 등록하고 실행       | `@nest-langchain/core`              | NestJS                          |
+| LangGraph workflow 작성과 실행               | `@nest-langchain/langgraph`         | `@langchain/langgraph`          |
+| LangSmith tracing 추가                       | `@nest-langchain/langsmith`         | `langsmith`                     |
+| Nest method를 LangChain tool로 노출          | `@nest-langchain/tools`             | `@langchain/core`, `zod`        |
+| prompt template를 이름으로 관리              | `@nest-langchain/prompts`           | `@langchain/core`               |
+| collaborative task workflow 실행             | `@nest-langchain/patterns`          | `@langchain/core`               |
+| Deep Agents adapter 추가                     | `@nest-langchain/patterns`          | `@langchain/core`, `deepagents` |
+| 앱에서 graph docs 제공                       | `@nest-langchain/visualization`     | app registry의 graph metadata   |
+| OpenAI chat model 주입                       | `@nest-langchain/openai`            | `@langchain/openai`             |
+| OpenAI-compatible chat model을 이름별로 주입 | `@nest-langchain/openai-compatible` | `@langchain/openai`             |
+| Anthropic chat model 주입                    | `@nest-langchain/anthropic`         | `@langchain/anthropic`          |
+| Gemini chat model 주입                       | `@nest-langchain/gemini`            | `@langchain/google-genai`       |
+| AWS Bedrock chat model 주입                  | `@nest-langchain/bedrock`           | `@langchain/aws`                |
 
-- Nest module registration
-- `LangChainRegistry`
-- runnable-like contract
-- generic provider scanner utility
-- optional integration을 import하지 않는 test helper
+Maintainer가 dependency drift를 확인할 때는 다음을 실행합니다.
 
-Core에서 금지되는 것:
-
-- `@langchain/langgraph`
-- `langsmith`
-- `@langchain/openai`
-- `@langchain/anthropic`
-- `@langchain/google-genai`
-- `@langchain/aws`
-- provider SDK
-- `@langchain/core`
-- visualization/rendering dependency
-
-각 optional feature는 자기 package에 있어야 하고 runtime dependency를 peer dependency로 선언해야 합니다.
-
-현재 optional dependency ownership:
-
-| Package                             | Runtime Dependency It Owns                    |
-| ----------------------------------- | --------------------------------------------- |
-| `@nest-langchain/langgraph`         | `@langchain/langgraph`                        |
-| `@nest-langchain/langsmith`         | `langsmith`                                   |
-| `@nest-langchain/tools`             | `@langchain/core`, `zod`                      |
-| `@nest-langchain/prompts`           | `@langchain/core`                             |
-| `@nest-langchain/patterns`          | `@langchain/core`, optional `deepagents` peer |
-| `@nest-langchain/openai`            | `@langchain/openai`                           |
-| `@nest-langchain/openai-compatible` | `@langchain/openai`                           |
-| `@nest-langchain/anthropic`         | `@langchain/anthropic`                        |
-| `@nest-langchain/gemini`            | `@langchain/google-genai`                     |
-| `@nest-langchain/bedrock`           | `@langchain/aws`                              |
-
-`@nest-langchain/prompts`는 `@nest-langchain/core`가 필요하지 않습니다. 자체 Nest module로 주입 가능한 prompt registry를 노출합니다.
-
-Provider package도 `@nest-langchain/core`를 요구하지 않습니다. provider-specific Nest token과 model factory만 노출합니다.
-
-`@nest-langchain/patterns`는 collaborative task와 Deep Agent adapter가 runnable metadata를 core registry에 등록하므로 `@nest-langchain/core`가 필요합니다. provider SDK, LangSmith, direct LangGraph dependency를 소유하면 안 됩니다. Deep Agents support는 application이 `deepagents`를 설치하고 `@DeepAgent`를 사용할 때만 활성화됩니다.
+```bash
+pnpm check:boundaries
+```

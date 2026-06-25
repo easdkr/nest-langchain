@@ -142,9 +142,3 @@ curl -X POST "http://localhost:3004/tasks/launch-review" \
   -H "content-type: application/json" \
   -d '{"product":"Nest LangChain Patterns","market":"Korea B2B SaaS"}'
 ```
-
-## Boundary
-
-- `@langchain/core`를 소유하고 `deepagents`를 optional peer로 노출합니다.
-- Discovered task가 core package family를 통해 등록되므로 `@nest-langchain/core`를 peer로 둡니다.
-- Provider SDK, LangGraph, LangSmith에 의존하지 않습니다.

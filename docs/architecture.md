@@ -2,8 +2,8 @@
 
 [English](architecture.md) | [한국어](architecture.ko.md)
 
-`nest-langchain` is organized as a thin core plus optional integration packages.
-Consumers install only the feature packages they need.
+`nest-langchain` lets a Nest app add one LangChain capability at a time. Start
+with the registry, then add the feature module your app needs.
 
 ## Layering
 
@@ -24,12 +24,9 @@ Nest app
        @nest-langchain/bedrock
 ```
 
-`@nest-langchain/core` owns only Nest module registration, provider discovery
-helpers, runnable-like contracts, and `LangChainRegistry`.
+Feature modules connect your Nest app to these runtime libraries:
 
-Optional packages own their runtime dependency imports:
-
-| Package                         | Runtime Dependency Boundary                 |
+| Package                         | Runtime Library                             |
 | ------------------------------- | ------------------------------------------- |
 | `@nest-langchain/langgraph`     | `@langchain/langgraph`                      |
 | `@nest-langchain/langsmith`     | `langsmith`                                 |
@@ -39,14 +36,14 @@ Optional packages own their runtime dependency imports:
 | `@nest-langchain/visualization` | hosted docs UI and graph metadata rendering |
 | provider packages               | provider-specific LangChain SDK             |
 
-## Runtime Registration
+## What Happens At Runtime
 
-1. Core registers `LangChainRegistry`.
-2. Feature modules discover their own decorators/providers.
-3. Feature modules register runnable metadata into core only when installed.
-4. Application controllers or services use the feature package API.
-5. Collaborative patterns register provider collaboration tasks and optional Deep Agents into core.
-6. Visualization reads neutral metadata from core and serves docs routes when
+1. `LangChainModule` registers `LangChainRegistry`.
+2. Feature modules discover their decorators and providers.
+3. Installed feature modules add their runnable metadata to the registry.
+4. Controllers and services call the feature package API.
+5. Collaborative patterns add task workflows and Deep Agents metadata.
+6. Visualization reads registry metadata and serves docs routes when
    `VisualizationModule.setup(path, app, options)` is called.
 
 ## Visualization Layout
@@ -64,4 +61,4 @@ The default visualization package does not rewrite `.ts` graph source files.
 ## Detailed Design
 
 See [design.md](design.md) for API examples, runtime flow, and verification
-rules.
+commands.

@@ -69,9 +69,3 @@ curl -X POST "http://localhost:3006/providers/bedrock/invoke" \
   -H "content-type: application/json" \
   -d '{"prompt":"Write one sentence about Bedrock model routing."}'
 ```
-
-## Boundary
-
-- Owns `@langchain/aws`.
-- Does not depend on `@nest-langchain/core`, LangGraph, or LangSmith.
-- Exposes the model as a Nest DI token for direct injection or task-pattern use.

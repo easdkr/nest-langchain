@@ -2,13 +2,8 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-Thin NestJS registry and shared contracts for optional LangChain ecosystem
-packages.
-
-`@nest-langchain/core` owns only the Nest module, runnable registry, structural
-runnable contracts, and decorated-provider scanner. It deliberately does not
-depend on LangGraph, LangSmith, provider SDKs, prompt templates, tools, or the
-visualization renderer.
+Use `@nest-langchain/core` when your Nest app needs a shared place to register
+and call runnables by name.
 
 ## Install
 
@@ -16,7 +11,7 @@ visualization renderer.
 pnpm add @nest-langchain/core
 ```
 
-Peer dependencies are expected to come from the host Nest application:
+Install the Nest peer dependencies in your app if they are not already present:
 
 ```bash
 pnpm add @nestjs/common @nestjs/core reflect-metadata rxjs
@@ -42,7 +37,7 @@ import { LangChainModule } from '@nest-langchain/core';
 export class AppModule {}
 ```
 
-## Register A Runnable
+## Register Your Runnable
 
 ```ts
 import { Injectable, OnModuleInit } from '@nestjs/common';
@@ -70,31 +65,26 @@ export class SupportRegistry implements OnModuleInit {
 }
 ```
 
-`invoke()` is the only required method. `stream()` and `streamEvents()` are
-optional structural methods, so integration packages can expose streaming
-without forcing core to import LangChain runtime types.
+Start with `invoke()`. Add `stream()` or `streamEvents()` only when the runnable
+needs streaming.
 
-## Optional Packages
+## Add More Features
 
-Core stays thin; install the package that owns the feature you need.
+Install another package when you want to add a specific LangChain feature.
 
-| Feature                         | Packages                                                                              |
+| When You Want To                | Install                                                                               |
 | ------------------------------- | ------------------------------------------------------------------------------------- |
-| LangGraph decorators and runner | `@nest-langchain/core @nest-langchain/langgraph @langchain/core @langchain/langgraph` |
-| LangSmith tracing               | `@nest-langchain/core @nest-langchain/langsmith langsmith`                            |
-| LangChain tools                 | `@nest-langchain/core @nest-langchain/tools @langchain/core zod`                      |
-| Prompt registry                 | `@nest-langchain/prompts @langchain/core`                                             |
-| Collaborative task patterns     | `@nest-langchain/core @nest-langchain/patterns @langchain/core`                       |
-| Hosted graph docs               | `@nest-langchain/core @nest-langchain/visualization`                                  |
-| OpenAI model token              | `@nest-langchain/openai @langchain/openai`                                            |
-| OpenAI-compatible model token   | `@nest-langchain/openai-compatible @langchain/openai`                                 |
-| Anthropic model token           | `@nest-langchain/anthropic @langchain/anthropic`                                      |
-| Gemini model token              | `@nest-langchain/gemini @langchain/google-genai`                                      |
-| AWS Bedrock model token         | `@nest-langchain/bedrock @langchain/aws`                                              |
-
-Provider packages intentionally expose Nest DI tokens and do not require core.
-Packages that discover or register runnables, such as `langgraph`, `tools`,
-`patterns`, and `visualization`, peer against core.
+| build LangGraph workflows       | `@nest-langchain/core @nest-langchain/langgraph @langchain/core @langchain/langgraph` |
+| trace runs with LangSmith       | `@nest-langchain/core @nest-langchain/langsmith langsmith`                            |
+| expose Nest methods as tools    | `@nest-langchain/core @nest-langchain/tools @langchain/core zod`                      |
+| manage prompt templates         | `@nest-langchain/prompts @langchain/core`                                             |
+| run collaborative task patterns | `@nest-langchain/core @nest-langchain/patterns @langchain/core`                       |
+| serve graph documentation       | `@nest-langchain/core @nest-langchain/visualization`                                  |
+| inject an OpenAI model          | `@nest-langchain/openai @langchain/openai`                                            |
+| inject OpenAI-compatible models | `@nest-langchain/openai-compatible @langchain/openai`                                 |
+| inject an Anthropic model       | `@nest-langchain/anthropic @langchain/anthropic`                                      |
+| inject a Gemini model           | `@nest-langchain/gemini @langchain/google-genai`                                      |
+| inject an AWS Bedrock model     | `@nest-langchain/bedrock @langchain/aws`                                              |
 
 ## Demo
 
@@ -107,10 +97,3 @@ curl -X POST "http://localhost:3000/support/triage" \
   -H "content-type: application/json" \
   -d '{"message":"Checkout fails with a card error","customerTier":"enterprise","channel":"web"}'
 ```
-
-## Package Boundary
-
-- Core does not import provider SDKs.
-- Core does not import LangGraph or LangSmith.
-- Core owns registry behavior only.
-- Optional packages own their runtime dependencies and Nest integration surface.

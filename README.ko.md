@@ -2,60 +2,56 @@
 
 [English](README.md) | [한국어](README.ko.md)
 
-LangChain 생태계를 NestJS에서 운영 환경에 맞게 사용할 수 있도록 만든 통합 패키지 모음입니다.
-
-이 패키지군은 의도적으로 분리되어 있습니다. `@nest-langchain/core`는 얇게 유지하며 Nest registry/contract만 소유합니다. LangGraph, LangSmith, tools, prompts, visualization, task patterns, provider SDK 통합은 선택 패키지가 각각 소유합니다.
+NestJS 앱에 LangChain 기능을 필요한 만큼 붙일 수 있는 패키지 모음입니다. 만들려는 기능을 고르고, 맞는 package를 설치한 뒤 Nest module에 연결해 사용하세요.
 
 ## 패키지
 
-| Package                             | 담당 영역                                                   | Demo                                 |
-| ----------------------------------- | ----------------------------------------------------------- | ------------------------------------ |
-| `@nest-langchain/core`              | registry, runnable contract, 공통 scanner                   | `@nest-langchain/demo-basic`         |
-| `@nest-langchain/langgraph`         | LangGraph decorator, discovery, runner, Command/Send helper | `@nest-langchain/demo-langgraph`     |
-| `@nest-langchain/langsmith`         | LangSmith runtime config, context, trace decorator          | `@nest-langchain/demo-langsmith`     |
-| `@nest-langchain/tools`             | Nest method를 LangChain tool로 노출                         | `@nest-langchain/demo-tools-prompts` |
-| `@nest-langchain/prompts`           | 이름 기반 LangChain prompt template                         | `@nest-langchain/demo-tools-prompts` |
-| `@nest-langchain/patterns`          | collaborative task와 Deep Agents decorator                  | `@nest-langchain/demo-patterns`      |
-| `@nest-langchain/visualization`     | 서버 호스팅 graph docs UI와 JSON/Mermaid/DOT endpoint       | `@nest-langchain/demo-visualization` |
-| `@nest-langchain/openai`            | OpenAI chat model DI token                                  | `@nest-langchain/demo-providers`     |
-| `@nest-langchain/openai-compatible` | OpenAI-compatible chat model DI token                       | `@nest-langchain/demo-providers`     |
-| `@nest-langchain/anthropic`         | Anthropic chat model DI token                               | `@nest-langchain/demo-providers`     |
-| `@nest-langchain/gemini`            | Gemini chat model DI token                                  | `@nest-langchain/demo-providers`     |
-| `@nest-langchain/bedrock`           | AWS Bedrock chat model DI token                             | `@nest-langchain/demo-providers`     |
+| Package                             | 이런 작업을 할 때 설치하세요                   | Demo                                 |
+| ----------------------------------- | ---------------------------------------------- | ------------------------------------ |
+| `@nest-langchain/core`              | 내 runnable을 등록하고 이름으로 실행           | `@nest-langchain/demo-basic`         |
+| `@nest-langchain/langgraph`         | LangGraph workflow 작성과 실행                 | `@nest-langchain/demo-langgraph`     |
+| `@nest-langchain/langsmith`         | LangSmith tracing과 request metadata 추가      | `@nest-langchain/demo-langsmith`     |
+| `@nest-langchain/tools`             | Nest method를 LangChain tool로 노출            | `@nest-langchain/demo-tools-prompts` |
+| `@nest-langchain/prompts`           | prompt template를 이름으로 관리                | `@nest-langchain/demo-tools-prompts` |
+| `@nest-langchain/patterns`          | collaborative task와 Deep Agents workflow 실행 | `@nest-langchain/demo-patterns`      |
+| `@nest-langchain/visualization`     | graph docs와 layout endpoint를 app에서 제공    | `@nest-langchain/demo-visualization` |
+| `@nest-langchain/openai`            | OpenAI chat model 주입                         | `@nest-langchain/demo-providers`     |
+| `@nest-langchain/openai-compatible` | OpenAI-compatible chat model을 이름별로 주입   | `@nest-langchain/demo-providers`     |
+| `@nest-langchain/anthropic`         | Anthropic chat model 주입                      | `@nest-langchain/demo-providers`     |
+| `@nest-langchain/gemini`            | Gemini chat model 주입                         | `@nest-langchain/demo-providers`     |
+| `@nest-langchain/bedrock`           | AWS Bedrock chat model 주입                    | `@nest-langchain/demo-providers`     |
 
-## 설치 형태
+## 설치 예시
 
 ```bash
-# registry only
+# 내 runnable 등록/실행
 pnpm add @nest-langchain/core
 
-# LangGraph decorators and execution
+# LangGraph workflow 작성/실행
 pnpm add @nest-langchain/core @nest-langchain/langgraph @langchain/core @langchain/langgraph
 
 # LangSmith tracing
 pnpm add @nest-langchain/core @nest-langchain/langsmith langsmith
 
-# LangChain tools
+# Nest method를 tool로 노출
 pnpm add @nest-langchain/core @nest-langchain/tools @langchain/core zod
 
-# prompt templates
+# prompt template 관리
 pnpm add @nest-langchain/prompts @langchain/core
 
-# provider collaboration and task patterns
+# collaborative task pattern 실행
 pnpm add @nest-langchain/core @nest-langchain/patterns @langchain/core
 
-# hosted graph docs
+# graph 문서 화면 제공
 pnpm add @nest-langchain/core @nest-langchain/visualization
 
-# provider packages
+# chat model provider 주입
 pnpm add @nest-langchain/openai @langchain/openai
 pnpm add @nest-langchain/openai-compatible @langchain/openai
 pnpm add @nest-langchain/anthropic @langchain/anthropic
 pnpm add @nest-langchain/gemini @langchain/google-genai
 pnpm add @nest-langchain/bedrock @langchain/aws
 ```
-
-Provider 패키지는 Nest DI token을 노출하며 `@nest-langchain/core`를 요구하지 않습니다. `langgraph`, `tools`, `patterns`, `visualization`처럼 runnable을 발견하거나 등록하는 패키지는 core를 peer dependency로 사용합니다.
 
 ## 데모
 
@@ -250,7 +246,7 @@ export class SupportDraftService {
 ## 추가 문서
 
 - [Architecture](docs/architecture.ko.md)
-- [Package boundaries](docs/package-boundaries.ko.md)
+- [어떤 패키지를 설치해야 하나요?](docs/package-boundaries.ko.md)
 - [LangGraph patterns](docs/langgraph-patterns.ko.md)
 - [Visualization](docs/visualization.ko.md)
 - [LangSmith privacy and redaction](docs/langsmith.ko.md)

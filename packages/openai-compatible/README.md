@@ -130,9 +130,3 @@ curl -X POST "http://localhost:3006/providers/openai-compatible/invoke" \
   -H "content-type: application/json" \
   -d '{"prompt":"Write one sentence about compatible model endpoints."}'
 ```
-
-## Boundary
-
-- Owns `@langchain/openai`.
-- Does not depend on `@nest-langchain/core`, LangGraph, or LangSmith.
-- Supports multiple named provider tokens in a single Nest module.

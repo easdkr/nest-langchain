@@ -4,7 +4,7 @@
 
 NestJS dependency injection을 위한 OpenAI chat model provider입니다.
 
-이 패키지는 `@langchain/openai`의 `ChatOpenAI` instance를 만들고 안정적인 Nest token으로 export합니다. `@nest-langchain/core`에 runnable을 등록하지 않습니다. Application은 model을 직접 inject하거나 `@nest-langchain/patterns` 같은 상위 패키지에 token을 전달할 수 있습니다.
+이 패키지는 `@langchain/openai`의 `ChatOpenAI` instance를 만들고 안정적인 Nest token으로 export합니다. Application은 model을 직접 inject하거나 `@nest-langchain/patterns` 같은 상위 패키지에 token을 전달할 수 있습니다.
 
 ## Install
 
@@ -63,9 +63,3 @@ curl -X POST "http://localhost:3006/providers/openai/invoke" \
   -H "content-type: application/json" \
   -d '{"prompt":"Write one sentence about NestJS provider tokens."}'
 ```
-
-## Boundary
-
-- `@langchain/openai`를 소유합니다.
-- `@nest-langchain/core`, LangGraph, LangSmith에 의존하지 않습니다.
-- Host app이 어디에서 사용할지 결정할 수 있도록 model을 Nest DI token으로 노출합니다.
