@@ -1,5 +1,11 @@
 # @nest-langchain/langgraph
 
+## 0.4.0
+
+### Minor Changes
+
+- b586451: Add `defineTypedLangGraph`, a typed local-node-key builder for LangGraph decorators, same-graph command routing, Send fan-out helpers, and static edge metadata.
+
 ## 0.3.4
 
 ### Patch Changes
