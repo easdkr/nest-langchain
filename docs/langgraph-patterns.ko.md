@@ -13,6 +13,58 @@
 | Send fan-out       | `sendTo`, `fanOut`                                                     | router, map-reduce, orchestrator-worker flow가 runtime fan-out을 쓸 때        |
 | Human-in-the-loop  | `interruptFor`, `resumeWith`                                           | graph가 승인, 수정, 거절, external input을 기다리며 멈춰야 할 때              |
 | Subgraph transform | `callSubgraph`                                                         | parent와 subgraph state schema가 달라 명시적 input/output mapping이 필요할 때 |
+| Typed graph keys   | `defineTypedLangGraph`                                                 | raw string 대신 compile-time 검증되는 local node key를 쓰고 싶을 때           |
+
+## Typed Graph Builder
+
+`defineTypedLangGraph()`는 기존 decorator와 helper function을 감싸는 얇은
+wrapper입니다. Discovery나 graph execution behavior는 바꾸지 않고, typed local
+node key를 LangGraph가 이미 기대하는 string node name으로 변환합니다.
+
+```ts
+const support = defineTypedLangGraph({
+  name: 'support-intake',
+  state: SupportState,
+  nodes: {
+    classify: 'classifyAndRoute',
+    billing: 'handleBilling',
+    draft: 'draftResponse',
+  },
+} as const);
+
+@support.Graph({
+  edges: support.edges(['billing', 'draft']),
+})
+class SupportGraph {
+  @support.Node('classify', {
+    entry: true,
+    ends: support.ends('billing'),
+  })
+  classify() {
+    return support.commandTo('billing', {
+      update: { intent: 'billing' },
+    });
+  }
+
+  @support.Node('billing')
+  handleBilling() {
+    return {
+      intent: 'billing',
+    };
+  }
+
+  @support.Node('draft', {
+    finish: true,
+  })
+  draft() {
+    return {};
+  }
+}
+```
+
+Same-graph routing에는 typed helper를 사용하세요. `parentHandoff`,
+`ParentHandoffNode`, remote `CommandNode` destination은 local node map 밖을
+가리키므로 계속 string 기반으로 둡니다.
 
 ## Design Notes
 
