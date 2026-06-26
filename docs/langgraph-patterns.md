@@ -13,6 +13,58 @@ This project keeps LangGraph execution-control patterns in `@nest-langchain/lang
 | Send fan-out       | `sendTo`, `fanOut`                                                     | Router, map-reduce, and orchestrator-worker flows need dynamic parallel work    |
 | Human-in-the-loop  | `interruptFor`, `resumeWith`                                           | A graph must pause for approval, edit, rejection, or external input             |
 | Subgraph transform | `callSubgraph`                                                         | Parent and subgraph state schemas differ and need explicit input/output mapping |
+| Typed graph keys   | `defineTypedLangGraph`                                                 | A graph should use compile-time checked local node keys instead of raw strings  |
+
+## Typed Graph Builder
+
+`defineTypedLangGraph()` wraps the existing decorators and helper functions. It
+does not change discovery or graph execution; it only converts typed local node
+keys into the string node names that LangGraph already expects.
+
+```ts
+const support = defineTypedLangGraph({
+  name: 'support-intake',
+  state: SupportState,
+  nodes: {
+    classify: 'classifyAndRoute',
+    billing: 'handleBilling',
+    draft: 'draftResponse',
+  },
+} as const);
+
+@support.Graph({
+  edges: support.edges(['billing', 'draft']),
+})
+class SupportGraph {
+  @support.Node('classify', {
+    entry: true,
+    ends: support.ends('billing'),
+  })
+  classify() {
+    return support.commandTo('billing', {
+      update: { intent: 'billing' },
+    });
+  }
+
+  @support.Node('billing')
+  handleBilling() {
+    return {
+      intent: 'billing',
+    };
+  }
+
+  @support.Node('draft', {
+    finish: true,
+  })
+  draft() {
+    return {};
+  }
+}
+```
+
+Use typed helpers for same-graph routing. Keep `parentHandoff`,
+`ParentHandoffNode`, and remote `CommandNode` destinations string-based because
+those destinations are outside the local node map.
 
 ## Design Notes
 

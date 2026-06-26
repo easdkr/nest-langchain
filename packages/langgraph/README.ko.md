@@ -233,6 +233,66 @@ export class DecoratedRoutes {
 
 Parent handoff helper는 local `ends`를 자동 추론하지 않습니다. Parent destination은 LangGraph가 검증하는 child graph 밖에 있습니다.
 
+### Typed Graph Builder
+
+Graph가 커지면 `defineTypedLangGraph()`로 local node key를 한 번 선언하고,
+decorator, static edge, `ends`, `commandTo`, `RouteCommandNode`, `sendTo`,
+`fanOut`에서 같은 key를 사용할 수 있습니다. Builder는 metadata가 runtime에
+전달되기 전에 key를 실제 LangGraph node name으로 변환합니다.
+
+```ts
+import { Annotation } from '@langchain/langgraph';
+import { defineTypedLangGraph } from '@nest-langchain/langgraph';
+
+const SupportState = Annotation.Root({
+  intent: Annotation<'billing' | 'general'>(),
+});
+
+const support = defineTypedLangGraph({
+  name: 'support-intake',
+  state: SupportState,
+  nodes: {
+    classify: 'classifyAndRoute',
+    billing: 'handleBilling',
+    draft: 'draftResponse',
+  },
+} as const);
+
+@support.Graph({
+  edges: support.edges(['billing', 'draft']),
+})
+export class SupportGraph {
+  @support.Node('classify', {
+    entry: true,
+    ends: support.ends('billing'),
+  })
+  classify() {
+    return support.commandTo('billing', {
+      update: { intent: 'billing' },
+    });
+  }
+
+  @support.Node('billing')
+  handleBilling() {
+    return {
+      intent: 'billing',
+    };
+  }
+
+  @support.Node('draft', {
+    finish: true,
+  })
+  draft() {
+    return {};
+  }
+}
+```
+
+기존 API가 runtime node name을 요구하면 `support.node('draft')`를 사용하세요.
+Parent handoff와 remote `CommandNode` destination은 local graph node map 밖을
+가리키므로 계속 string 기반입니다. 기존 string 기반 decorator와 helper도
+lower-level API로 그대로 사용할 수 있습니다.
+
 `@nest-langchain/demo-langgraph`는 command routing, `Send` fan-out, interrupt/resume, explicit subgraph transform을 HTTP로 실행합니다.
 
 ## Demo
