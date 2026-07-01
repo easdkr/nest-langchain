@@ -223,32 +223,58 @@ artifacts; runtime/user-specific layouts can use custom storage.
 
 ## Provider Token Example
 
+Each provider module exposes connection info at the module level and lets you
+declare named model presets. Inject a preset by name, or inject the factory to
+create models at runtime.
+
 ```ts
-import { Inject, Injectable, Module } from '@nestjs/common';
+import { Injectable, Module } from '@nestjs/common';
 import { ChatOpenAI } from '@langchain/openai';
 import {
-  NEST_LANGCHAIN_OPENAI_CHAT_MODEL,
+  InjectOpenAIChatModel,
+  InjectOpenAIChatModelFactory,
+  OpenAIChatModelFactory,
   OpenAIProviderModule,
 } from '@nest-langchain/openai';
 
 @Module({
-  imports: [OpenAIProviderModule.forRoot()],
+  imports: [
+    OpenAIProviderModule.forRoot({
+      apiKey: process.env.OPENAI_API_KEY,
+      presets: [
+        { name: 'fast', model: 'gpt-4.1-mini', temperature: 0 },
+        { name: 'creative', model: 'gpt-4.1', temperature: 0.9 },
+      ],
+    }),
+  ],
   providers: [SupportDraftService],
 })
 export class AiModule {}
 
 @Injectable()
 export class SupportDraftService {
+  // inject a named preset
   constructor(
-    @Inject(NEST_LANGCHAIN_OPENAI_CHAT_MODEL)
-    private readonly model: ChatOpenAI,
+    @InjectOpenAIChatModel('fast') private readonly model: ChatOpenAI,
+    @InjectOpenAIChatModelFactory()
+    private readonly factory: OpenAIChatModelFactory,
   ) {}
 
   draft(message: string) {
     return this.model.invoke(message);
   }
+
+  // create a model on the fly with any model id / overrides
+  draftWith(model: string, message: string) {
+    return this.factory.create({ model }).invoke(message);
+  }
 }
 ```
+
+Use `getOpenAIChatModelToken(name)` for dynamic lookup. The same factory +
+presets pattern applies to `@nest-langchain/anthropic`, `gemini`, and `bedrock`
+(each with its own connection fields). `@nest-langchain/openai-compatible` adds
+`InjectOpenAICompatibleModelFactory(name)` alongside its existing named tokens.
 
 ## More Docs
 

@@ -216,32 +216,57 @@ Layout editing은 graph source file을 다시 쓰지 않습니다. 공유 layout
 
 ## Provider Token 예시
 
+각 프로바이더 모듈은 연결정보는 모듈 레벨에 두고, 이름별 모델 프리셋을 선언할 수 있다.
+프리셋을 이름으로 주입하거나, 팩토리를 주입해 런타임에 모델을 생성한다.
+
 ```ts
-import { Inject, Injectable, Module } from '@nestjs/common';
+import { Injectable, Module } from '@nestjs/common';
 import { ChatOpenAI } from '@langchain/openai';
 import {
-  NEST_LANGCHAIN_OPENAI_CHAT_MODEL,
+  InjectOpenAIChatModel,
+  InjectOpenAIChatModelFactory,
+  OpenAIChatModelFactory,
   OpenAIProviderModule,
 } from '@nest-langchain/openai';
 
 @Module({
-  imports: [OpenAIProviderModule.forRoot()],
+  imports: [
+    OpenAIProviderModule.forRoot({
+      apiKey: process.env.OPENAI_API_KEY,
+      presets: [
+        { name: 'fast', model: 'gpt-4.1-mini', temperature: 0 },
+        { name: 'creative', model: 'gpt-4.1', temperature: 0.9 },
+      ],
+    }),
+  ],
   providers: [SupportDraftService],
 })
 export class AiModule {}
 
 @Injectable()
 export class SupportDraftService {
+  // 이름별 프리셋 주입
   constructor(
-    @Inject(NEST_LANGCHAIN_OPENAI_CHAT_MODEL)
-    private readonly model: ChatOpenAI,
+    @InjectOpenAIChatModel('fast') private readonly model: ChatOpenAI,
+    @InjectOpenAIChatModelFactory()
+    private readonly factory: OpenAIChatModelFactory,
   ) {}
 
   draft(message: string) {
     return this.model.invoke(message);
   }
+
+  // 원하는 model id / 오버라이드로 런타임 생성
+  draftWith(model: string, message: string) {
+    return this.factory.create({ model }).invoke(message);
+  }
 }
 ```
+
+동적 조회에는 `getOpenAIChatModelToken(name)`을 사용한다. 동일한 팩토리 + 프리셋 패턴이
+`@nest-langchain/anthropic`, `gemini`, `bedrock`에도 적용된다(각 패키지 연결정보만 상이).
+`@nest-langchain/openai-compatible`은 기존 이름별 토큰과 함께
+`InjectOpenAICompatibleModelFactory(name)`을 추가한다.
 
 ## 추가 문서
 

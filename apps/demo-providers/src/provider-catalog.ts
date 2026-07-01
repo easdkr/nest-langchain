@@ -1,21 +1,21 @@
 import {
-  NEST_LANGCHAIN_ANTHROPIC_CHAT_MODEL,
   AnthropicProviderModule,
+  getAnthropicChatModelToken,
 } from '@nest-langchain/anthropic';
 import {
-  NEST_LANGCHAIN_BEDROCK_CHAT_MODEL,
   BedrockProviderModule,
+  getBedrockChatModelToken,
 } from '@nest-langchain/bedrock';
 import {
-  NEST_LANGCHAIN_GEMINI_CHAT_MODEL,
   GeminiProviderModule,
+  getGeminiChatModelToken,
 } from '@nest-langchain/gemini';
 import {
   getOpenAICompatibleModelToken,
   OpenAICompatibleProviderModule,
 } from '@nest-langchain/openai-compatible';
 import {
-  NEST_LANGCHAIN_OPENAI_CHAT_MODEL,
+  getOpenAIChatModelToken,
   OpenAIProviderModule,
 } from '@nest-langchain/openai';
 import type { DynamicModule } from '@nestjs/common';
@@ -30,7 +30,7 @@ export type ProviderName =
 export interface ProviderCatalogItem {
   name: ProviderName;
   packageName: string;
-  token: string | symbol;
+  token: string;
   requiredEnv: string[];
   description: string;
 }
@@ -39,7 +39,7 @@ export const PROVIDER_CATALOG: ProviderCatalogItem[] = [
   {
     name: 'openai',
     packageName: '@nest-langchain/openai',
-    token: NEST_LANGCHAIN_OPENAI_CHAT_MODEL,
+    token: getOpenAIChatModelToken('default'),
     requiredEnv: ['OPENAI_API_KEY'],
     description: 'OpenAI ChatOpenAI provider token.',
   },
@@ -57,21 +57,21 @@ export const PROVIDER_CATALOG: ProviderCatalogItem[] = [
   {
     name: 'anthropic',
     packageName: '@nest-langchain/anthropic',
-    token: NEST_LANGCHAIN_ANTHROPIC_CHAT_MODEL,
+    token: getAnthropicChatModelToken('default'),
     requiredEnv: ['ANTHROPIC_API_KEY or CLAUDE_API_KEY'],
     description: 'Anthropic ChatAnthropic provider token.',
   },
   {
     name: 'gemini',
     packageName: '@nest-langchain/gemini',
-    token: NEST_LANGCHAIN_GEMINI_CHAT_MODEL,
+    token: getGeminiChatModelToken('default'),
     requiredEnv: ['GOOGLE_API_KEY or GEMINI_API_KEY'],
     description: 'Google Gemini chat model provider token.',
   },
   {
     name: 'bedrock',
     packageName: '@nest-langchain/bedrock',
-    token: NEST_LANGCHAIN_BEDROCK_CHAT_MODEL,
+    token: getBedrockChatModelToken('default'),
     requiredEnv: ['AWS_REGION or AWS_DEFAULT_REGION'],
     description: 'AWS Bedrock converse chat model provider token.',
   },
@@ -81,7 +81,16 @@ export function buildProviderImports(): DynamicModule[] {
   const imports: DynamicModule[] = [];
 
   if (process.env.OPENAI_API_KEY) {
-    imports.push(OpenAIProviderModule.forRoot());
+    imports.push(
+      OpenAIProviderModule.forRoot({
+        presets: [
+          {
+            name: 'default',
+            model: process.env.OPENAI_MODEL ?? 'gpt-4.1-mini',
+          },
+        ],
+      }),
+    );
   }
 
   if (
@@ -93,15 +102,37 @@ export function buildProviderImports(): DynamicModule[] {
   }
 
   if (process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY) {
-    imports.push(AnthropicProviderModule.forRoot());
+    imports.push(
+      AnthropicProviderModule.forRoot({
+        presets: [
+          {
+            name: 'default',
+            model: 'claude-haiku-4-5-20251001',
+          },
+        ],
+      }),
+    );
   }
 
   if (process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY) {
-    imports.push(GeminiProviderModule.forRoot());
+    imports.push(
+      GeminiProviderModule.forRoot({
+        presets: [{ name: 'default', model: 'gemini-2.5-flash' }],
+      }),
+    );
   }
 
   if (process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION) {
-    imports.push(BedrockProviderModule.forRoot());
+    imports.push(
+      BedrockProviderModule.forRoot({
+        presets: [
+          {
+            name: 'default',
+            model: 'anthropic.claude-3-5-sonnet-20240620-v1:0',
+          },
+        ],
+      }),
+    );
   }
 
   return imports;
