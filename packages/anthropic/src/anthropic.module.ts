@@ -35,8 +35,10 @@ export interface AnthropicProviderOptions extends AnthropicConnectionOptions {
   presets?: AnthropicChatModelPreset[];
 }
 
-export interface AnthropicProviderAsyncOptions
-  extends Pick<ModuleMetadata, 'imports'> {
+export interface AnthropicProviderAsyncOptions extends Pick<
+  ModuleMetadata,
+  'imports'
+> {
   inject?: Array<string | symbol | Type<unknown>>;
   useFactory: (
     ...args: unknown[]
@@ -166,7 +168,5 @@ function providerAsToken(provider: Provider): string | symbol {
 function firstNonEmpty(
   ...values: Array<string | undefined>
 ): string | undefined {
-  return values.find(
-    (value) => typeof value === 'string' && value.length > 0,
-  );
+  return values.find((value) => typeof value === 'string' && value.length > 0);
 }

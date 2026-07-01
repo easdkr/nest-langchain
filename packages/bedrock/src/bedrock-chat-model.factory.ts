@@ -7,8 +7,7 @@ export interface BedrockChatModelOverrides {
   [key: string]: unknown; // 그 외 ChatBedrockConverse 생성 필드 passthrough
 }
 
-export interface BedrockChatModelCreateOptions
-  extends BedrockChatModelOverrides {
+export interface BedrockChatModelCreateOptions extends BedrockChatModelOverrides {
   model: string; // 필수 — 라이브러리는 model을 임의로 정하지 않음
 }
 

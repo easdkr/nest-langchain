@@ -37,8 +37,10 @@ export interface BedrockProviderOptions extends BedrockConnectionOptions {
   presets?: BedrockChatModelPreset[];
 }
 
-export interface BedrockProviderAsyncOptions
-  extends Pick<ModuleMetadata, 'imports'> {
+export interface BedrockProviderAsyncOptions extends Pick<
+  ModuleMetadata,
+  'imports'
+> {
   inject?: Array<string | symbol | Type<unknown>>;
   useFactory: (
     ...args: unknown[]
@@ -162,9 +164,7 @@ function providerAsToken(provider: Provider): string | symbol {
 function firstNonEmpty(
   ...values: Array<string | undefined>
 ): string | undefined {
-  return values.find(
-    (value) => typeof value === 'string' && value.length > 0,
-  );
+  return values.find((value) => typeof value === 'string' && value.length > 0);
 }
 
 function readAwsProfileRegion(profileName = 'default'): string | undefined {

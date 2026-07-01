@@ -7,8 +7,7 @@ export interface AnthropicChatModelOverrides {
   [key: string]: unknown; // 그 외 ChatAnthropic 생성 필드 passthrough
 }
 
-export interface AnthropicChatModelCreateOptions
-  extends AnthropicChatModelOverrides {
+export interface AnthropicChatModelCreateOptions extends AnthropicChatModelOverrides {
   model: string; // 필수 — 라이브러리는 model을 임의로 정하지 않음
 }
 

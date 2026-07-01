@@ -19,12 +19,19 @@ vi.mock('@langchain/anthropic', () => ({
 }));
 
 function findProvider(
-  module: ReturnType<typeof AnthropicProviderModule.forRoot> | Record<string, unknown>,
+  module:
+    | ReturnType<typeof AnthropicProviderModule.forRoot>
+    | Record<string, unknown>,
   token: unknown,
 ): { useFactory: (...args: unknown[]) => unknown } {
   const providers = (module as { providers?: unknown[] }).providers ?? [];
   const candidate = providers.find(
-    (entry): entry is { provide: unknown; useFactory: (...args: unknown[]) => unknown } =>
+    (
+      entry,
+    ): entry is {
+      provide: unknown;
+      useFactory: (...args: unknown[]) => unknown;
+    } =>
       typeof entry === 'object' &&
       entry !== null &&
       'provide' in entry &&
@@ -54,7 +61,9 @@ describe('AnthropicProviderModule', () => {
     const factory = findProvider(
       module,
       NEST_LANGCHAIN_ANTHROPIC_CHAT_MODEL_FACTORY,
-    ).useFactory() as { create(options: unknown): { config: Record<string, unknown> } };
+    ).useFactory() as {
+      create(options: unknown): { config: Record<string, unknown> };
+    };
 
     expect(factory.create({ model: 'claude-x', temperature: 0.7 })).toEqual({
       provider: 'anthropic',
@@ -77,7 +86,9 @@ describe('AnthropicProviderModule', () => {
     const factory = findProvider(
       module,
       NEST_LANGCHAIN_ANTHROPIC_CHAT_MODEL_FACTORY,
-    ).useFactory() as { create(options: unknown): { config: Record<string, unknown> } };
+    ).useFactory() as {
+      create(options: unknown): { config: Record<string, unknown> };
+    };
 
     expect(factory.create({ model: 'claude-x' }).config).toMatchObject({
       apiKey: 'anthropic-key',
@@ -95,7 +106,9 @@ describe('AnthropicProviderModule', () => {
     const factory = findProvider(
       module,
       NEST_LANGCHAIN_ANTHROPIC_CHAT_MODEL_FACTORY,
-    ).useFactory() as { create(options: unknown): { config: Record<string, unknown> } };
+    ).useFactory() as {
+      create(options: unknown): { config: Record<string, unknown> };
+    };
 
     expect(factory.create({ model: 'claude-x' }).config).toMatchObject({
       apiKey: 'claude-key',
@@ -138,7 +151,10 @@ describe('AnthropicProviderModule', () => {
     const module = AnthropicProviderModule.forRoot({});
 
     expect(() =>
-      findProvider(module, NEST_LANGCHAIN_ANTHROPIC_CHAT_MODEL_FACTORY).useFactory(),
+      findProvider(
+        module,
+        NEST_LANGCHAIN_ANTHROPIC_CHAT_MODEL_FACTORY,
+      ).useFactory(),
     ).toThrow('Anthropic API key is required.');
   });
 
@@ -170,7 +186,9 @@ describe('AnthropicProviderModule', () => {
       model: 'claude-x',
     });
     expect(
-      findProvider(module, getAnthropicChatModelToken('creative')).useFactory(factory),
+      findProvider(module, getAnthropicChatModelToken('creative')).useFactory(
+        factory,
+      ),
     ).toEqual({
       provider: 'anthropic',
       config: {
@@ -180,7 +198,9 @@ describe('AnthropicProviderModule', () => {
       },
     });
 
-    expect(module.exports).toContain(NEST_LANGCHAIN_ANTHROPIC_CHAT_MODEL_FACTORY);
+    expect(module.exports).toContain(
+      NEST_LANGCHAIN_ANTHROPIC_CHAT_MODEL_FACTORY,
+    );
     expect(module.exports).toContain(getAnthropicChatModelToken('creative'));
   });
 });

@@ -17,12 +17,19 @@ vi.mock('@langchain/openai', () => ({
 }));
 
 function findProvider(
-  module: ReturnType<typeof OpenAICompatibleProviderModule.forRoot> | Record<string, unknown>,
+  module:
+    | ReturnType<typeof OpenAICompatibleProviderModule.forRoot>
+    | Record<string, unknown>,
   token: unknown,
 ): { useFactory: (...args: unknown[]) => unknown } {
   const providers = (module as { providers?: unknown[] }).providers ?? [];
   const candidate = providers.find(
-    (entry): entry is { provide: unknown; useFactory: (...args: unknown[]) => unknown } =>
+    (
+      entry,
+    ): entry is {
+      provide: unknown;
+      useFactory: (...args: unknown[]) => unknown;
+    } =>
       typeof entry === 'object' &&
       entry !== null &&
       'provide' in entry &&

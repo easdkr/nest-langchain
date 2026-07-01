@@ -16,7 +16,9 @@ import {
 } from './tokens';
 
 // 모듈 비공개 — index에서 export 안 함 (async 연결정보 전달용)
-const GEMINI_CONNECTION_OPTIONS = Symbol('nest-langchain:gemini:connection-options');
+const GEMINI_CONNECTION_OPTIONS = Symbol(
+  'nest-langchain:gemini:connection-options',
+);
 
 export interface GeminiConnectionOptions {
   apiKey?: string; // env GOOGLE_API_KEY / GEMINI_API_KEY fallback
@@ -31,8 +33,10 @@ export interface GeminiProviderOptions extends GeminiConnectionOptions {
   presets?: GeminiChatModelPreset[];
 }
 
-export interface GeminiProviderAsyncOptions
-  extends Pick<ModuleMetadata, 'imports'> {
+export interface GeminiProviderAsyncOptions extends Pick<
+  ModuleMetadata,
+  'imports'
+> {
   inject?: Array<string | symbol | Type<unknown>>;
   useFactory: (
     ...args: unknown[]
@@ -105,7 +109,9 @@ export class GeminiProviderModule {
   }
 }
 
-function createFactory(options: GeminiConnectionOptions): GeminiChatModelFactory {
+function createFactory(
+  options: GeminiConnectionOptions,
+): GeminiChatModelFactory {
   const apiKey =
     options.apiKey ?? process.env.GOOGLE_API_KEY ?? process.env.GEMINI_API_KEY;
 

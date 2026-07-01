@@ -16,7 +16,9 @@ import {
 } from './tokens';
 
 // 모듈 비공개 — index에서 export 안 함 (async 연결정보 전달용)
-const OPENAI_CONNECTION_OPTIONS = Symbol('nest-langchain:openai:connection-options');
+const OPENAI_CONNECTION_OPTIONS = Symbol(
+  'nest-langchain:openai:connection-options',
+);
 
 export interface OpenAIConnectionOptions {
   apiKey?: string; // env OPENAI_API_KEY fallback
@@ -31,8 +33,10 @@ export interface OpenAIProviderOptions extends OpenAIConnectionOptions {
   presets?: OpenAIChatModelPreset[];
 }
 
-export interface OpenAIProviderAsyncOptions
-  extends Pick<ModuleMetadata, 'imports'> {
+export interface OpenAIProviderAsyncOptions extends Pick<
+  ModuleMetadata,
+  'imports'
+> {
   inject?: Array<string | symbol | Type<unknown>>;
   useFactory: (
     ...args: unknown[]
@@ -105,7 +109,9 @@ export class OpenAIProviderModule {
   }
 }
 
-function createFactory(options: OpenAIConnectionOptions): OpenAIChatModelFactory {
+function createFactory(
+  options: OpenAIConnectionOptions,
+): OpenAIChatModelFactory {
   const apiKey = options.apiKey ?? process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
@@ -130,7 +136,11 @@ function assertUniquePresetNames(presets?: OpenAIChatModelPreset[]): void {
 }
 
 function providerAsToken(provider: Provider): string | symbol {
-  if (typeof provider === 'object' && provider !== null && 'provide' in provider) {
+  if (
+    typeof provider === 'object' &&
+    provider !== null &&
+    'provide' in provider
+  ) {
     const token = (provider as { provide: string | symbol }).provide;
     if (typeof token === 'string' || typeof token === 'symbol') {
       return token;

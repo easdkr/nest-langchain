@@ -21,5 +21,7 @@ export function InjectBedrockChatModel(name: string): ParameterDecorator {
 }
 
 export function InjectBedrockChatModelFactory(): ParameterDecorator {
-  return Inject(NEST_LANGCHAIN_BEDROCK_CHAT_MODEL_FACTORY) as ParameterDecorator;
+  return Inject(
+    NEST_LANGCHAIN_BEDROCK_CHAT_MODEL_FACTORY,
+  ) as ParameterDecorator;
 }

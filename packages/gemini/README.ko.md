@@ -50,7 +50,8 @@ import {
 @Injectable()
 export class JudgeService {
   constructor(
-    @InjectGeminiChatModel('pro') private readonly model: ChatGoogleGenerativeAI,
+    @InjectGeminiChatModel('pro')
+    private readonly model: ChatGoogleGenerativeAI,
     @InjectGeminiChatModelFactory()
     private readonly factory: GeminiChatModelFactory,
   ) {}

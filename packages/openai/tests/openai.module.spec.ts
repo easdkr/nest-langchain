@@ -17,12 +17,19 @@ vi.mock('@langchain/openai', () => ({
 }));
 
 function findProvider(
-  module: ReturnType<typeof OpenAIProviderModule.forRoot> | Record<string, unknown>,
+  module:
+    | ReturnType<typeof OpenAIProviderModule.forRoot>
+    | Record<string, unknown>,
   token: unknown,
 ): { useFactory: (...args: unknown[]) => unknown } {
   const providers = (module as { providers?: unknown[] }).providers ?? [];
   const candidate = providers.find(
-    (entry): entry is { provide: unknown; useFactory: (...args: unknown[]) => unknown } =>
+    (
+      entry,
+    ): entry is {
+      provide: unknown;
+      useFactory: (...args: unknown[]) => unknown;
+    } =>
       typeof entry === 'object' &&
       entry !== null &&
       'provide' in entry &&
@@ -50,7 +57,9 @@ describe('OpenAIProviderModule', () => {
     const factory = findProvider(
       module,
       NEST_LANGCHAIN_OPENAI_CHAT_MODEL_FACTORY,
-    ).useFactory() as { create(options: unknown): { config: Record<string, unknown> } };
+    ).useFactory() as {
+      create(options: unknown): { config: Record<string, unknown> };
+    };
 
     expect(factory.create({ model: 'gpt-x', temperature: 0.7 })).toEqual({
       provider: 'openai',
@@ -73,9 +82,7 @@ describe('OpenAIProviderModule', () => {
     const token = getOpenAIChatModelToken('creative');
 
     expect(module.exports).toContain(token);
-    expect(
-      findProvider(module, token).useFactory(),
-    ).toEqual({
+    expect(findProvider(module, token).useFactory()).toEqual({
       provider: 'openai',
       config: {
         apiKey: 'openai-key',
@@ -101,7 +108,10 @@ describe('OpenAIProviderModule', () => {
     const module = OpenAIProviderModule.forRoot({});
 
     expect(() =>
-      findProvider(module, NEST_LANGCHAIN_OPENAI_CHAT_MODEL_FACTORY).useFactory(),
+      findProvider(
+        module,
+        NEST_LANGCHAIN_OPENAI_CHAT_MODEL_FACTORY,
+      ).useFactory(),
     ).toThrow('OpenAI API key is required.');
   });
 
@@ -134,7 +144,9 @@ describe('OpenAIProviderModule', () => {
       model: 'gpt-x',
     });
     expect(
-      findProvider(module, getOpenAIChatModelToken('creative')).useFactory(factory),
+      findProvider(module, getOpenAIChatModelToken('creative')).useFactory(
+        factory,
+      ),
     ).toEqual({
       provider: 'openai',
       config: {

@@ -196,7 +196,9 @@ function buildFactory(
         : {}),
     },
     {
-      ...(options.temperature != null ? { temperature: options.temperature } : {}),
+      ...(options.temperature != null
+        ? { temperature: options.temperature }
+        : {}),
       ...(options.modelKwargs ? { modelKwargs: options.modelKwargs } : {}),
     },
   );

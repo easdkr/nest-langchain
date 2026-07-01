@@ -1,9 +1,9 @@
 ---
-"@nest-langchain/openai": minor
-"@nest-langchain/anthropic": minor
-"@nest-langchain/gemini": minor
-"@nest-langchain/bedrock": minor
-"@nest-langchain/openai-compatible": minor
+'@nest-langchain/openai': minor
+'@nest-langchain/anthropic': minor
+'@nest-langchain/gemini': minor
+'@nest-langchain/bedrock': minor
+'@nest-langchain/openai-compatible': minor
 ---
 
 # Provider model DI: runtime factory + named presets
@@ -22,6 +22,7 @@ move `model` + `temperature` to the call site.
 ### Migrate to one of:
 
 1. **Named preset** — declare a model once, inject by name:
+
    ```ts
    OpenAIProviderModule.forRoot({
      apiKey: process.env.OPENAI_API_KEY,
@@ -33,6 +34,7 @@ move `model` + `temperature` to the call site.
    // or dynamic lookup
    getOpenAIChatModelToken('fast');
    ```
+
 2. **Runtime factory** — inject the factory and build models per call. `model`
    is **required** (no library default):
    ```ts

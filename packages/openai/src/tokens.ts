@@ -21,7 +21,5 @@ export function InjectOpenAIChatModel(name: string): ParameterDecorator {
 }
 
 export function InjectOpenAIChatModelFactory(): ParameterDecorator {
-  return Inject(
-    NEST_LANGCHAIN_OPENAI_CHAT_MODEL_FACTORY,
-  ) as ParameterDecorator;
+  return Inject(NEST_LANGCHAIN_OPENAI_CHAT_MODEL_FACTORY) as ParameterDecorator;
 }

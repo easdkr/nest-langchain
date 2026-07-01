@@ -22,12 +22,19 @@ vi.mock('@langchain/aws', () => ({
 }));
 
 function findProvider(
-  module: ReturnType<typeof BedrockProviderModule.forRoot> | Record<string, unknown>,
+  module:
+    | ReturnType<typeof BedrockProviderModule.forRoot>
+    | Record<string, unknown>,
   token: unknown,
 ): { useFactory: (...args: unknown[]) => unknown } {
   const providers = (module as { providers?: unknown[] }).providers ?? [];
   const candidate = providers.find(
-    (entry): entry is { provide: unknown; useFactory: (...args: unknown[]) => unknown } =>
+    (
+      entry,
+    ): entry is {
+      provide: unknown;
+      useFactory: (...args: unknown[]) => unknown;
+    } =>
       typeof entry === 'object' &&
       entry !== null &&
       'provide' in entry &&
@@ -58,7 +65,9 @@ describe('BedrockProviderModule', () => {
     const factory = findProvider(
       module,
       NEST_LANGCHAIN_BEDROCK_CHAT_MODEL_FACTORY,
-    ).useFactory() as { create(options: unknown): { config: Record<string, unknown> } };
+    ).useFactory() as {
+      create(options: unknown): { config: Record<string, unknown> };
+    };
 
     expect(
       factory.create({ model: 'anthropic.claude-test-v1:0', temperature: 0.7 }),
@@ -115,7 +124,10 @@ describe('BedrockProviderModule', () => {
     const module = BedrockProviderModule.forRoot({});
 
     expect(() =>
-      findProvider(module, NEST_LANGCHAIN_BEDROCK_CHAT_MODEL_FACTORY).useFactory(),
+      findProvider(
+        module,
+        NEST_LANGCHAIN_BEDROCK_CHAT_MODEL_FACTORY,
+      ).useFactory(),
     ).toThrow('AWS region is required.');
   });
 
@@ -190,7 +202,9 @@ describe('BedrockProviderModule', () => {
       region: 'us-east-1',
     });
     expect(
-      findProvider(module, getBedrockChatModelToken('creative')).useFactory(factory),
+      findProvider(module, getBedrockChatModelToken('creative')).useFactory(
+        factory,
+      ),
     ).toEqual({
       provider: 'bedrock',
       config: {

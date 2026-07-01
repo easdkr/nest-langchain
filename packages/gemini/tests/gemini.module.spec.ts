@@ -19,12 +19,19 @@ vi.mock('@langchain/google-genai', () => ({
 }));
 
 function findProvider(
-  module: ReturnType<typeof GeminiProviderModule.forRoot> | Record<string, unknown>,
+  module:
+    | ReturnType<typeof GeminiProviderModule.forRoot>
+    | Record<string, unknown>,
   token: unknown,
 ): { useFactory: (...args: unknown[]) => unknown } {
   const providers = (module as { providers?: unknown[] }).providers ?? [];
   const candidate = providers.find(
-    (entry): entry is { provide: unknown; useFactory: (...args: unknown[]) => unknown } =>
+    (
+      entry,
+    ): entry is {
+      provide: unknown;
+      useFactory: (...args: unknown[]) => unknown;
+    } =>
       typeof entry === 'object' &&
       entry !== null &&
       'provide' in entry &&
@@ -53,7 +60,9 @@ describe('GeminiProviderModule', () => {
     const factory = findProvider(
       module,
       NEST_LANGCHAIN_GEMINI_CHAT_MODEL_FACTORY,
-    ).useFactory() as { create(options: unknown): { config: Record<string, unknown> } };
+    ).useFactory() as {
+      create(options: unknown): { config: Record<string, unknown> };
+    };
 
     expect(factory.create({ model: 'gemini-x', temperature: 0.7 })).toEqual({
       provider: 'gemini',
@@ -102,7 +111,10 @@ describe('GeminiProviderModule', () => {
     const module = GeminiProviderModule.forRoot({});
 
     expect(() =>
-      findProvider(module, NEST_LANGCHAIN_GEMINI_CHAT_MODEL_FACTORY).useFactory(),
+      findProvider(
+        module,
+        NEST_LANGCHAIN_GEMINI_CHAT_MODEL_FACTORY,
+      ).useFactory(),
     ).toThrow('Gemini API key is required.');
   });
 
@@ -134,7 +146,9 @@ describe('GeminiProviderModule', () => {
       model: 'gemini-x',
     });
     expect(
-      findProvider(module, getGeminiChatModelToken('creative')).useFactory(factory),
+      findProvider(module, getGeminiChatModelToken('creative')).useFactory(
+        factory,
+      ),
     ).toEqual({
       provider: 'gemini',
       config: {

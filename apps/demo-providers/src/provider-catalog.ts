@@ -84,7 +84,10 @@ export function buildProviderImports(): DynamicModule[] {
     imports.push(
       OpenAIProviderModule.forRoot({
         presets: [
-          { name: 'default', model: process.env.OPENAI_MODEL ?? 'gpt-4.1-mini' },
+          {
+            name: 'default',
+            model: process.env.OPENAI_MODEL ?? 'gpt-4.1-mini',
+          },
         ],
       }),
     );
