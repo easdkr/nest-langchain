@@ -1,6 +1,6 @@
 {
   "name": "@nest-langchain/openai-compatible",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "OpenAI-compatible provider tokens and model factory wiring for Nest LangChain.",
   "license": "MIT",
   "author": "easdkr",
