@@ -4,8 +4,10 @@
 
 Gemini chat model provider for NestJS dependency injection.
 
-This package creates a `ChatGoogleGenerativeAI` instance from
-`@langchain/google-genai` and exports it through a stable Nest token.
+This package wires a `ChatGoogleGenerativeAI` instance from
+`@langchain/google-genai` into NestJS dependency injection. Connection info
+(`apiKey`) lives at the module level; `model` and `temperature` are chosen per
+preset or per call via a factory — the library no longer picks a default model.
 
 ## Install
 
@@ -23,8 +25,10 @@ import { GeminiProviderModule } from '@nest-langchain/gemini';
   imports: [
     GeminiProviderModule.forRoot({
       apiKey: process.env.GEMINI_API_KEY,
-      model: 'gemini-2.5-flash',
-      temperature: 0,
+      presets: [
+        { name: 'flash', model: 'gemini-2.5-flash', temperature: 0 },
+        { name: 'pro', model: 'gemini-2.5-pro', temperature: 0.3 },
+      ],
     }),
   ],
 })
@@ -36,23 +40,60 @@ When `apiKey` is omitted, the module reads `GOOGLE_API_KEY` and then
 
 ## Injection
 
+Inject a named preset, or inject the factory for per-call model creation. `model`
+is always required — the library never assumes one:
+
 ```ts
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
-import { NEST_LANGCHAIN_GEMINI_CHAT_MODEL } from '@nest-langchain/gemini';
+import {
+  InjectGeminiChatModel,
+  InjectGeminiChatModelFactory,
+  GeminiChatModelFactory,
+} from '@nest-langchain/gemini';
 
 @Injectable()
 export class JudgeService {
   constructor(
-    @Inject(NEST_LANGCHAIN_GEMINI_CHAT_MODEL)
-    private readonly model: ChatGoogleGenerativeAI,
+    @InjectGeminiChatModel('pro') private readonly model: ChatGoogleGenerativeAI,
+    @InjectGeminiChatModelFactory()
+    private readonly factory: GeminiChatModelFactory,
   ) {}
 
-  async decide(prompt: string) {
+  decide(prompt: string) {
     return this.model.invoke(prompt);
+  }
+
+  decideWith(model: string, prompt: string) {
+    return this.factory.create({ model }).invoke(prompt);
   }
 }
 ```
+
+For dynamic lookup use `getGeminiChatModelToken(name)`.
+
+## Async Connection Info
+
+Use `forRootAsync` when the API key comes from `ConfigService` or a secrets
+manager. Presets stay static:
+
+```ts
+GeminiProviderModule.forRootAsync({
+  imports: [ConfigModule],
+  inject: [ConfigService],
+  useFactory: (config: ConfigService) => ({
+    apiKey: config.get('GEMINI_API_KEY'),
+  }),
+  presets: [{ name: 'flash', model: 'gemini-2.5-flash' }],
+});
+```
+
+## Migration (v0.1 → v0.2)
+
+`NEST_LANGCHAIN_GEMINI_CHAT_MODEL` and the module-level `model` /
+`temperature` options were **removed**. Replace
+`@Inject(NEST_LANGCHAIN_GEMINI_CHAT_MODEL)` with a named preset, or inject the
+factory with `@InjectGeminiChatModelFactory()` and call `.create({ model })`.
 
 ## Demo
 

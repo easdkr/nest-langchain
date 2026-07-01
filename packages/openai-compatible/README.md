@@ -76,6 +76,36 @@ export class ProductWorkflow {
 `InjectOpenAICompatibleModel()` is a constructor-parameter helper. For dynamic
 lookup, use `getOpenAICompatibleModelToken(name)`.
 
+## Runtime Factory
+
+Each named entry also exposes a factory. Inject it to create models with
+per-call model ids / overrides while inheriting the entry's connection info
+and defaults (`temperature`, `modelKwargs`, `timeout`, `maxRetries`):
+
+```ts
+import { Injectable } from '@nestjs/common';
+import { ChatOpenAI } from '@langchain/openai';
+import {
+  InjectOpenAICompatibleModelFactory,
+  OpenAICompatibleChatModelFactory,
+} from '@nest-langchain/openai-compatible';
+
+@Injectable()
+export class ProductWorkflow {
+  constructor(
+    @InjectOpenAICompatibleModelFactory('minimax')
+    private readonly factory: OpenAICompatibleChatModelFactory,
+  ) {}
+
+  run(model: string, prompt: string) {
+    return this.factory.create({ model, temperature: 0.5 }).invoke(prompt);
+  }
+}
+```
+
+For dynamic lookup use `getOpenAICompatibleModelFactoryToken(name)`. `model` is
+required on `create()`.
+
 ## Environment Fallbacks
 
 For `name: 'minimax'`, the module checks both long and short env names:

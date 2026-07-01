@@ -1,6 +1,6 @@
 import type { DynamicModule } from '@nestjs/common';
 import {
-  NEST_LANGCHAIN_OPENAI_CHAT_MODEL,
+  getOpenAIChatModelToken,
   OpenAIProviderModule,
 } from '@nest-langchain/openai';
 import {
@@ -8,14 +8,23 @@ import {
   OpenAICompatibleProviderModule,
 } from '@nest-langchain/openai-compatible';
 
-export const OPENAI_MODEL_TOKEN = NEST_LANGCHAIN_OPENAI_CHAT_MODEL;
+export const OPENAI_MODEL_TOKEN = getOpenAIChatModelToken('default');
 export const OPENAI_COMPATIBLE_MODEL_TOKEN = getOpenAICompatibleModelToken();
 
 export function buildModelProviderImports(): DynamicModule[] {
   const imports: DynamicModule[] = [];
 
   if (process.env.OPENAI_API_KEY) {
-    imports.push(OpenAIProviderModule.forRoot());
+    imports.push(
+      OpenAIProviderModule.forRoot({
+        presets: [
+          {
+            name: 'default',
+            model: process.env.OPENAI_MODEL ?? 'gpt-4.1-mini',
+          },
+        ],
+      }),
+    );
   }
 
   if (

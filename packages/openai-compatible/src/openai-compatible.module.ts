@@ -3,6 +3,7 @@ import { ChatOpenAI } from '@langchain/openai';
 
 import {
   DEFAULT_OPENAI_COMPATIBLE_MODEL_NAME,
+  getOpenAICompatibleModelFactoryToken,
   getOpenAICompatibleModelToken,
 } from './tokens';
 
@@ -37,13 +38,66 @@ export type OpenAICompatibleProviderModuleOptions =
   | OpenAICompatibleChatModelOptions
   | OpenAICompatibleProviderOptions;
 
+/**
+ * 런타임 팩토리 — 이름별 연결정보(apiKey/baseURL/configuration)와 기본값
+ * (temperature/modelKwargs/timeout/maxRetries)를 보유한다.
+ * `create({ model, ... })`로 호출 시점에 model과 오버라이드를 받아
+ * ChatOpenAI 인스턴스를 생성한다.
+ */
+export class OpenAICompatibleChatModelFactory {
+  constructor(
+    private readonly conn: {
+      apiKey: string;
+      configuration: OpenAICompatibleClientConfiguration;
+      timeout?: number;
+      maxRetries?: number;
+    },
+    private readonly defaults: {
+      temperature?: number;
+      modelKwargs?: Record<string, unknown>;
+    },
+  ) {}
+
+  create(options: {
+    model: string;
+    temperature?: number;
+    modelKwargs?: Record<string, unknown>;
+    [key: string]: unknown;
+  }): ChatOpenAI {
+    const { model, temperature, modelKwargs, ...rest } = options;
+    const config: Record<string, unknown> = {
+      apiKey: this.conn.apiKey,
+      model,
+      temperature: temperature ?? this.defaults.temperature ?? 0,
+      configuration: this.conn.configuration,
+      ...rest,
+    };
+
+    if (this.conn.timeout != null) {
+      config.timeout = this.conn.timeout;
+    }
+
+    if (this.conn.maxRetries != null) {
+      config.maxRetries = this.conn.maxRetries;
+    }
+
+    const resolvedModelKwargs = modelKwargs ?? this.defaults.modelKwargs;
+
+    if (resolvedModelKwargs) {
+      config.modelKwargs = resolvedModelKwargs;
+    }
+
+    return new (ChatOpenAI as ChatOpenAIConstructor)(config);
+  }
+}
+
 @Module({})
 export class OpenAICompatibleProviderModule {
   static forRoot(
     options: OpenAICompatibleProviderModuleOptions = {},
   ): DynamicModule {
     const modelOptions = normalizeModuleOptions(options);
-    const providers = modelOptions.map(createModelProvider);
+    const providers = modelOptions.flatMap(createModelProviders);
 
     return {
       module: OpenAICompatibleProviderModule,
@@ -57,7 +111,7 @@ type ChatOpenAIConstructor = new (
   fields: Record<string, unknown>,
 ) => InstanceType<typeof ChatOpenAI>;
 
-type ModelProvider = Provider & {
+type NamedProvider = Provider & {
   provide: string;
 };
 
@@ -91,41 +145,61 @@ function hasModelList(
   return 'models' in options && Array.isArray(options.models);
 }
 
-function createModelProvider(
+/**
+ * 이름별로 2개 provider를 등록한다:
+ *   1. 인스턴스 토큰(getOpenAICompatibleModelToken) — 기존 동작 유지, factory.create()経由
+ *   2. 팩토리 토큰(getOpenAICompatibleModelFactoryToken) — 신규(추가형)
+ */
+function createModelProviders(
   options: OpenAICompatibleChatModelOptions,
-): ModelProvider {
+): NamedProvider[] {
   const name = normalizeName(options.name);
-  const provide = getOpenAICompatibleModelToken(name);
+  const instanceToken = getOpenAICompatibleModelToken(name);
+  const factoryToken = getOpenAICompatibleModelFactoryToken(name);
 
-  return {
-    provide,
+  const instanceProvider: NamedProvider = {
+    provide: instanceToken,
     useFactory: () => {
-      const apiKey = resolveApiKey(name, options);
-      const baseURL = resolveBaseURL(name, options);
-      const model = resolveModel(name, options);
-
-      const config: Record<string, unknown> = {
-        apiKey,
-        model,
-        temperature: options.temperature ?? 0,
-        configuration: resolveClientConfiguration(baseURL, options),
-      };
-
-      if (typeof options.timeout === 'number') {
-        config.timeout = options.timeout;
-      }
-
-      if (typeof options.maxRetries === 'number') {
-        config.maxRetries = options.maxRetries;
-      }
-
-      if (options.modelKwargs) {
-        config.modelKwargs = options.modelKwargs;
-      }
-
-      return new (ChatOpenAI as ChatOpenAIConstructor)(config);
+      const factory = buildFactory(name, options);
+      return factory.create({
+        model: resolveModel(name, options),
+        temperature: options.temperature,
+        modelKwargs: options.modelKwargs,
+      });
     },
   };
+
+  const factoryProvider: NamedProvider = {
+    provide: factoryToken,
+    useFactory: () => buildFactory(name, options),
+  };
+
+  return [instanceProvider, factoryProvider];
+}
+
+function buildFactory(
+  name: string,
+  options: OpenAICompatibleChatModelOptions,
+): OpenAICompatibleChatModelFactory {
+  const apiKey = resolveApiKey(name, options);
+  const baseURL = resolveBaseURL(name, options);
+
+  return new OpenAICompatibleChatModelFactory(
+    {
+      apiKey,
+      configuration: resolveClientConfiguration(baseURL, options),
+      ...(typeof options.timeout === 'number'
+        ? { timeout: options.timeout }
+        : {}),
+      ...(typeof options.maxRetries === 'number'
+        ? { maxRetries: options.maxRetries }
+        : {}),
+    },
+    {
+      ...(options.temperature != null ? { temperature: options.temperature } : {}),
+      ...(options.modelKwargs ? { modelKwargs: options.modelKwargs } : {}),
+    },
+  );
 }
 
 function resolveApiKey(

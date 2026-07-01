@@ -73,6 +73,33 @@ export class ProductWorkflow {
 
 `InjectOpenAICompatibleModel()`은 constructor parameter helper입니다. Dynamic lookup에는 `getOpenAICompatibleModelToken(name)`을 사용합니다.
 
+## Runtime Factory
+
+각 이름별 엔트리는 팩토리도 노출합니다. 팩토리를 주입하면 엔트리의 연결정보와 기본값(`temperature`, `modelKwargs`, `timeout`, `maxRetries`)을 상속하면서 호출마다 model id / 오버라이드를 바꿔 모델을 생성할 수 있습니다:
+
+```ts
+import { Injectable } from '@nestjs/common';
+import { ChatOpenAI } from '@langchain/openai';
+import {
+  InjectOpenAICompatibleModelFactory,
+  OpenAICompatibleChatModelFactory,
+} from '@nest-langchain/openai-compatible';
+
+@Injectable()
+export class ProductWorkflow {
+  constructor(
+    @InjectOpenAICompatibleModelFactory('minimax')
+    private readonly factory: OpenAICompatibleChatModelFactory,
+  ) {}
+
+  run(model: string, prompt: string) {
+    return this.factory.create({ model, temperature: 0.5 }).invoke(prompt);
+  }
+}
+```
+
+Dynamic lookup에는 `getOpenAICompatibleModelFactoryToken(name)`을 사용합니다. `create()`에는 `model`이 필수입니다.
+
 ## Environment Fallbacks
 
 `name: 'minimax'`에서는 긴 env name과 짧은 env name을 모두 확인합니다.
