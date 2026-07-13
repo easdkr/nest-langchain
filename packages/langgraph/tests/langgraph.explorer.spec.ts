@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, Module } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
 import { Annotation, StateGraph } from '@langchain/langgraph';
@@ -8,6 +8,7 @@ import { LangChainRegistry } from '@nest-langchain/core';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ConditionalEdge, GraphNode, LangGraph } from '../src/decorators';
+import { LANG_GRAPH_MODULE_OPTIONS } from '../src/constants';
 import { LangGraphExplorer } from '../src/langgraph.explorer';
 import { LangGraphModule } from '../src/langgraph.module';
 import { LangGraphRunner } from '../src/langgraph.runner';
@@ -325,6 +326,80 @@ describe('LangGraphExplorer', () => {
 
     expect(compile).toHaveBeenCalledWith({
       checkpointer,
+    });
+
+    await moduleRef.close();
+  });
+
+  it('resolves checkpointers from forRootAsync useFactory', async () => {
+    const checkpointer = { marker: 'async-checkpointer' };
+    const compile = vi.spyOn(StateGraph.prototype, 'compile').mockReturnValue({
+      invoke: async (input: unknown) => input,
+    } as never);
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [
+        LangGraphModule.forRootAsync({
+          useFactory: async () => ({ checkpointer }),
+        }),
+      ],
+      providers: [DemoGraph, DemoGreeter],
+    }).compile();
+
+    await moduleRef.init();
+
+    expect(compile).toHaveBeenCalledWith({ checkpointer });
+
+    await moduleRef.close();
+  });
+
+  it('injects dependencies into forRootAsync useFactory', async () => {
+    const checkpointer = { marker: 'injected-checkpointer' };
+    const compile = vi.spyOn(StateGraph.prototype, 'compile').mockReturnValue({
+      invoke: async (input: unknown) => input,
+    } as never);
+    const factory = vi.fn().mockResolvedValue({ checkpointer });
+
+    @Module({
+      providers: [
+        { provide: 'DATABASE_URL', useValue: 'postgres://localhost/demo' },
+      ],
+      exports: ['DATABASE_URL'],
+    })
+    class DbConfigModule {}
+
+    const moduleRef = await Test.createTestingModule({
+      imports: [
+        LangGraphModule.forRootAsync({
+          imports: [DbConfigModule],
+          inject: ['DATABASE_URL'],
+          useFactory: factory,
+        }),
+      ],
+      providers: [DemoGraph, DemoGreeter],
+    }).compile();
+
+    await moduleRef.init();
+
+    expect(factory).toHaveBeenCalledWith('postgres://localhost/demo');
+    expect(compile).toHaveBeenCalledWith({ checkpointer });
+
+    await moduleRef.close();
+  });
+
+  it('keeps top-level global configuration in resolved async options', async () => {
+    const dynamicModule = LangGraphModule.forRootAsync({
+      global: true,
+      useFactory: async () => ({}),
+    });
+    const moduleRef = await Test.createTestingModule({
+      imports: [dynamicModule],
+    }).compile();
+
+    expect(dynamicModule.global).toBe(true);
+    expect(moduleRef.get(LANG_GRAPH_MODULE_OPTIONS)).toMatchObject({
+      global: true,
+      autoDiscoverGraphs: true,
     });
 
     await moduleRef.close();
