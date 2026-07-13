@@ -55,10 +55,12 @@ jobs:
           node-version: '24'
           cache: pnpm
 
-      # OIDC trusted publishing requires npm >= 11.5.1; keep this explicit
-      # so the workflow does not depend on the Node image's bundled npm.
+      # OIDC trusted publishing requires npm >= 11.5.1. Pin npm 11 because
+      # pnpm 10's publish flow passes --no-git-checks, which npm 12 rejects.
       - name: Upgrade npm
-        run: npm install -g npm@latest
+        run: |
+          npm install -g npm@11.18.0
+          npm --version
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
