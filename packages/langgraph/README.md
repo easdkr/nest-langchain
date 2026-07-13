@@ -34,6 +34,44 @@ export class AppModule {}
 
 `checkpointer` is passed to LangGraph `compile({ checkpointer })`.
 
+### Async Checkpointer
+
+Production checkpointers (`PostgresSaver`, `MongoDBSaver`, `RedisSaver`, ...)
+need async setup before they can be used. Use `forRootAsync` to resolve the
+checkpointer (and any other module options) from a factory that can `await`
+connection setup and inject NestJS dependencies such as `ConfigService`.
+
+```ts
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { PostgresSaver } from '@langchain/langgraph-checkpoint-postgres';
+import { LangGraphModule } from '@nest-langchain/langgraph';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    LangGraphModule.forRootAsync({
+      global: true,
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => {
+        const url = config.getOrThrow('DATABASE_URL');
+        const checkpointer = await PostgresSaver.fromConnString(url);
+        await checkpointer.setup();
+        return { checkpointer };
+      },
+    }),
+  ],
+  providers: [SupportGraph],
+})
+export class AppModule {}
+```
+
+The factory returns `LangGraphModuleFactoryOptions` (`autoDiscoverGraphs` and
+`checkpointer`). Configure `global` on `forRootAsync` itself because NestJS
+module scope is static. When the checkpointer depends on another module's
+providers, list that module in `imports` (or make it global) so NestJS can
+inject its tokens.
+
 ## Define A Graph
 
 ```ts

@@ -32,6 +32,44 @@ export class AppModule {}
 
 `checkpointer`는 LangGraph `compile({ checkpointer })`로 전달됩니다.
 
+### Async Checkpointer
+
+프로덕션 checkpointer(`PostgresSaver`, `MongoDBSaver`, `RedisSaver` 등)는
+사용 전에 비동기 setup이 필요합니다. `forRootAsync`를 사용하면 연결 setup을
+`await`하고 `ConfigService` 같은 NestJS 의존성을 주입받을 수 있는 factory에서
+checkpointer와 기타 모듈 옵션을 해석합니다.
+
+```ts
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { PostgresSaver } from '@langchain/langgraph-checkpoint-postgres';
+import { LangGraphModule } from '@nest-langchain/langgraph';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    LangGraphModule.forRootAsync({
+      global: true,
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => {
+        const url = config.getOrThrow('DATABASE_URL');
+        const checkpointer = await PostgresSaver.fromConnString(url);
+        await checkpointer.setup();
+        return { checkpointer };
+      },
+    }),
+  ],
+  providers: [SupportGraph],
+})
+export class AppModule {}
+```
+
+factory는 `LangGraphModuleFactoryOptions`(`autoDiscoverGraphs`,
+`checkpointer`)을 반환합니다. NestJS 모듈 범위는 정적이므로 `global`은
+`forRootAsync` 자체에 설정합니다. checkpointer가 다른 모듈의 provider에
+의존할 때는 해당 모듈을 `imports`에 추가하거나 global로 만들어야 NestJS가
+토큰을 주입할 수 있습니다.
+
 ## Define A Graph
 
 ```ts

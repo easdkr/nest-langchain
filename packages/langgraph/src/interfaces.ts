@@ -1,4 +1,10 @@
 import type { RunnableEdge } from '@nest-langchain/core';
+import type {
+  Abstract,
+  DynamicModule,
+  ForwardReference,
+  Type,
+} from '@nestjs/common';
 
 export type LangGraphEdge = RunnableEdge;
 
@@ -39,6 +45,26 @@ export interface LangGraphModuleOptions {
   global?: boolean;
   autoDiscoverGraphs?: boolean;
   checkpointer?: LangGraphCheckpointer;
+}
+
+export type LangGraphModuleFactoryOptions = Omit<
+  LangGraphModuleOptions,
+  'global'
+> & {
+  global?: never;
+};
+
+export interface LangGraphModuleAsyncOptions {
+  global?: boolean;
+  imports?: Array<
+    Type<unknown> | DynamicModule | Promise<DynamicModule> | ForwardReference
+  >;
+  inject?: Array<
+    Type<unknown> | string | symbol | Abstract<unknown> | Function
+  >;
+  useFactory: (
+    ...args: any[]
+  ) => Promise<LangGraphModuleFactoryOptions> | LangGraphModuleFactoryOptions;
 }
 
 export interface DiscoveredGraphMetadata {

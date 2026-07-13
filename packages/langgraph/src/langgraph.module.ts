@@ -1,4 +1,4 @@
-import { DynamicModule, Module } from '@nestjs/common';
+import { type DynamicModule, type Provider, Module } from '@nestjs/common';
 import { DiscoveryModule } from '@nestjs/core';
 import { LangChainModule } from '@nest-langchain/core';
 
@@ -6,33 +6,70 @@ import {
   LANG_GRAPH_CHECKPOINTER,
   LANG_GRAPH_MODULE_OPTIONS,
 } from './constants';
-import type { LangGraphModuleOptions } from './interfaces';
+import type {
+  LangGraphModuleAsyncOptions,
+  LangGraphModuleOptions,
+} from './interfaces';
 import { LangGraphExplorer } from './langgraph.explorer';
 import { LangGraphRunner } from './langgraph.runner';
 
 @Module({})
 export class LangGraphModule {
   static forRoot(options: LangGraphModuleOptions = {}): DynamicModule {
-    return {
-      module: LangGraphModule,
+    const resolved: LangGraphModuleOptions = {
+      autoDiscoverGraphs: true,
+      ...options,
+    };
+
+    return this.buildDynamicModule({
+      global: resolved.global ?? false,
+      imports: [],
+      optionsProvider: {
+        provide: LANG_GRAPH_MODULE_OPTIONS,
+        useValue: resolved,
+      },
+    });
+  }
+
+  static forRootAsync(options: LangGraphModuleAsyncOptions): DynamicModule {
+    return this.buildDynamicModule({
       global: options.global ?? false,
-      imports: [
-        DiscoveryModule,
-        LangChainModule.forRoot({
+      imports: options.imports ?? [],
+      optionsProvider: {
+        provide: LANG_GRAPH_MODULE_OPTIONS,
+        inject: options.inject ?? [],
+        useFactory: async (...args: unknown[]) => ({
+          autoDiscoverGraphs: true,
+          ...(await options.useFactory(...args)),
           global: options.global,
         }),
+      },
+    });
+  }
+
+  private static buildDynamicModule({
+    global,
+    imports,
+    optionsProvider,
+  }: {
+    global: boolean;
+    imports: NonNullable<DynamicModule['imports']>;
+    optionsProvider: Provider;
+  }): DynamicModule {
+    return {
+      module: LangGraphModule,
+      global,
+      imports: [
+        DiscoveryModule,
+        LangChainModule.forRoot({ global }),
+        ...imports,
       ],
       providers: [
-        {
-          provide: LANG_GRAPH_MODULE_OPTIONS,
-          useValue: {
-            autoDiscoverGraphs: true,
-            ...options,
-          },
-        },
+        optionsProvider,
         {
           provide: LANG_GRAPH_CHECKPOINTER,
-          useValue: options.checkpointer,
+          inject: [LANG_GRAPH_MODULE_OPTIONS],
+          useFactory: (opts: LangGraphModuleOptions) => opts.checkpointer,
         },
         LangGraphExplorer,
         LangGraphRunner,
